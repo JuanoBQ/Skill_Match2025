@@ -3,6 +3,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_cors import cross_origin
+
 
 routes = Blueprint('routes', __name__)
 api = Blueprint('api', __name__)

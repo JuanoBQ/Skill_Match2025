@@ -38,6 +38,10 @@ bcrypt = Bcrypt(app)
 # Flask-CORS
 CORS(app)
 
+
+
+
+
 # Setup JWT
 jwt = JWTManager(app)
 
