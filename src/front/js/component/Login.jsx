@@ -1,23 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { Context } from '../store/appContext';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const { actions } = useContext(Context);
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
 
     if (!email || !password) {
       setError('Por favor, completa todos los campos.');
       return;
     }
 
-    console.log('Formulario enviado:', { email, password });
+    const response = await actions.login(email, password);
 
-    history.push('/home');
+    if (response.success) {
+      navigate('/home'); // redirige al home o a donde necesites
+    } else {
+      setError(response.error); // muestra mensaje del backend
+    }
   };
 
   return (
