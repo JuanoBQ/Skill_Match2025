@@ -20,9 +20,15 @@ def register():
     email = data.get('email')
     password = data.get('password')
     role = data.get('role')
+    first_name=data.get('first_name')
+    last_name=data.get('last_name')
 
     if not email or not password or role not in ['freelancer', 'employer']:
         return jsonify({"msg": "Rellena todos los campos"}), 400
+    if not first_name or not last_name:
+        return jsonify({"msg": "Nombres y apellidos son obligatorios"}), 400
+
+    
 
     user = User.query.filter_by(email=email).first()
 
@@ -31,7 +37,7 @@ def register():
 
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    new_user = User(email=email, password=password_hash, role=role)
+    new_user = User(email=email, password=password_hash, role=role,first_name=first_name, last_name= last_name)
 
     db.session.add(new_user)
     db.session.commit()

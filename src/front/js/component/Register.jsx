@@ -48,7 +48,7 @@ const Register = () => {
     }
 
     // Llamar al action register
-    const response = await actions.register(email, password, role);
+    const response = await actions.register(email, password, role,firstName, lastName);
 
     if (response.success) {
       navigate('/login');

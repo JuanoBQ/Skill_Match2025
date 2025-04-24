@@ -1,5 +1,8 @@
 
-const BASE_URL = "https://ominous-robot-7v9vgj954g5phr7jw-3001.app.github.dev/api";
+// const BASE_URL = "https://ominous-robot-7v9vgj954g5phr7jw-3001.app.github.dev/api";
+const BASE_URL = "https://potential-halibut-g4q4gvqrvq6v2pwqj-3001.app.github.dev/api";
+
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -49,7 +52,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				  return { success: false, error: "Error de conexión al servidor" };
 				}
 			  },
-			  register: async (email, password, role ) => {
+
+			  register: async (email, password, role,firstName, lastName ) => {
 				try {
 				  // Hacemos un POST a la API /register con email, password y rol
 				  const res = await fetch(`${BASE_URL}/register`, {
@@ -57,7 +61,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					headers: {
 					  "Content-Type": "application/json",
 					},
-					body: JSON.stringify({ email, password, role }), // Enviamos los datos como JSON
+					body: JSON.stringify({ email, password, role,first_name: firstName,last_name: lastName }), // Enviamos los datos como JSON
 				  });
 		
 				  // Convertimos la respuesta en JSON
