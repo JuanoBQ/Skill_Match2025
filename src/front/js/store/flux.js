@@ -10,6 +10,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: localStorage.getItem("token") || null,
 			//  Guardamos el email del usuario logueado (puede servir para mostrarlo en el UI)
 			email: null,
+			role: null,
 			//  Bandera para saber si el usuario está autenticado
 			isAuthenticated: !!localStorage.getItem("token"), // true si hay token
 			
@@ -39,6 +40,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					  token: data.access_token,
 					  email: data.email,
 					  isAuthenticated: true,
+					  role:data.role
 					});
 		
 					// Devolvemos éxito al componente que llamó la acción

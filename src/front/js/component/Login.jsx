@@ -3,7 +3,7 @@ import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const { actions } = useContext(Context);
+  const { actions, store } = useContext(Context);
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -21,9 +21,17 @@ const Login = () => {
     const response = await actions.login(email, password);
 
     if (response.success) {
-      navigate('/home'); // redirige al home o a donde necesites
+      const { role } = store;
+
+      if (role === 'freelancer') {
+        navigate('/freelancerProfile');
+      } else if (role === 'employer') {
+        navigate('/employerProfile');
+      } else {
+        navigate('/home'); // fallback por si no hay rol
+      }
     } else {
-      setError(response.error); // muestra mensaje del backend
+      setError(response.error);
     }
   };
 
