@@ -33,7 +33,7 @@ const Register = () => {
     const { firstName, lastName, email, password, company, gender, age, role } = formData;
 
     // Validaciones
-    if (!firstName || !lastName || !email || !password || !company || !gender || !age || !role) {
+    if (!firstName || !lastName || !email || !password  || !role) {
       setFormData((prevData) => ({ ...prevData, error: 'Por favor, completa todos los campos.' }));
       return;
     }
@@ -119,7 +119,7 @@ const Register = () => {
                   />
                 </div>
 
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <label htmlFor="company" className="form-label">Empresa (Opcional)</label>
                   <input
                     type="text"
@@ -130,9 +130,9 @@ const Register = () => {
                     value={formData.company}
                     onChange={handleChange}
                   />
-                </div>
+                </div> */}
 
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <label htmlFor="gender" className="form-label">Género</label>
                   <select
                     id="gender"
@@ -146,9 +146,9 @@ const Register = () => {
                     <option value="female">Femenino</option>
                     <option value="other">Otro</option>
                   </select>
-                </div>
+                </div> */}
 
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <label htmlFor="age" className="form-label">Edad</label>
                   <input
                     type="number"
@@ -159,7 +159,7 @@ const Register = () => {
                     value={formData.age}
                     onChange={handleChange}
                   />
-                </div>
+                </div> */}
 
                 <div className="mb-3">
                   <label htmlFor="role" className="form-label">Rol</label>
@@ -172,7 +172,7 @@ const Register = () => {
                   >
                     <option value="">Seleccione un rol</option>
                     <option value="freelancer">Freelancer</option>
-                    <option value="employer">Empresa</option>
+                    <option value="employer">Empleador</option>
                   </select>
                 </div>
 

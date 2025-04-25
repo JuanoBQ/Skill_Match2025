@@ -10,7 +10,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: localStorage.getItem("token") || null,
 			//  Guardamos el email del usuario logueado (puede servir para mostrarlo en el UI)
 			email: null,
-			role: null,
+			role: localStorage.getItem("role") || null, 
 			//  Bandera para saber si el usuario está autenticado
 			isAuthenticated: !!localStorage.getItem("token"), // true si hay token
 			
@@ -26,34 +26,35 @@ const getState = ({ getStore, getActions, setStore }) => {
 					},
 					body: JSON.stringify({ email, password }), // Convertimos los datos a JSON
 				  });
-		
-				  // Convertimos la respuesta en JSON
-				  const data = await res.json();
-		
-				  // Si la respuesta fue exitosa (status 200)
+			  
+				  const data = await res.json(); // Convertimos la respuesta en JSON
+				  console.log("🔍 Respuesta completa del backend en login:", data);
+
+			  
 				  if (res.ok) {
 					// Guardamos el token en localStorage
 					localStorage.setItem("token", data.access_token);
-		
-					// Actualizamos el estado global
+					localStorage.setItem("role", data.role);
+			  
+					// ✅ Actualizamos el store con toda la info
 					setStore({
 					  token: data.access_token,
 					  email: data.email,
+					  role: data.role, // 👈 Aquí guardas el rol recibido
 					  isAuthenticated: true,
-					  role:data.role
 					});
-		
-					// Devolvemos éxito al componente que llamó la acción
+			  
 					return { success: true };
 				  } else {
-					// Si hubo un error, devolvemos el mensaje del backend
+					// Si hubo error de autenticación
 					return { success: false, error: data.msg };
 				  }
 				} catch (error) {
-				  // Si hubo un error de red o conexión, lo manejamos aquí
+				  // Si hubo error de red o servidor
 				  return { success: false, error: "Error de conexión al servidor" };
 				}
 			  },
+			  
 
 			  register: async (email, password, role,firstName, lastName ) => {
 				try {
@@ -71,14 +72,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 		
 				  // Si el registro fue exitoso
 				  if (res.ok) {
-					// Guardamos el token en localStorage
-					localStorage.setItem("token", data.access_token);
+					localStorage.removeItem("token");
+                    localStorage.removeItem("role");
+
+			
 		
 					// Actualizamos el estado global
 					setStore({
 					  token: data.access_token,
 					  email: data.email,
-					  isAuthenticated: true,
+					  isAuthenticated: false,
 					});
 		
 					// Devolvemos éxito al componente
@@ -92,6 +95,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 				  return { success: false, error: "Error de conexión al servidor" };
 				}
 			  },
+			  logout: () => {
+				// Limpia los datos del usuario
+				localStorage.removeItem("token");
+				localStorage.removeItem("role");
+			  
+				setStore({
+				  token: null,
+				  email: null,
+				  role: null,
+				  isAuthenticated: false
+				});
+			  }
+			  
 		
 			  
 

@@ -3,7 +3,7 @@ import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const { actions, store } = useContext(Context);
+  const { actions } = useContext(Context); // ⬅️ No necesitas store aquí
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -21,15 +21,7 @@ const Login = () => {
     const response = await actions.login(email, password);
 
     if (response.success) {
-      const { role } = store;
-
-      if (role === 'freelancer') {
-        navigate('/freelancerProfile');
-      } else if (role === 'employer') {
-        navigate('/employerProfile');
-      } else {
-        navigate('/home'); // fallback por si no hay rol
-      }
+      navigate('/'); // 
     } else {
       setError(response.error);
     }
