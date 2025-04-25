@@ -4,14 +4,16 @@ import { Link } from "react-router-dom";
 export const Navbar = () => {
 
 	return (
-		<div className="container">
+		<div className="container-fluid">
 			<nav className="navbar">
-				<div className="container-fluid">
-					<a className="navbar-brand" href="#">
-						<img src="https://demo.themetorium.net/html/nui/assets/img/logo-dark.png" alt="Bootstrap" width="42" height="38"></img>
-					</a>
+				<div className="container-fluid navStyles">
+					<Link to={"/"}>
+						<a className="navbar-brand" href="#">
+							<img src="https://demo.themetorium.net/html/nui/assets/img/logo-dark.png" alt="Bootstrap" width="42" height="38"></img>
+						</a>
+					</Link>
 					<div className="navbar-nav navOptions col d-flex flex-row">
-						<a className="nav-link active me-3" aria-current="page" href="#">Home</a>
+						<a className="nav-link active ms-2 me-3" aria-current="page" href="#">Home</a>
 						<a className="nav-link me-3" href="#">About</a>
 						<a className="nav-link me-3" href="#">Services</a>
 						<a className="nav-link" href="#">Contact</a>

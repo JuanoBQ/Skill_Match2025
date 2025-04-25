@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Register = () => {
   const { actions } = useContext(Context);
@@ -181,10 +182,11 @@ const Register = () => {
               </form>
             </div>
           </div>
+          <div className='text-center mt-3'>Ya tienes una cuenta? <Link to={"/login"}><a className=''>Log In</a></Link></div>
         </div>
       </div>
     </div>
   );
 };
 
-export default Register;
+export default Register;
