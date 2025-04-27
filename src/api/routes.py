@@ -4,6 +4,7 @@ from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
+from sqlalchemy.orm import joinedload
 
 
 routes = Blueprint('routes', __name__)
@@ -75,8 +76,10 @@ def login():
             "msg": "Sesion iniciada",
             "access_token": access_token,
             "email": email,
-            "role": current_user.role
+            "role": current_user.role,
+            "user_id": current_user.id,
         }), 200
+    
 
     else:
         return jsonify({"msg": "Usuario o contraseña invalido."}), 401
@@ -133,7 +136,11 @@ def get_profile():
     user_id = request.args.get('user_id')
 
     if user_id:
-        profile = Profile.query.filter_by(user_id=user_id).first()
+        # profile = Profile.query.filter_by(user_id=user_id).first()
+         profile = Profile.query.options(
+            joinedload(Profile.skills).joinedload(FreelancerSkill.skill),
+            joinedload(Profile.user)
+        ).filter_by(user_id=user_id).first()
     else:
         user = User.query.filter_by(role='freelancer').first()
         if not user:

@@ -11,6 +11,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			//  Guardamos el email del usuario logueado (puede servir para mostrarlo en el UI)
 			email: null,
 			role: localStorage.getItem("role") || null, 
+			userId: localStorage.getItem("user_id") || null,
 			//  Bandera para saber si el usuario está autenticado
 			isAuthenticated: !!localStorage.getItem("token"), // true si hay token
 			
@@ -22,12 +23,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 				  const res = await fetch(`${BASE_URL}/login`, {
 					method: "POST",
 					headers: {
-					  "Content-Type": "application/json", // Indicamos que el cuerpo es JSON
+					  "Content-Type": "application/json", 
 					},
-					body: JSON.stringify({ email, password }), // Convertimos los datos a JSON
+					body: JSON.stringify({ email, password }), 
 				  });
 			  
-				  const data = await res.json(); // Convertimos la respuesta en JSON
+				  const data = await res.json();
 				  console.log("🔍 Respuesta completa del backend en login:", data);
 
 			  
@@ -35,12 +36,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 					// Guardamos el token en localStorage
 					localStorage.setItem("token", data.access_token);
 					localStorage.setItem("role", data.role);
+					localStorage.setItem("user_id", data.user_id); 
 			  
 					// ✅ Actualizamos el store con toda la info
 					setStore({
 					  token: data.access_token,
 					  email: data.email,
-					  role: data.role, // 👈 Aquí guardas el rol recibido
+					  role: data.role,
+					  userId: data.user_id,
 					  isAuthenticated: true,
 					});
 			  
@@ -106,7 +109,41 @@ const getState = ({ getStore, getActions, setStore }) => {
 				  role: null,
 				  isAuthenticated: false
 				});
-			  }
+			  },
+			     // --- Nuevo FETCH para traer el perfil del Freelancer ---
+				getFreelancerProfile: async (userId) => {
+					try {
+						const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
+						const data = await res.json();
+						
+						if (res.ok) {
+							return { success: true, profile: data };
+						} else {
+							return { success: false, error: data.msg };
+						}
+					} catch (error) {
+						return { success: false, error: "Error al obtener perfil de freelancer" };
+					}
+				},
+
+				// --- Nuevo FETCH para traer la info de EMPLOYER (lo básico, por ahora el User) ---
+				getEmployerProfile: async (userId) => {
+					try {
+						const res = await fetch(`${BASE_URL}/users/me?user_id=${userId}`);
+						const data = await res.json();
+						
+						if (res.ok) {
+							return { success: true, employer: data };
+						} else {
+							return { success: false, error: data.msg };
+						}
+					} catch (error) {
+						return { success: false, error: "Error al obtener perfil de employer" };
+					}
+				},
+
+			  
+
 			  
 		
 			  

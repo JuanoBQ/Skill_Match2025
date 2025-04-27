@@ -75,7 +75,9 @@ class Profile(db.Model):
             "profile_picture": self.profile_picture,
             "hourly_rate": self.hourly_rate,
             "rating": self.rating,
-            "skills": [fs.skill.serialize() for fs in self.skills]
+            "skills": [fs.serialize() for fs in self.skills],
+            "user": self.user.serialize() if self.user else None
+
         }
 
 
@@ -117,8 +119,9 @@ class FreelancerSkill(db.Model):
         return {
             "id": self.id,
             "profile_id": self.profile_id,
-            "skill": self.skill.serialize()
-        }
+            "skill": self.skill.serialize() if self.skill else {"id": self.skill_id, "name": "Skill desconocida"}
+    }
+        
 
 
 # --- PROYECTOS Y PROPUESTAS ---

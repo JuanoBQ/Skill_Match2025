@@ -1,36 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from "react";
+import { Context } from "../store/appContext";
 
 const FreelancerProfile = () => {
-  // 👇 Datos simulados directamente aquí
-  const user = {
-    role: 'freelancer',
-    first_name: 'Ana',
-    last_name: 'Gómez',
-    profile: {
-      bio: 'Soy desarrolladora full stack con 3 años de experiencia.',
-      profile_picture: '', // o usa una URL como 'https://i.pravatar.cc/150?img=5'
-      hourly_rate: 35,
-      rating: 4.8,
-      skills: [
-        { skill: { id: 1, name: 'React' } },
-        { skill: { id: 2, name: 'Python' } },
-        { skill: { id: 3, name: 'PostgreSQL' } }
-      ]
-    }
-  };
+  const { actions } = useContext(Context);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const fullName = `${user.first_name} ${user.last_name}`;
-  const profile = user.profile;
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const userId = localStorage.getItem("user_id"); 
+
+      if (!userId) {
+        console.error("No hay user_id en localStorage.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await actions.getFreelancerProfile(userId);
+
+      if (response.success) {
+        console.log("Perfil recibido:", profile);
+        setProfile(response.profile);
+   
+
+
+      } else {
+        console.error("Error al cargar el perfil:", response.error);
+      }
+
+      setLoading(false);
+    };
+
+    fetchProfile();
+  }, [actions]);
+
+  if (loading) {
+    return <div className="text-center mt-5">Cargando perfil...</div>;
+  }
+
+  if (!profile) {
+    return <div className="text-center mt-5">No se encontró el perfil.</div>;
+  }
+
+  const fullName = profile.user?.first_name && profile.user?.last_name
+    ? `${profile.user.first_name} ${profile.user.last_name}`
+    : "Nombre no disponible";
 
   return (
     <div className="container mt-5">
-      <h2 className="mb-4">Perfil del Freelancer</h2>
+      <h2 className="mb-4 text-center">Perfil del Freelancer</h2>
 
       <div className="card">
         <div className="card-body">
           <div className="text-center mb-3">
             <img
-              src={profile?.profile_picture || '/default.jpg'}
+              src={profile.profile_picture || "https://i.pravatar.cc/150?img=5"}
               alt="Foto de perfil"
               width="120"
               className="rounded-circle"
@@ -38,16 +62,22 @@ const FreelancerProfile = () => {
           </div>
 
           <h4 className="text-center">{fullName}</h4>
-          <p><strong>Biografía:</strong> {profile?.bio}</p>
-          <p><strong>Tarifa por hora:</strong> ${profile?.hourly_rate}</p>
-          <p><strong>Calificación:</strong> {profile?.rating}</p>
+          <p><strong>Biografía:</strong> {profile.bio || "Sin biografía aún."}</p>
+          <p><strong>Tarifa por hora:</strong> ${profile.hourly_rate || "No definida"}</p>
+          <p><strong>Calificación:</strong> {profile.rating || "Sin calificación"}</p>
 
-          <div>
+          <div className="mt-4">
             <strong>Habilidades:</strong>
             <ul>
-              {profile.skills.map((fs) => (
-                <li key={fs.skill.id}>{fs.skill.name}</li>
-              ))}
+              {profile.skills && profile.skills.length > 0 ? (
+                profile.skills.map((fs, index) => (
+                  <li key={fs.skill?.id || index}>
+                    {fs.skill?.name || "Skill desconocida"}
+                  </li>
+                ))
+              ) : (
+                <li>No hay habilidades registradas.</li>
+              )}
             </ul>
           </div>
         </div>
