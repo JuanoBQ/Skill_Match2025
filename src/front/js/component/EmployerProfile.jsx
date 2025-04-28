@@ -4,8 +4,8 @@ const EmployerProfile = () => {
   //  Datos simulados dentro del mismo componente
   const user = {
     role: 'employer',
-    first_name: 'Carlos',
-    last_name: 'Martínez',
+    first_name: 'Miguel',
+    last_name: 'Cabrera',
     projects: [
       {
         id: 1,

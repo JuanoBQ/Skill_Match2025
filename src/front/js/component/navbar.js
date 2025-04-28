@@ -51,15 +51,15 @@ export const Navbar = () => {
         <div className="container-fluid navStyles">
           <Link to={"/"}>
             <a className="navbar-brand" href="#">
-              <img src={logo} alt="Bootstrap" width="42" height="38" />
+              <img src={logo} alt="Bootstrap" width="42" height="42" />
             </a>
           </Link>
 
           <div className="navbar-nav navOptions col d-flex flex-row">
-            <Link className="nav-link active ms-2 me-3" to="/">Home</Link>
-            <a className="nav-link me-3" href="#">About</a>
-            <a className="nav-link me-3" href="#">Services</a>
-            <a className="nav-link me-3" href="#">Contact</a>
+            <Link className="nav-link active ms-2 me-3" to="/">Inicio</Link>
+            <a className="nav-link me-3" href="#">Nosotros</a>
+            <a className="nav-link me-3" href="#">Servicios</a>
+            <a className="nav-link me-3" href="#">Contacto</a>
             {store.isAuthenticated ? (
              <div class="dropdown">
              <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
