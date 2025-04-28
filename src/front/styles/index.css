@@ -7,8 +7,12 @@
 }
 
 .footStyles {
-    margin-top: 5%;
+    margin-top: 4%;
     margin-left: 10.1%;
     margin-right: 10.1%;
-    border-radius: 8px 8px 0px 0px;
+    border-radius: 8px 8px 0px 0px;
+}
+
+.background {
+    background-color: #f0f0f0;
 }

@@ -43,7 +43,7 @@ export const Navbar = () => {
           </Link>
 
           <div className="navbar-nav navOptions col d-flex flex-row">
-            <Link className="nav-link active ms-2 me-3" to="/">Home</Link>
+            <Link to={"/dashboard"} className="nav-link active ms-2 me-3">Dashboard</Link>
             <a className="nav-link me-3" href="#">About</a>
             <a className="nav-link me-3" href="#">Services</a>
             <a className="nav-link" href="#">Contact</a>

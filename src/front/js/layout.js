@@ -6,6 +6,10 @@ import { BackendURL } from "./component/backendURL";
 import { Home } from "./pages/home";
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
+import { Dashboard } from "./pages/dashboard";
+import { Helpcenter } from "./pages/helpcenter";
+import { ContactUs } from "./pages/contactus";
+import { Historial } from "./pages/historial";
 import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar";
@@ -14,7 +18,6 @@ import Login from "./component/Login.jsx";
 import Register from "./component/Register.jsx";
 import EmployerProfile from "./component/EmployerProfile.jsx"
 import FreelancerProfile from "./component/FreelancerProfile.jsx"
-
 
 
 
@@ -41,7 +44,10 @@ const Layout = () => {
                         <Route element={<Register />} path="/register" />
                         <Route element={<EmployerProfile/>} path="/employerProfile" />
                         <Route element={<FreelancerProfile />} path="/freelancerProfile" />
-
+                        <Route element={<Dashboard />} path="/dashboard" />
+                        <Route element={<Helpcenter />} path="/helpcenter" />
+                        <Route element={<ContactUs />} path="/contactus" />
+                        <Route element={<Historial />} path="/historial" />
 
                       
                         
