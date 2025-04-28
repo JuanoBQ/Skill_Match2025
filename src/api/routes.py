@@ -435,6 +435,16 @@ def get_project(id):
         return jsonify({"msg": "Proyecto no encontrado"}), 404
     return jsonify(project.serialize())
 
+@routes.route('/proposals/<int:proposal_id>', methods=['GET'])
+@jwt_required()
+def get_proposal_by_id(proposal_id):
+    proposal = Proposal.query.get(proposal_id)
+
+    if not proposal:
+        return jsonify({"msg": "Propuesta no encontrada."}), 404
+
+    return jsonify(proposal.serialize()), 200
+
 
 # --- PROPOSALS ---
 
@@ -522,10 +532,10 @@ def create_payment():
         if not proposal:
             return jsonify({"error": "Proposal not found"}), 404
 
-        # Crea un PaymentIntent en Stripe
+        # Crea un Pago en Stripe
         intent = stripe.PaymentIntent.create(
-            amount=int(proposal.proposed_budget * 100),  # Stripe cobra en centavos
-            currency='usd',  # O la moneda que decidas
+            amount=int(proposal.proposed_budget * 100),
+            currency='usd',
             automatic_payment_methods={"enabled": True},
         )
 

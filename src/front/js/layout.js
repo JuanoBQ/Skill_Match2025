@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
-import { Home } from "./pages/home";
+import Home from "./pages/home";
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
@@ -17,9 +17,7 @@ import FreelancerProfile from "./component/FreelancerProfile.jsx"
 import ProfileForm from "./component/ProfileForm.jsx";
 import DashboardFreelancer from "./component/DashboardFreelancer.jsx";
 import DashboardProjects from "./component/DashboardProjects.jsx";
-
-
-
+import PaymentPage from "./component/PaymentPage.jsx";
 
 
 
@@ -29,7 +27,7 @@ const Layout = () => {
     // you can set the basename on the .env file located at the root of this project, E.g: BASENAME=/react-hello-webapp/
     const basename = process.env.BASENAME || "";
 
-    if(!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL/ >;
+    if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     return (
         <div>
@@ -40,17 +38,18 @@ const Layout = () => {
                         <Route element={<Home />} path="/" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
-                        <Route element={<Login/>} path="/login" />
+                        <Route element={<Login />} path="/login" />
                         <Route element={<Register />} path="/register" />
-                        <Route element={<EmployerProfile/>} path="/employerProfile" />
+                        <Route element={<EmployerProfile />} path="/employerProfile" />
                         <Route element={<FreelancerProfile />} path="/freelancerProfile" />
                         <Route element={<ProfileForm />} path="/profileform" />
-                        <Route element={<DashboardFreelancer/>} path="/DashboardFreelancer" />
-                        <Route element={<DashboardProjects/>} path="/DashboardProjects" />
+                        <Route element={<DashboardFreelancer />} path="/DashboardFreelancer" />
+                        <Route element={<DashboardProjects />} path="/DashboardProjects" />
+                        <Route element={<PaymentPage />} path="/payment/:proposalId" />
 
 
-                      
-                        
+
+
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
