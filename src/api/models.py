@@ -159,6 +159,12 @@ class Project(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "proposals": [p.serialize_basic() for p in self.proposals]
         }
+    
+    def serialize_basic(self):
+        return {
+            "id": self.id,
+            "title": self.title
+    }
 
 
 class Proposal(db.Model):
@@ -193,7 +199,8 @@ class Proposal(db.Model):
             "proposed_budget": self.proposed_budget,
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "freelancer": self.freelancer.serialize()
+            "freelancer": self.freelancer.serialize() if self.freelancer else None,
+            "project": self.project.serialize_basic() if self.project else None
         }
 
     def serialize_basic(self):
