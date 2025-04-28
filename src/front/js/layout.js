@@ -14,6 +14,7 @@ import Login from "./component/Login.jsx";
 import Register from "./component/Register.jsx";
 import EmployerProfile from "./component/EmployerProfile.jsx"
 import FreelancerProfile from "./component/FreelancerProfile.jsx"
+import ProfileForm from "./component/ProfileForm.jsx";
 
 
 
@@ -41,6 +42,7 @@ const Layout = () => {
                         <Route element={<Register />} path="/register" />
                         <Route element={<EmployerProfile/>} path="/employerProfile" />
                         <Route element={<FreelancerProfile />} path="/freelancerProfile" />
+                        <Route element={<ProfileForm />} path="/profileform" />
 
 
                       

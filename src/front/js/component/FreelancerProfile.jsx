@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Context } from "../store/appContext";
+import { useNavigate } from "react-router-dom";
 
 const FreelancerProfile = () => {
+  const navigate = useNavigate();
   const { actions } = useContext(Context);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,20 +21,22 @@ const FreelancerProfile = () => {
       const response = await actions.getFreelancerProfile(userId);
 
       if (response.success) {
-        console.log("Perfil recibido:", profile);
+        console.log("Perfil recibido:", response.profile);
         setProfile(response.profile);
-   
-
-
       } else {
         console.error("Error al cargar el perfil:", response.error);
+        navigate("/profileForm");
       }
 
       setLoading(false);
     };
 
     fetchProfile();
-  }, [actions]);
+  }, [actions, navigate]);
+
+  const handleEditProfile = () => {
+    navigate('/profileForm');
+  };
 
   if (loading) {
     return <div className="text-center mt-5">Cargando perfil...</div>;
@@ -80,6 +84,14 @@ const FreelancerProfile = () => {
               )}
             </ul>
           </div>
+
+          {/* BOTÓN PARA EDITAR PERFIL */}
+          <div className="text-center mt-4">
+            <button className="btn btn-dark px-4 py-2" onClick={handleEditProfile}>
+              Editar Perfil
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
