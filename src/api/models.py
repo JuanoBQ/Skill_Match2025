@@ -75,9 +75,7 @@ class Profile(db.Model):
             "profile_picture": self.profile_picture,
             "hourly_rate": self.hourly_rate,
             "rating": self.rating,
-            "skills": [fs.serialize() for fs in self.skills],
-            "user": self.user.serialize() if self.user else None
-
+            "skills": [fs.skill.serialize() for fs in self.skills]
         }
 
 
@@ -119,9 +117,8 @@ class FreelancerSkill(db.Model):
         return {
             "id": self.id,
             "profile_id": self.profile_id,
-            "skill": self.skill.serialize() if self.skill else {"id": self.skill_id, "name": "Skill desconocida"}
-    }
-        
+            "skill": self.skill.serialize()
+        }
 
 
 # --- PROYECTOS Y PROPUESTAS ---
@@ -181,6 +178,8 @@ class Proposal(db.Model):
         "Project", back_populates="proposals")
     freelancer: Mapped["User"] = relationship(
         "User", back_populates="proposals")
+    payment: Mapped[Optional["Payment"]] = relationship(
+        "Payment", back_populates="proposal", uselist=False)
 
     def __repr__(self):
         return f"<Proposal ProjectID={self.project_id} FreelancerID={self.freelancer_id}>"
@@ -203,4 +202,28 @@ class Proposal(db.Model):
             "freelancer_id": self.freelancer_id,
             "status": self.status,
             "proposed_budget": self.proposed_budget
+        }
+    
+
+class Payment(db.Model):
+    __tablename__ = "payments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    proposal_id: Mapped[int] = mapped_column(ForeignKey("proposals.id"), nullable=False)
+    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)  # pending, completed, failed
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    proposal: Mapped["Proposal"] = relationship("Proposal", back_populates="payment")
+
+    def __repr__(self):
+        return f"<Payment ID={self.id} ProposalID={self.proposal_id} Status={self.status}>"
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "proposal_id": self.proposal_id,
+            "amount": self.amount,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
