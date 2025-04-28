@@ -20,9 +20,8 @@ const ProfileForm = () => {
         setSkills(resSkills.skills);
       }
 
-      const userId = store.userId;
-      if (userId) {
-        const resProfile = await actions.getFreelancerProfile(userId);
+      if (store.userId) {
+        const resProfile = await actions.getFreelancerProfile(store.userId);
         if (resProfile.success && resProfile.profile) {
           const profileData = resProfile.profile;
           setBio(profileData.bio || "");
@@ -37,8 +36,10 @@ const ProfileForm = () => {
       }
     };
 
-    fetchData();
-  }, []);
+    if (store.userId) {
+      fetchData();
+    }
+  }, [store.userId]);
 
   const handleSkillToggle = (skillId) => {
     if (selectedSkills.includes(skillId)) {
@@ -52,29 +53,29 @@ const ProfileForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const userId = store.userId;
-  
+
     if (!userId) {
       console.error("No hay usuario logueado");
       return;
     }
-  
+
     // 1. Crear o actualizar perfil
     const resProfile = await actions.createOrUpdateProfile(userId, {
       bio,
       profile_picture: profilePicture,
       hourly_rate: parseFloat(hourlyRate),
     });
-  
+
     if (!resProfile.success) {
       alert("Error al crear o actualizar perfil.");
       return;
     }
-  
+
     // 2. Eliminar TODAS las skills actuales antes
     await actions.clearFreelancerSkills(userId);
-  
+
     // 3. Asignar skills seleccionadas
     if (selectedSkills.length > 0) {
       const resSkills = await actions.addFreelancerSkills(userId, selectedSkills);
@@ -83,11 +84,11 @@ const ProfileForm = () => {
         return;
       }
     }
-  
+
     // 4. Navegar de regreso al perfil
     navigate("/freelancerProfile");
   };
-  
+
 
   return (
     <div className="container mt-5">

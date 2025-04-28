@@ -136,36 +136,41 @@ def get_current_user():
 # --- PERFIL FREELANCER ---
 
 @routes.route('/freelancer/profile', methods=['GET'])
-def get_profile():
-    user_id = request.args.get('user_id')
+def get_freelancer_profile():
+    user_id = request.args.get("user_id")
 
-    if user_id:
-        profile = Profile.query.filter_by(user_id=user_id).first()
-    else:
-        user = User.query.filter_by(role='freelancer').first()
-        if not user:
-            user = User(email="freelancer@example.com",
-                        password=generate_password_hash("dev123"), role="freelancer")
-            db.session.add(user)
-            db.session.commit()
+    if not user_id:
+        return jsonify({"msg": "No se proporcionó user_id"}), 400
 
-        profile = Profile.query.filter_by(user_id=user.id).first()
-
-    if not profile and user:
-        profile = Profile(
-            user_id=user.id,
-            bio="Perfil de desarrollo para pruebas",
-            profile_picture="https://via.placeholder.com/150",
-            hourly_rate=25.0,
-            rating=4.5
-        )
-        db.session.add(profile)
-        db.session.commit()
+    profile = Profile.query.filter_by(user_id=user_id).first()
 
     if not profile:
         return jsonify({"msg": "Perfil no encontrado"}), 404
 
-    return jsonify(profile.serialize())
+    user = profile.user
+
+    freelancer_data = {
+        "id": profile.id,
+        "bio": profile.bio,
+        "profile_picture": profile.profile_picture,
+        "hourly_rate": profile.hourly_rate,
+        "rating": profile.rating,
+        "user": {
+            "first_name": user.first_name if user else None,
+            "last_name": user.last_name if user else None,
+            "email": user.email if user else None
+        },
+        "skills": []
+    }
+
+    for fs in profile.skills:
+        if fs.skill:
+            freelancer_data["skills"].append({
+                "id": fs.skill.id,
+                "name": fs.skill.name
+            })
+
+    return jsonify(freelancer_data), 200
 
 
 @routes.route('/freelancer/profile', methods=['POST'])

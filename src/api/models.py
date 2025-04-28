@@ -75,7 +75,7 @@ class Profile(db.Model):
             "profile_picture": self.profile_picture,
             "hourly_rate": self.hourly_rate,
             "rating": self.rating,
-            "skills": [fs.skill.serialize() for fs in self.skills]
+            "skills": [fs.skill.serialize() for fs in self.skills if fs.skill is not None]
         }
 
 
