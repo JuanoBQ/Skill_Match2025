@@ -167,7 +167,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 						body: JSON.stringify({
 							title: formData.title,
 							description: formData.description,
-							budget: formData.budget
+							budget: formData.budget,
+							category: formData.category,
+							deadline: formData.deadline
 						})
 					});
 
@@ -179,6 +181,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						return { success: false, error: data.msg };
 					}
 				} catch (error) {
+					console.error("Error real:", error);
 					return { success: false, error: "Error de conexión al servidor" };
 				}
 			},
@@ -215,7 +218,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			getEmployerProposals: async (employerId) => {
 				const token = localStorage.getItem("token");
-			
+
 				try {
 					const res = await fetch(`${BASE_URL}/employer/${employerId}/proposals`, {
 						method: "GET",
@@ -223,9 +226,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Authorization": "Bearer " + token
 						}
 					});
-			
+
 					const data = await res.json();
-			
+
 					if (res.ok) {
 						return { success: true, proposals: data };
 					} else {

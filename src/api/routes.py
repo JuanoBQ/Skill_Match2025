@@ -392,32 +392,29 @@ def get_all_projects():
 
 
 @routes.route('/projects', methods=['POST'])
+@jwt_required()
 def create_project():
-    data = request.json
-    employer_id = data.get('employer_id')
+    data = request.get_json()
 
-    if not employer_id:
-        employer = User.query.filter_by(role='employer').first()
-        if not employer:
-            employer = User(email="employer@example.com",
-                            password=generate_password_hash("dev123"), role="employer")
-            db.session.add(employer)
-            db.session.commit()
-        employer_id = employer.id
+    current_user_id = get_jwt_identity()
 
-    # Convertir la cadena de fecha a objeto datetime
+    # Verifica que sea un employer
+    employer = User.query.get(current_user_id)
+    if not employer or employer.role != "employer":
+        return jsonify({"msg": "Solo los empleadores pueden crear proyectos."}), 403
+
     deadline_str = data.get('deadline')
     deadline = None
     if deadline_str:
         try:
-            # Asumiendo formato YYYY-MM-DD
             from datetime import datetime
             deadline = datetime.strptime(deadline_str, "%Y-%m-%d")
         except ValueError:
             return jsonify({"msg": "Formato de fecha inválido. Use YYYY-MM-DD"}), 400
 
+    # Crea el proyecto
     project = Project(
-        employer_id=employer_id,
+        employer_id=current_user_id,
         title=data.get('title'),
         description=data.get('description'),
         category=data.get('category'),
@@ -425,6 +422,7 @@ def create_project():
         deadline=deadline,
         status="open"
     )
+
     db.session.add(project)
     db.session.commit()
     return jsonify(project.serialize()), 201
