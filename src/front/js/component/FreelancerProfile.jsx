@@ -10,7 +10,7 @@ const FreelancerProfile = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const userId = localStorage.getItem("user_id"); 
+      const userId = localStorage.getItem("user_id");
 
       if (!userId) {
         console.error("No hay user_id en localStorage.");
@@ -20,11 +20,11 @@ const FreelancerProfile = () => {
 
       const response = await actions.getFreelancerProfile(userId);
 
-      if (response.success) {
+      if (response.success && response.profile && response.profile.bio !== null) {
         console.log("Perfil recibido:", response.profile);
         setProfile(response.profile);
       } else {
-        console.error("Error al cargar el perfil:", response.error);
+        console.warn("Perfil incompleto o no encontrado, redirigiendo...");
         navigate("/profileForm");
       }
 

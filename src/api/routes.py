@@ -52,7 +52,13 @@ def register():
     user_id = new_user.id
     access_token = create_access_token(identity=str(user_id))
 
-    return jsonify({**new_user.serialize(), "access_token": access_token}), 201
+    return jsonify({
+    "msg": "Usuario registrado exitosamente",
+    "user_id": new_user.id,
+    "email": new_user.email,
+    "role": new_user.role,
+    "access_token": access_token
+}), 201
 
 
 @routes.route('/login', methods=['POST'])
@@ -82,7 +88,8 @@ def login():
             "msg": "Sesion iniciada",
             "access_token": access_token,
             "email": email,
-            "role": current_user.role
+            "role": current_user.role,
+            "user_id": current_user.id
         }), 200
 
     else:
