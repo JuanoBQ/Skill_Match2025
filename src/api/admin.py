@@ -1,6 +1,6 @@
 import os
 from flask_admin import Admin
-from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal
+from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Payment
 from flask_admin.contrib.sqla import ModelView
 
 def setup_admin(app):
@@ -26,9 +26,13 @@ def setup_admin(app):
     class ProposalModelView(ModelView):
         column_list = ('id', 'project_id', 'freelancer_id', 'message', 'proposed_budget', 'status', 'created_at', 'project', 'freelancer')
 
+    class PaymentModelView(ModelView):
+        column_list = ('id', 'proposal_id', 'amount', 'status', 'created_at')
+
     admin.add_view(UserModelView(User, db.session))
     admin.add_view(ProfileModelView(Profile, db.session))
     admin.add_view(SkillModelView(Skill, db.session))
     admin.add_view(FreelancerSkillModelView(FreelancerSkill, db.session))
     admin.add_view(ProjectModelView(Project, db.session))
     admin.add_view(ProposalModelView(Proposal, db.session))
+    admin.add_view(PaymentModelView(Payment, db.session))

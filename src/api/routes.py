@@ -1,11 +1,17 @@
+import os
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal
+from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Payment
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
-from sqlalchemy.orm import joinedload
+import stripe
+from dotenv import load_dotenv
 
+load_dotenv()
+
+# --- Configuracion de Stripe ---
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 routes = Blueprint('routes', __name__)
 api = Blueprint('api', __name__)
@@ -76,10 +82,8 @@ def login():
             "msg": "Sesion iniciada",
             "access_token": access_token,
             "email": email,
-            "role": current_user.role,
-            "user_id": current_user.id,
+            "role": current_user.role
         }), 200
-    
 
     else:
         return jsonify({"msg": "Usuario o contraseña invalido."}), 401
@@ -136,11 +140,7 @@ def get_profile():
     user_id = request.args.get('user_id')
 
     if user_id:
-        # profile = Profile.query.filter_by(user_id=user_id).first()
-         profile = Profile.query.options(
-            joinedload(Profile.skills).joinedload(FreelancerSkill.skill),
-            joinedload(Profile.user)
-        ).filter_by(user_id=user_id).first()
+        profile = Profile.query.filter_by(user_id=user_id).first()
     else:
         user = User.query.filter_by(role='freelancer').first()
         if not user:
@@ -482,3 +482,40 @@ def get_my_proposals():
 def list_users():
     users = User.query.all()
     return jsonify([u.serialize() for u in users])
+
+
+# --- STRIPE ---
+
+@routes.route('/create-payment-intent', methods=['POST'])
+def create_payment():
+    try:
+        data = request.json
+        proposal_id = data.get('proposal_id')
+
+        proposal = Proposal.query.get(proposal_id)
+        if not proposal:
+            return jsonify({"error": "Proposal not found"}), 404
+
+        # Crea un PaymentIntent en Stripe
+        intent = stripe.PaymentIntent.create(
+            amount=int(proposal.proposed_budget * 100),  # Stripe cobra en centavos
+            currency='usd',  # O la moneda que decidas
+            automatic_payment_methods={"enabled": True},
+        )
+
+        # Guarda el intento en tu base de datos (opcional)
+        payment = Payment(
+            proposal_id=proposal_id,
+            amount=proposal.proposed_budget,
+            status="pending"
+        )
+        db.session.add(payment)
+        db.session.commit()
+
+        return jsonify({
+            "client_secret": intent.client_secret,
+            "payment_id": payment.id
+        }), 200
+
+    except Exception as e:
+        return jsonify(error=str(e)), 500
