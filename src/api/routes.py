@@ -5,6 +5,7 @@ from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
+from sqlalchemy.orm import joinedload
 import stripe
 from dotenv import load_dotenv
 
@@ -144,17 +145,19 @@ def get_current_user():
 
 @routes.route('/freelancer/profile', methods=['GET'])
 def get_freelancer_profile():
-    user_id = request.args.get("user_id")
+    user_id = request.args.get('user_id')
 
     if not user_id:
         return jsonify({"msg": "No se proporcionó user_id"}), 400
 
-    profile = Profile.query.filter_by(user_id=user_id).first()
+    profile = Profile.query.options(
+        joinedload(Profile.skills).joinedload(FreelancerSkill.skill)
+    ).filter_by(user_id=user_id).first()
 
     if not profile:
         return jsonify({"msg": "Perfil no encontrado"}), 404
 
-    user = profile.user
+    user = profile.user  # relación a User
 
     freelancer_data = {
         "id": profile.id,
@@ -473,6 +476,19 @@ def list_proposals_for_project(project_id):
         return jsonify({"msg": "Proyecto no encontrado"}), 404
 
     return jsonify([p.serialize() for p in project.proposals])
+
+
+@routes.route('/employer/<int:employer_id>/proposals', methods=['GET'])
+@jwt_required()
+def get_employer_proposals(employer_id):
+    projects = Project.query.filter_by(employer_id=employer_id).all()
+
+    proposals = []
+    for project in projects:
+        for proposal in project.proposals:
+            proposals.append(proposal.serialize())
+
+    return jsonify(proposals), 200
 
 
 @routes.route('/freelancer/proposals', methods=['GET'])

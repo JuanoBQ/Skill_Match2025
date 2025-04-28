@@ -153,13 +153,95 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, error: "Error al obtener perfil de employer" };
 				}
 			},
+
+			createProject: async (formData) => {
+				const token = localStorage.getItem("token");
+
+				try {
+					const res = await fetch(`${BASE_URL}/projects`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": "Bearer " + token
+						},
+						body: JSON.stringify({
+							title: formData.title,
+							description: formData.description,
+							budget: formData.budget
+						})
+					});
+
+					const data = await res.json();
+
+					if (res.ok) {
+						return { success: true, project: data };
+					} else {
+						return { success: false, error: data.msg };
+					}
+				} catch (error) {
+					return { success: false, error: "Error de conexión al servidor" };
+				}
+			},
+
+			createProposal: async (proposalData) => {
+				const token = localStorage.getItem("token");
+
+				try {
+					const res = await fetch(`${BASE_URL}/projects/${proposalData.project_id}/proposals`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": "Bearer " + token
+						},
+						body: JSON.stringify({
+							freelancer_id: proposalData.freelancer_id,
+							message: proposalData.message,
+							proposed_budget: proposalData.proposed_budget
+						})
+					});
+
+					const data = await res.json();
+
+					if (res.ok) {
+						return { success: true, proposal: data };
+					} else {
+						return { success: false, error: data.msg };
+					}
+				} catch (error) {
+					console.error("Error real:", error);
+					return { success: false, error: "Error de conexión al servidor" };
+				}
+			},
+
+			getEmployerProposals: async (employerId) => {
+				const token = localStorage.getItem("token");
+			
+				try {
+					const res = await fetch(`${BASE_URL}/employer/${employerId}/proposals`, {
+						method: "GET",
+						headers: {
+							"Authorization": "Bearer " + token
+						}
+					});
+			
+					const data = await res.json();
+			
+					if (res.ok) {
+						return { success: true, proposals: data };
+					} else {
+						return { success: false, error: data.msg };
+					}
+				} catch (error) {
+					console.error("Error al ver Solicitudes:", error);
+					return { success: false, error: "Error de conexión al servidor" };
+				}
+			},
+
 			createOrUpdateProfile: async (userId, formData) => {
 				try {
 
-					console.log("👉 Datos que estoy mandando:", userId, formData); // Agrega este console.log
-
 					const res = await fetch(`${BASE_URL}/freelancer/profile`, {
-						method: "PATCH", // intentamos actualizar primero
+						method: "PATCH",
 						headers: {
 							"Content-Type": "application/json",
 						},
@@ -176,7 +258,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						console.log("✅ Perfil actualizado:", data);
 						return { success: true, profile: data };
 					} else if (res.status === 404) {
-						// Si el perfil no existe, creamos uno nuevo
 						const createRes = await fetch(`${BASE_URL}/freelancer/profile`, {
 							method: "POST",
 							headers: {
