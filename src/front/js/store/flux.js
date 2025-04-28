@@ -1,6 +1,4 @@
-
-
-const BASE_URL = "https://fictional-carnival-q74qppx4p4w63vpg-3001.app.github.dev/api";
+const BASE_URL = "https://improved-happiness-7v59ppx5pwgpfrwqr-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -14,7 +12,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			userId: localStorage.getItem("user_id") || null,
 			//  Bandera para saber si el usuario está autenticado
 			isAuthenticated: !!localStorage.getItem("token"), // true si hay token
-			user: []
+			user: [],
+			projects: []
 			
 		},
 		actions: {
@@ -142,7 +141,143 @@ const getState = ({ getStore, getActions, setStore }) => {
 						return { success: false, error: "Error al obtener perfil de employer" };
 					}
 				},
-
+				createOrUpdateProfile: async (userId, formData) => {
+					try {
+						
+							  console.log("👉 Datos que estoy mandando:", userId, formData); // Agrega este console.log
+						  
+					  const res = await fetch(`${BASE_URL}/freelancer/profile`, {
+						method: "PATCH", // intentamos actualizar primero
+						headers: {
+						  "Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+						  user_id: userId,
+						  bio: formData.bio,
+						  profile_picture: formData.profile_picture,
+						  hourly_rate: formData.hourly_rate,
+						}),
+					  });
+				  
+					  if (res.ok) {
+						const data = await res.json();
+						console.log("✅ Perfil actualizado:", data);
+						return { success: true, profile: data };
+					  } else if (res.status === 404) {
+						// Si el perfil no existe, creamos uno nuevo
+						const createRes = await fetch(`${BASE_URL}/freelancer/profile`, {
+						  method: "POST",
+						  headers: {
+							"Content-Type": "application/json",
+						  },
+						  body: JSON.stringify({
+							user_id: userId,
+							bio: formData.bio,
+							profile_picture: formData.profile_picture,
+							hourly_rate: formData.hourly_rate,
+						  }),
+						});
+				  
+						const createData = await createRes.json();
+						if (createRes.ok) {
+						  console.log("✅ Perfil creado:", createData);
+						  return { success: true, profile: createData };
+						} else {
+						  return { success: false, error: createData.msg };
+						}
+					  } else {
+						const errorData = await res.json();
+						return { success: false, error: errorData.msg };
+					  }
+					} catch (error) {
+					  console.error("❌ Error en 	createOrUpdateProfile::", error);
+					  return { success: false, error: "Error de red" };
+					}
+				  },
+				  getSkills: async () => {
+					try {
+					  const res = await fetch(`${BASE_URL}/skills`);
+					  const data = await res.json();
+				  
+					  if (res.ok) {
+						return { success: true, skills: data };
+					  } else {
+						return { success: false, error: data.msg };
+					  }
+					} catch (error) {
+					  return { success: false, error: "Error al obtener skills" };
+					}
+				  },
+				  addFreelancerSkills: async (userId, skillIds) => {
+					try {
+					  const res = await fetch(`${BASE_URL}/freelancer/skills`, {
+						method: "POST",
+						headers: {
+						  "Content-Type": "application/json"
+						},
+						body: JSON.stringify({
+						  user_id: userId,
+						  skill_ids: skillIds
+						})
+					  });
+				  
+					  const data = await res.json();
+				  
+					  if (res.ok) {
+						return { success: true };
+					  } else {
+						return { success: false, error: data.msg };
+					  }
+					} catch (error) {
+					  return { success: false, error: "Error al asignar skills" };
+					}
+				  },
+				  clearFreelancerSkills: async (userId) => {
+					try {
+					  // Traemos todas las skills actuales del perfil
+					  const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
+					  const data = await res.json();
+				  
+					  if (!res.ok || !data.skills) {
+						return { success: false, error: "No se pudieron obtener las skills actuales." };
+					  }
+				  
+					  // Borramos cada skill individualmente
+					  for (const fs of data.skills) {
+						const skillId = fs.skill?.id;
+						if (skillId) {
+						  await fetch(`${BASE_URL}/freelancer/skills/${skillId}?user_id=${userId}`, {
+							method: "DELETE",
+						  });
+						}
+					  }
+				  
+					  return { success: true };
+					} catch (error) {
+					  return { success: false, error: "Error al limpiar skills." };
+					}
+				  },
+				  
+				  getUsers: async ()=>{
+					try {
+						const res = await fetch(`${BASE_URL}/admin/users`)
+						const data = await res.json();
+						setStore({user : data});
+					} catch (error) {
+						console.error(error)
+					}
+				  },
+				  
+				  
+				  getProjects: async ()=>{
+					try {
+						const res = await fetch(`${BASE_URL}/projects`)
+						const data = await res.json();
+						setStore({projects : data});
+					} catch (error) {
+						console.error(error)
+					}
+				  }
 				
 			  
 

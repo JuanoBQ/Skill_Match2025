@@ -1,6 +1,7 @@
 import React, { useContext,useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
+import logo from './../../../../public/Logo SkillMatch.png';
 
 export const Navbar = () => {
   const { store, actions } = useContext(Context);
@@ -32,13 +33,25 @@ export const Navbar = () => {
   };
   
 
+  const goToFreelancers = () => {
+
+      navigate('/DashboardFreelancer');
+ 
+    };
+
+  const goToProjects = () => {
+
+      navigate('/DashboardProjects');
+ 
+  };
+
   return (
     <div className="container-fluid">
       <nav className="navbar">
         <div className="container-fluid navStyles">
           <Link to={"/"}>
             <a className="navbar-brand" href="#">
-              <img src="https://demo.themetorium.net/html/nui/assets/img/logo-dark.png" alt="Bootstrap" width="42" height="38" />
+              <img src={logo} alt="Bootstrap" width="42" height="38" />
             </a>
           </Link>
 
@@ -46,8 +59,28 @@ export const Navbar = () => {
             <Link className="nav-link active ms-2 me-3" to="/">Home</Link>
             <a className="nav-link me-3" href="#">About</a>
             <a className="nav-link me-3" href="#">Services</a>
-            <a className="nav-link" href="#">Contact</a>
+            <a className="nav-link me-3" href="#">Contact</a>
+            {store.isAuthenticated ? (
+             <div class="dropdown">
+             <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+               Services
+             </button>
+             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               <li><a class="dropdown-item" href="#" onClick={goToFreelancers}>Freelancers</a></li>
+               <li><a class="dropdown-item" href="#" onClick={goToProjects}>Projects</a></li>
+             </ul>
+           </div>
+            ) : null}
           </div>
+
+         
+       
+
+                
+
+
+
+
 
           <form className="d-flex me-4" role="search">
             <input className="form-control me-2" type="search" aria-label="Search" />
