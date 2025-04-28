@@ -85,7 +85,7 @@ def login():
         return jsonify({"msg": "Usuario o contraseña invalido."}), 401
 
 
-@api.route('/private', methods=["GET"])
+@routes.route('/private', methods=["GET"])
 @jwt_required()
 def home():
 

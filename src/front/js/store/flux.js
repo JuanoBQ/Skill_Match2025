@@ -1,6 +1,6 @@
 
 
-const BASE_URL = "https://potential-halibut-g4q4gvqrvq6v2pwqj-3001.app.github.dev/api";
+const BASE_URL = "https://fictional-carnival-q74qppx4p4w63vpg-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -14,6 +14,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			userId: localStorage.getItem("user_id") || null,
 			//  Bandera para saber si el usuario está autenticado
 			isAuthenticated: !!localStorage.getItem("token"), // true si hay token
+			user: []
 			
 		},
 		actions: {
@@ -142,6 +143,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 				},
 
+				
 			  
 
 			  
