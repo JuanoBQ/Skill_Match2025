@@ -1,4 +1,4 @@
-const BASE_URL = "https://bug-free-space-sniffle-976wxwj69r9737pxg-3001.app.github.dev/api";
+const BASE_URL = "https://fuzzy-umbrella-x5w5jgwpgw5726q7v-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
