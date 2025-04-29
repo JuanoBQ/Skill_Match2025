@@ -19,8 +19,6 @@ api = Blueprint('api', __name__)
 
 bcrypt = Bcrypt()
 
-# --- AUTENTICACIÓN ---
-
 
 @routes.route('/register', methods=['POST'])
 def register():

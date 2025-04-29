@@ -12,7 +12,7 @@ export const Jumbotron = () => {
                 ¡Tu próxima oportunidad comienza aquí!
                 </p>
                 <button className="btn btn-primary btn-lg" type="button">
-                    Empezar ahora
+                    Empezar ahora!
                 </button>
             </div>
         </div>
