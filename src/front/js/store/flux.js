@@ -216,6 +216,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			
+
 			getEmployerProposals: async (employerId) => {
 				const token = localStorage.getItem("token");
 

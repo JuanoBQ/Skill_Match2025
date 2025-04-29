@@ -130,7 +130,7 @@ const Home = () => {
 									<p>"Encontré el desarrollador perfecto en solo 48 horas. La calidad del trabajo superó mis expectativas."</p>
 								</div>
 								<div className="testimonial-author">
-									<img src="https://via.placeholder.com/60x60" alt="Client" className="author-img" />
+								<img src="/public/user01.png" alt="Freelancer 3" className="author-img" />
 									<div>
 										<h4>María González</h4>
 										<p>CEO, TechStartup</p>
@@ -144,7 +144,7 @@ const Home = () => {
 									<p>"La plataforma me permitió encontrar proyectos interesantes y clientes que valoran mi trabajo."</p>
 								</div>
 								<div className="testimonial-author">
-									<img src="https://via.placeholder.com/60x60" alt="Freelancer" className="author-img" />
+								<img src="/img/freelancer2.png" alt="Freelancer 2" className="author-img" />
 									<div>
 										<h4>Carlos Rodríguez</h4>
 										<p>Diseñador UX/UI</p>
@@ -158,7 +158,7 @@ const Home = () => {
 									<p>"Skill Match nos ayudó a escalar nuestro equipo rápidamente con talento de alta calidad."</p>
 								</div>
 								<div className="testimonial-author">
-									<img src="https://via.placeholder.com/60x60" alt="Client" className="author-img" />
+								<img src="/img/freelancer1.png" alt="Freelancer 1" className="author-img" />
 									<div>
 										<h4>Andrea Silva</h4>
 										<p>Director de Proyecto, GrowthCorp</p>

@@ -15,7 +15,6 @@ const PaymentPage = () => {
     useEffect(() => {
         const fetchProposal = async () => {
             try {
-
                 const res = await fetch(`${BASE_URL}/proposals/${proposalId}`, {
                     method: "GET",
                     headers: {
@@ -40,9 +39,29 @@ const PaymentPage = () => {
         fetchProposal();
     }, [proposalId]);
 
-    const handlePayment = () => {
-        alert("💳 ¡Pago confirmado exitosamente!");
-        navigate("/employerProfile");
+    const handlePayment = async () => {
+        try {
+            const res = await fetch(`${BASE_URL}/create-payment-intent`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+                body: JSON.stringify({ proposal_id: proposalId })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("¡Pago procesado exitosamente en Stripe!");
+                navigate("/employerProfile");
+            } else {
+                alert("Error en el pago: " + data.error);
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+            alert("Error de conexión al procesar el pago");
+        }
     };
 
     if (loading) {
