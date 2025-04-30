@@ -15,6 +15,8 @@ const EmployerProfile = () => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [budget, setBudget] = useState("");
+    const [availableSkills, setAvailableSkills] = useState([]);
+    const [selectedSkills, setSelectedSkills] = useState([]);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -37,34 +39,54 @@ const EmployerProfile = () => {
             setLoading(false);
         };
 
-        const fetchProposals = async () => {
-            const userId = localStorage.getItem("user_id");
-            const res = await actions.getEmployerProposals(userId);
+        const fetchSkillsAndProposals = async () => {
+            const employerId = localStorage.getItem("user_id");
+
+            // Habilidades disponibles
+            const skillsRes = await actions.getSkills();
+            if (skillsRes.success) {
+                const options = skillsRes.skills.map(skill => ({
+                    value: skill.id,
+                    label: skill.name
+                }));
+                setAvailableSkills(options);
+            }
+
+            // Propuestas del empleador
+            const res = await actions.getEmployerProposals(employerId);
             if (res.success) {
                 setProposals(res.proposals);
+            } else {
+                console.error("Error cargando propuestas:", res.error);
             }
         };
 
+
         fetchProfile();
-        fetchProposals();
+        fetchSkillsAndProposals();
     }, [actions]);
 
     const handleEditProfile = () => navigate("/employerForm");
 
     const handleCreateProject = async (e) => {
         e.preventDefault();
+    
         const res = await actions.createProject({
             title,
             description,
             budget: parseFloat(budget),
+            skills: selectedSkills.map(skill => skill.value)
         });
-
+    
         if (res.success) {
-            alert("Oferta creada");
+            alert("Oferta creada exitosamente.");
             setShowForm(false);
-            setTitle(""); setDescription(""); setBudget("");
+            setTitle("");
+            setDescription("");
+            setBudget("");
+            setSelectedSkills([]);
         } else {
-            alert("Error: " + res.error);
+            alert("Error al crear la oferta: " + res.error);
         }
     };
 
@@ -88,6 +110,8 @@ const EmployerProfile = () => {
         };
         reader.readAsDataURL(file);
     };
+
+    
 
     if (loading) return <div className="text-center mt-5">Cargando perfil...</div>;
     if (!profile) return <div className="text-center mt-5">Perfil no encontrado.</div>;
@@ -170,6 +194,16 @@ const EmployerProfile = () => {
                             <div className="mb-3">
                                 <input type="number" className="form-control" placeholder="Presupuesto (USD)"
                                     value={budget} onChange={(e) => setBudget(e.target.value)} required />
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label">Habilidades requeridas</label>
+                                <Select
+                                    isMulti
+                                    options={availableSkills}
+                                    value={selectedSkills}
+                                    onChange={setSelectedSkills}
+                                    placeholder="Selecciona las habilidades necesarias"
+                                />
                             </div>
                             <button type="submit" className="btn btn-success w-100">Publicar proyecto</button>
                         </form>
