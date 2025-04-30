@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "../../styles/home.css";
+import 'animate.css';
 
 const Home = () => {
 	return (
@@ -32,7 +33,7 @@ const Home = () => {
 						</div>
 						<div className="col-lg-6 col-md-12 hero-image">
 							<img
-								src="https://via.placeholder.com/600x400?text=Professional+Working"
+								src="https://s36496.pcdn.co/wp-content/uploads/2022/12/guia-sector-it-02.jpg"
 								alt="Profesional trabajando"
 								className="img-fluid"
 							/>
@@ -130,7 +131,7 @@ const Home = () => {
 									<p>"Encontré el desarrollador perfecto en solo 48 horas. La calidad del trabajo superó mis expectativas."</p>
 								</div>
 								<div className="testimonial-author">
-								<img src="/public/user01.png" alt="Freelancer 3" className="author-img" />
+									<img src="/user02.png" alt="Freelancer 3" className="author-img" />
 									<div>
 										<h4>María González</h4>
 										<p>CEO, TechStartup</p>
@@ -144,7 +145,7 @@ const Home = () => {
 									<p>"La plataforma me permitió encontrar proyectos interesantes y clientes que valoran mi trabajo."</p>
 								</div>
 								<div className="testimonial-author">
-								<img src="/img/freelancer2.png" alt="Freelancer 2" className="author-img" />
+									<img src="/img/freelancer2.png" alt="Freelancer 2" className="author-img" />
 									<div>
 										<h4>Carlos Rodríguez</h4>
 										<p>Diseñador UX/UI</p>
@@ -158,7 +159,7 @@ const Home = () => {
 									<p>"Skill Match nos ayudó a escalar nuestro equipo rápidamente con talento de alta calidad."</p>
 								</div>
 								<div className="testimonial-author">
-								<img src="/img/freelancer1.png" alt="Freelancer 1" className="author-img" />
+									<img src="/img/freelancer1.png" alt="Freelancer 1" className="author-img" />
 									<div>
 										<h4>Andrea Silva</h4>
 										<p>Director de Proyecto, GrowthCorp</p>

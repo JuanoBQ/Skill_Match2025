@@ -59,10 +59,56 @@ const EmployerForm = () => {
 
     return (
         <div className="container mt-5">
-            <h2 className="mb-4 text-center">Editar Perfil de Empleador</h2>
-            <form onSubmit={handleSubmit} className="card shadow-sm p-4">
+            <h2 className="mb-4 text-center fw-bold">Editar Perfil</h2>
+            <form onSubmit={handleSubmit} className="card shadow-sm p-4 animate__animated animate__fadeIn">
+
+                <div className="mb-4 text-center">
+                    <div className="position-relative d-inline-block">
+                        <img
+                            src={profilePicture || "/default-avatar.png"}
+                            alt="Foto de perfil"
+                            className="rounded-circle border"
+                            style={{ width: "120px", height: "120px", objectFit: "cover" }}
+                        />
+                        <label
+                            htmlFor="uploadProfile"
+                            className="position-absolute bg-light border rounded-circle"
+                            style={{
+                                bottom: 0,
+                                right: 0,
+                                width: "30px",
+                                height: "30px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer"
+                            }}
+                        >
+                            <i className="fas fa-camera"></i>
+                        </label>
+                        <input
+                            type="file"
+                            id="uploadProfile"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                    const result = await actions.uploadEmployerPicture(store.userId, file);
+                                    if (result.success) {
+                                        setProfilePicture(`${process.env.PUBLIC_URL}${result.pictureUrl}`);
+                                        localStorage.setItem("profile_picture", result.pictureUrl);
+                                    } else {
+                                        alert("Error al subir la imagen");
+                                    }
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+
                 <div className="mb-3">
-                    <label className="form-label">Descripción / Sobre nosotros</label>
+                    <label className="form-label">Descripción</label>
                     <textarea
                         className="form-control"
                         value={bio}
@@ -71,22 +117,16 @@ const EmployerForm = () => {
                         rows={4}
                         required
                     />
-                </div>
-
-                <div className="mb-3">
-                    <label className="form-label">Foto de perfil (URL)</label>
-                    <input
-                        type="url"
-                        className="form-control"
-                        value={profilePicture}
-                        onChange={(e) => setProfilePicture(e.target.value)}
-                        placeholder="https://..."
-                        pattern="https?://.+"
-                    />
+                    <div className="invalid-feedback">
+                        Este campo es obligatorio.
+                    </div>
+                    <small className="form-text text-muted">
+                        Describe la misión de tu empresa, tus valores o el tipo de talento que buscas.
+                    </small>
                 </div>
 
                 <button type="submit" className="btn btn-dark w-100" disabled={saving}>
-                    {saving ? "Guardando..." : "Guardar Perfil"}
+                    {saving ? <><span className="spinner-border spinner-border-sm me-2"></span>Guardando...</> : "Guardar Perfil"}
                 </button>
             </form>
         </div>
