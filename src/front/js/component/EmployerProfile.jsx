@@ -8,6 +8,7 @@ const EmployerProfile = () => {
 
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [profileImage, setProfileImage] = useState("");
     const [proposals, setProposals] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [showProposals, setShowProposals] = useState(false);
@@ -16,45 +17,42 @@ const EmployerProfile = () => {
     const [budget, setBudget] = useState("");
 
     useEffect(() => {
-        const fetchProposals = async () => {
-            const employerId = localStorage.getItem("user_id");
-            const res = await actions.getEmployerProposals(employerId);
-
-            if (res.success) {
-                setProposals(res.proposals);
-            } else {
-                console.error("Error cargando propuestas:", res.error);
-            }
-        };
-
         const fetchProfile = async () => {
             const userId = localStorage.getItem("user_id");
-
             if (!userId) {
                 console.error("No hay user_id en localStorage.");
                 setLoading(false);
                 return;
             }
 
-            const response = await actions.getEmployerProfile(userId);
-
-            if (response.success && response.profile) {
-                setProfile(response.profile);
+            const res = await actions.getEmployerProfile(userId);
+            if (res.success && res.profile && res.profile.bio !== null) {
+                setProfile(res.profile);
+                const stored = localStorage.getItem("profile_picture");
+                setProfileImage(stored || res.profile.profile_picture || "https://via.placeholder.com/120");
             } else {
-                console.warn("Perfil incompleto o no encontrado, redirigiendo...");
                 navigate("/employerForm");
             }
 
             setLoading(false);
         };
 
+        const fetchProposals = async () => {
+            const userId = localStorage.getItem("user_id");
+            const res = await actions.getEmployerProposals(userId);
+            if (res.success) {
+                setProposals(res.proposals);
+            }
+        };
+
         fetchProfile();
         fetchProposals();
-    }, [actions, navigate]);
+    }, [actions]);
+
+    const handleEditProfile = () => navigate("/employerForm");
 
     const handleCreateProject = async (e) => {
         e.preventDefault();
-
         const res = await actions.createProject({
             title,
             description,
@@ -62,35 +60,39 @@ const EmployerProfile = () => {
         });
 
         if (res.success) {
-            alert("Oferta laboral creada exitosamente.");
+            alert("Oferta creada");
             setShowForm(false);
-            setTitle("");
-            setDescription("");
-            setBudget("");
+            setTitle(""); setDescription(""); setBudget("");
         } else {
-            alert("Error al crear Oferta laboral: " + res.error);
+            alert("Error: " + res.error);
         }
     };
 
-    const handleHire = (proposalId) => {
-        navigate(`/payment/${proposalId}`);
+    const handleHire = (proposalId) => navigate(`/payment/${proposalId}`);
+
+    const handlePictureChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const imageUrl = reader.result;
+            const userId = localStorage.getItem("user_id");
+            const res = await actions.uploadEmployerPicture(userId, imageUrl);
+            if (res.success) {
+                setProfileImage(imageUrl);
+                alert("Foto actualizada");
+            } else {
+                alert("Error al actualizar foto");
+            }
+        };
+        reader.readAsDataURL(file);
     };
 
-    const handleEditProfile = () => {
-        navigate("/employerForm");
-    };
+    if (loading) return <div className="text-center mt-5">Cargando perfil...</div>;
+    if (!profile) return <div className="text-center mt-5">Perfil no encontrado.</div>;
 
-    if (loading) {
-        return <div className="text-center mt-5">Cargando perfil...</div>;
-    }
-
-    if (!profile) {
-        return <div className="text-center mt-5">Perfil no disponible</div>;
-    }
-
-    const fullName = profile.user?.first_name && profile.user?.last_name
-        ? `${profile.user.first_name} ${profile.user.last_name}`
-        : "Nombre no disponible";
+    const fullName = `${profile.user?.first_name || ""} ${profile.user?.last_name || ""}`;
 
     return (
         <div className="container mt-5" style={{ minHeight: "100vh" }}>
@@ -98,13 +100,32 @@ const EmployerProfile = () => {
                 <h2 className="fw-bold">Perfil del Empleador</h2>
                 <div className="card mb-4 p-4">
                     <div className="d-flex align-items-center flex-column flex-md-row">
-                        <img
-                            src={profile.profile_picture || "https://via.placeholder.com/120"}
-                            alt="Foto de perfil"
-                            className="rounded-circle me-md-4 mb-3 mb-md-0"
-                            style={{ width: "120px", height: "120px", objectFit: "cover" }}
-                        />
+                        {/* Imagen con botón de cámara */}
+                        <div className="position-relative me-md-4 mb-3 mb-md-0">
+                            <img
+                                src={profileImage}
+                                alt="Foto de perfil"
+                                className="rounded-circle"
+                                style={{ width: "120px", height: "120px", objectFit: "cover" }}
+                            />
+                            <label
+                                htmlFor="upload-photo"
+                                className="position-absolute bottom-0 end-0 bg-light rounded-circle p-1 border"
+                                style={{ cursor: "pointer", width: "30px", height: "30px", display: "flex", justifyContent: "center", alignItems: "center" }}
+                                title="Cambiar foto"
+                            >
+                                <i className="fas fa-camera"></i>
+                            </label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                id="upload-photo"
+                                style={{ display: "none" }}
+                                onChange={handlePictureChange}
+                            />
+                        </div>
 
+                        {/* Info personal */}
                         <div className="text-center text-md-start flex-grow-1">
                             <h4>{fullName}</h4>
                             <p className="text-muted mb-1">{profile.user?.email}</p>
@@ -122,79 +143,49 @@ const EmployerProfile = () => {
                 </div>
             </div>
 
-            {/* ACCIONES */}
+            {/* Botones de acción */}
             <div className="d-flex justify-content-center gap-3 mb-4">
-                <button
-                    className="btn btn-dark"
-                    onClick={() => setShowForm((prev) => !prev)}
-                >
+                <button className="btn btn-dark" onClick={() => setShowForm((prev) => !prev)}>
                     {showForm ? "Cancelar" : "Crear nueva oferta"}
                 </button>
-
-                <button
-                    className="btn btn-outline-primary"
-                    onClick={() => setShowProposals((prev) => !prev)}
-                >
+                <button className="btn btn-outline-primary" onClick={() => setShowProposals((prev) => !prev)}>
                     {showProposals ? "Ocultar solicitudes" : "Ver solicitudes recibidas"}
                 </button>
             </div>
 
-            {/* FORMULARIO CREAR OFERTA */}
+            {/* Formulario de oferta */}
             {showForm && (
                 <div className="card shadow mb-4">
                     <div className="card-body">
                         <h5 className="mb-4">Nueva Oferta de Trabajo</h5>
                         <form onSubmit={handleCreateProject}>
                             <div className="mb-3">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Título del proyecto"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    required
-                                />
+                                <input type="text" className="form-control" placeholder="Título del proyecto"
+                                    value={title} onChange={(e) => setTitle(e.target.value)} required />
                             </div>
-
                             <div className="mb-3">
-                                <textarea
-                                    className="form-control"
-                                    placeholder="Descripción del proyecto"
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    required
-                                ></textarea>
+                                <textarea className="form-control" placeholder="Descripción"
+                                    value={description} onChange={(e) => setDescription(e.target.value)} required />
                             </div>
-
                             <div className="mb-3">
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    placeholder="Presupuesto (USD)"
-                                    value={budget}
-                                    onChange={(e) => setBudget(e.target.value)}
-                                    required
-                                />
+                                <input type="number" className="form-control" placeholder="Presupuesto (USD)"
+                                    value={budget} onChange={(e) => setBudget(e.target.value)} required />
                             </div>
-
-                            <button type="submit" className="btn btn-success w-100">
-                                Publicar proyecto
-                            </button>
+                            <button type="submit" className="btn btn-success w-100">Publicar proyecto</button>
                         </form>
                     </div>
                 </div>
             )}
 
-            {/* SOLICITUDES RECIBIDAS */}
+            {/* Propuestas */}
             {showProposals && (
                 <div className="card shadow mb-5">
                     <div className="card-body">
                         <h5 className="mb-4 text-center">Solicitudes Recibidas</h5>
-
                         {proposals.length > 0 ? (
                             proposals.map((proposal) => (
                                 <div key={proposal.id} className="border rounded p-3 mb-3">
-                                    <h6>Proyecto: {proposal.project?.title || "Proyecto desconocido"}</h6>
+                                    <h6>Proyecto: {proposal.project?.title || "Sin título"}</h6>
                                     <p><strong>Freelancer:</strong> {proposal.freelancer?.first_name} {proposal.freelancer?.last_name}</p>
                                     <p><strong>Mensaje:</strong> {proposal.message}</p>
                                     <p><strong>Presupuesto:</strong> ${proposal.proposed_budget}</p>

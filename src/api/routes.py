@@ -650,3 +650,22 @@ def update_employer_profile():
 
     db.session.commit()
     return jsonify(profile.serialize()), 200
+
+
+@routes.route('/employer/profile/picture', methods=['PATCH'])
+def update_employer_picture():
+    data = request.json
+    user_id = data.get("user_id")
+    picture_url = data.get("profile_picture")
+
+    if not user_id or not picture_url:
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    profile = Profile.query.filter_by(user_id=user_id).first()
+    if not profile:
+        return jsonify({"msg": "Perfil no encontrado"}), 404
+
+    profile.profile_picture = picture_url
+    db.session.commit()
+
+    return jsonify({ "success": True, "picture": picture_url }), 200

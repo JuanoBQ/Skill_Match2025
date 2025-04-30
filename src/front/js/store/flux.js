@@ -331,6 +331,29 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			uploadEmployerPicture: async (userId, pictureUrl) => {
+				try {
+					const res = await fetch(`${BASE_URL}/employer/profile/picture`, {
+						method: "PATCH",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({ user_id: userId, profile_picture: pictureUrl })
+					});
+			
+					if (res.ok) {
+						const data = await res.json();
+						localStorage.setItem("profile_picture", pictureUrl);
+						return { success: true, picture: pictureUrl };
+					} else {
+						return { success: false, error: "No se pudo actualizar la imagen" };
+					}
+				} catch (err) {
+					console.error(err);
+					return { success: false, error: "Error de conexión" };
+				}
+			},
+
 			getSkills: async () => {
 				try {
 					const res = await fetch(`${BASE_URL}/skills`);
