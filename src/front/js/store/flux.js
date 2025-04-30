@@ -93,7 +93,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							email: data.email,
 							role: data.role,
 							userId: data.user_id,
-							isAuthenticated: true,
+							isAuthenticated: false,
 						});
 
 						console.log("✅ Después de register:");
