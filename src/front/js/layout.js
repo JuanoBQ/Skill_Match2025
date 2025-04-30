@@ -21,8 +21,8 @@ import FreelancerProfile from "./component/FreelancerProfile.jsx";
 import ProfileForm from "./component/ProfileForm.jsx";
 import DashboardFreelancer from "./component/DashboardFreelancer.jsx";
 import DashboardProjects from "./component/DashboardProjects.jsx";
-
 import PaymentPage from "./component/PaymentPage.jsx";
+import EmployerForm from "./component/EmployerForm.jsx";
 
 
 
@@ -36,10 +36,11 @@ const Layout = () => {
     if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     return (
-        <div>
+        <div className="d-flex flex-column min-vh-100">
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
                     <Navbar />
+                    <div className="flex-grow-1">
                     <Routes>
                         <Route element={<Home />} path="/" />
                         <Route element={<Demo />} path="/demo" />
@@ -48,12 +49,12 @@ const Layout = () => {
                         <Route element={<Login />} path="/login" />
                         <Route element={<Register />} path="/register" />
                         <Route element={<EmployerProfile />} path="/employerProfile" />
-                        <Route element={<EmployerProfile />} path="/employerProfile" />
                         <Route element={<FreelancerProfile />} path="/freelancerProfile" />
                         <Route element={<ProfileForm />} path="/profileform" />
                         <Route element={<DashboardFreelancer />} path="/DashboardFreelancer" />
                         <Route element={<DashboardProjects />} path="/DashboardProjects" />
                         <Route element={<Dashboard />} path="/Dashboard" />
+                        <Route element={<EmployerForm />} path="/employerForm" />
 
                
                         <Route path="*" element={<h1>Not found!</h1>} />
@@ -62,10 +63,9 @@ const Layout = () => {
                         <Route element={<PaymentPage />} path="/payment/:proposalId" />
 
 
-
-
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
+                    </div>
                     <Footer />
                 </ScrollToTop>
             </BrowserRouter>

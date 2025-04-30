@@ -585,3 +585,68 @@ def create_payment():
 
     except Exception as e:
         return jsonify(error=str(e)), 500
+    
+
+@routes.route('/employer/profile', methods=['GET'])
+def get_employer_profile():
+    user_id = request.args.get('user_id')
+
+    if not user_id:
+        return jsonify({"msg": "No se proporcionó user_id"}), 400
+
+    profile = Profile.query.options(joinedload(Profile.user)).filter_by(user_id=user_id).first()
+
+    if not profile:
+        return jsonify({"msg": "Perfil no encontrado"}), 404
+
+    return jsonify({
+        "id": profile.id,
+        "bio": profile.bio,
+        "profile_picture": profile.profile_picture,
+        "user": {
+            "first_name": profile.user.first_name,
+            "last_name": profile.user.last_name,
+            "email": profile.user.email
+        }
+    }), 200
+
+
+@routes.route('/employer/profile', methods=['POST'])
+def create_employer_profile():
+    data = request.json
+    user_id = data.get('user_id')
+
+    if not user_id:
+        return jsonify({"msg": "user_id es requerido"}), 400
+
+    profile = Profile.query.filter_by(user_id=user_id).first()
+    if profile:
+        return jsonify({"msg": "El perfil ya existe"}), 400
+
+    profile = Profile(
+        user_id=user_id,
+        bio=data.get('bio'),
+        profile_picture=data.get('profile_picture'),
+        rating=0
+    )
+
+    db.session.add(profile)
+    db.session.commit()
+
+    return jsonify(profile.serialize()), 201
+
+
+@routes.route('/employer/profile', methods=['PATCH'])
+def update_employer_profile():
+    data = request.json
+    user_id = data.get('user_id')
+
+    profile = Profile.query.filter_by(user_id=user_id).first()
+    if not profile:
+        return jsonify({"msg": "Perfil no encontrado"}), 404
+
+    profile.bio = data.get('bio', profile.bio)
+    profile.profile_picture = data.get('profile_picture', profile.profile_picture)
+
+    db.session.commit()
+    return jsonify(profile.serialize()), 200
