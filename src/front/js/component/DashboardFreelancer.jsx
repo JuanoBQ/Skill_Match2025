@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Context } from '../store/appContext';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardFreelancer = () => {
     const { store, actions } = useContext(Context);
+    const navigate = useNavigate();
 
-useEffect(()=>{
+    useEffect(()=>{
     actions.getUsers();
-},[])
+    },[])
+
+    const goToProfile = (id) => {
+        navigate(`/Profile/${id}`);
+    };
 
 return(
  <div className='container-fluid d-flex justify-content-center mt-5'>
@@ -25,7 +31,7 @@ return(
                     <div className="card-body">
                         <h5 className="card-title">{user.first_name} {user.last_name}</h5>
                         <p className="card-text">Desarrollador web con experiencia en frontend y backend. Especializado en React, Node.js, y diseño UX/UI.</p>
-                        <a href="#" className="btn btn-info">Ver perfil</a>
+                        <button className="btn btn-info" onClick={() => goToProfile(user.id)}>Ver perfil</button>
                     </div>
                     <ul className="list-group list-group-flush">
                         <li className="list-group-item"><strong>Ubicación:</strong> Madrid, España</li>
