@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 
 export const Footer = () => {
     return (
-        <footer className="footer-section bg-dark text-light py-4">
+        <footer className="footer-section bg-dark text-light py-4 mt-5">
             <div className="container">
                 <div className="row align-items-center">
                     {/* Logo y nombre */}
                     <div className="col-md-4 text-center text-md-start mb-3 mb-md-0">
-                        <h4 className="mb-0">SkillMatch</h4>
+                        <h4 className="mb-0 text-white">SkillMatch</h4>
                         <small>Conectando talento y oportunidades</small>
                     </div>
 

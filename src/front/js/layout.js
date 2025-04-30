@@ -7,11 +7,11 @@ import Home from "./pages/home";
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import { Dashboard } from "./pages/Dashboard.js";
+import { Profile } from "./pages/Profile.js";
 import { Helpcenter } from "./pages/helpcenter";
 import { ContactUs } from "./pages/contactus";
 import { Historial } from "./pages/historial";
 import injectContext from "./store/appContext";
-
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import Login from "./component/Login.jsx";
@@ -53,14 +53,11 @@ const Layout = () => {
                         <Route element={<ProfileForm />} path="/profileform" />
                         <Route element={<DashboardFreelancer />} path="/DashboardFreelancer" />
                         <Route element={<DashboardProjects />} path="/DashboardProjects" />
-                        <Route element={<Dashboard />} path="/Dashboard" />
+                        <Route element={<Dashboard />} path="/Dashboard" />               
                         <Route element={<EmployerForm />} path="/employerForm" />
-
-               
                         <Route path="*" element={<h1>Not found!</h1>} />
-                        <Route element={<DashboardFreelancer />} path="/DashboardFreelancer" />
-                        <Route element={<DashboardProjects />} path="/DashboardProjects" />
                         <Route element={<PaymentPage />} path="/payment/:proposalId" />
+                        <Route element={<Profile />} path="/Profile/:id" />
 
 
                         <Route element={<h1>Not found!</h1>} />
