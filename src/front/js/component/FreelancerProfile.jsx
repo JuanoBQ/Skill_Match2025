@@ -74,9 +74,9 @@ const FreelancerProfile = () => {
             <strong>Habilidades:</strong>
             <ul>
               {profile.skills && profile.skills.length > 0 ? (
-                profile.skills.map((fs, index) => (
-                  <li key={fs.skill?.id || index}>
-                    {fs.skill?.name || "Skill desconocida"}
+                profile.skills.map((skill, index) => (
+                  <li key={skill.id || index}>
+                    {skill.name || "Skill desconocida"}
                   </li>
                 ))
               ) : (
@@ -85,7 +85,6 @@ const FreelancerProfile = () => {
             </ul>
           </div>
 
-          {/* BOTÓN PARA EDITAR PERFIL */}
           <div className="text-center mt-4">
             <button className="btn btn-dark px-4 py-2" onClick={handleEditProfile}>
               Editar Perfil

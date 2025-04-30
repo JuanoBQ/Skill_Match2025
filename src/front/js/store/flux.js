@@ -89,10 +89,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 						// Actualiza el store
 						setStore({
-							token: data.access_token,
+							token: null,
 							email: data.email,
-							role: data.role,
-							userId: data.user_id,
+							role: null,
+							userId: null,
 							isAuthenticated: false,
 						});
 
@@ -332,29 +332,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			clearFreelancerSkills: async (userId) => {
 				try {
-					// Traemos todas las skills actuales del perfil
 					const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
 					const data = await res.json();
-
+			
 					if (!res.ok || !data.skills) {
 						return { success: false, error: "No se pudieron obtener las skills actuales." };
 					}
-
-					// Borramos cada skill individualmente
-					for (const fs of data.skills) {
-						const skillId = fs.skill?.id;
+			
+					// Usamos Promise.all para esperar todos los DELETEs
+					const deleteRequests = data.skills.map(fs => {
+						const skillId = fs.id || fs.skill?.id;
 						if (skillId) {
-							await fetch(`${BASE_URL}/freelancer/skills/${skillId}?user_id=${userId}`, {
-								method: "DELETE",
+							return fetch(`${BASE_URL}/freelancer/skills/${skillId}?user_id=${userId}`, {
+								method: "DELETE"
 							});
 						}
-					}
-
+						return null;
+					}).filter(Boolean); // Filtra los null
+			
+					await Promise.all(deleteRequests);
+			
 					return { success: true };
 				} catch (error) {
 					return { success: false, error: "Error al limpiar skills." };
 				}
 			},
+			
 
 			getUsers: async () => {
 				try {

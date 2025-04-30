@@ -147,10 +147,11 @@ def get_freelancer_profile():
 
     if not user_id:
         return jsonify({"msg": "No se proporcionó user_id"}), 400
-
     profile = Profile.query.options(
-        joinedload(Profile.skills).joinedload(FreelancerSkill.skill)
+        joinedload(Profile.skills).joinedload(FreelancerSkill.skill),
+        joinedload(Profile.user)
     ).filter_by(user_id=user_id).first()
+
 
     if not profile:
         return jsonify({"msg": "Perfil no encontrado"}), 404
@@ -267,6 +268,37 @@ def create_skill():
     db.session.add(skill)
     db.session.commit()
     return jsonify(skill.serialize()), 201
+
+@routes.route('/skills/reset-and-seed', methods=['POST'])
+def reset_and_seed_skills():
+    # 1. Eliminar relaciones con freelancers
+    db.session.query(FreelancerSkill).delete()
+    db.session.commit()
+
+    # 2. Eliminar skills existentes
+    db.session.query(Skill).delete()
+    db.session.commit()
+
+    # 3. Lista nueva de skills
+    new_skills = [
+        "JavaScript", "Python", "React", "Vue.js", "Angular", "Node.js", "Django",
+        "Flask", "SQL", "MongoDB", "TypeScript", "PostgreSQL", "MySQL", "Express.js",
+        "Java", "C#", "PHP", "Laravel", "Ruby on Rails", "Swift", "Kotlin", "AWS",
+        "Docker", "Kubernetes", "Git", "CI/CD", "Figma", "Adobe XD", "UI/UX Design",
+        "Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "Data Science",
+        "Data Analysis", "Web Scraping", "Next.js", "Nuxt.js", "Firebase", "Redux",
+        "Tailwind CSS", "Bootstrap", "GraphQL", "REST APIs", "Jest", "Cypress",
+        "Selenium", "Scrum", "Agile", "Trello", "Notion", "WordPress", "Shopify"
+    ]
+
+    # 4. Insertarlas
+    for name in new_skills:
+        db.session.add(Skill(name=name))
+
+    db.session.commit()
+
+    return jsonify({"msg": f"{len(new_skills)} skills cargadas exitosamente"}), 200
+
 
 
 @routes.route('/freelancer/skills', methods=['POST'])
