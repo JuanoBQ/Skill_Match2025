@@ -98,7 +98,7 @@ const ProfileForm = () => {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Portafolio (URL)</label>
+          <label className="form-label">Foto de Perfil (URL)</label>
           <input
             type="text"
             className="form-control"
