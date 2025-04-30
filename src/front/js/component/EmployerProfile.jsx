@@ -38,8 +38,7 @@ const EmployerProfile = () => {
 
             const response = await actions.getEmployerProfile(userId);
 
-            if (response.success && response.profile && response.profile.bio !== null) {
-                console.log("Perfil recibido:", response.profile);
+            if (response.success && response.profile) {
                 setProfile(response.profile);
             } else {
                 console.warn("Perfil incompleto o no encontrado, redirigiendo...");
@@ -51,7 +50,7 @@ const EmployerProfile = () => {
 
         fetchProfile();
         fetchProposals();
-    }, [actions]);
+    }, [actions, navigate]);
 
     const handleCreateProject = async (e) => {
         e.preventDefault();
@@ -77,38 +76,51 @@ const EmployerProfile = () => {
         navigate(`/payment/${proposalId}`);
     };
 
+    const handleEditProfile = () => {
+        navigate("/employerForm");
+    };
+
+    if (loading) {
+        return <div className="text-center mt-5">Cargando perfil...</div>;
+    }
+
+    if (!profile) {
+        return <div className="text-center mt-5">Perfil no disponible</div>;
+    }
+
+    const fullName = profile.user?.first_name && profile.user?.last_name
+        ? `${profile.user.first_name} ${profile.user.last_name}`
+        : "Nombre no disponible";
+
     return (
         <div className="container mt-5" style={{ minHeight: "100vh" }}>
             <div className="text-center mb-5">
                 <h2 className="fw-bold">Perfil del Empleador</h2>
-                {profile && (
-                    <div className="card mb-4 p-4">
-                        <div className="d-flex align-items-center flex-column flex-md-row">
-                            <img
-                                src={profile.profile_picture || "https://via.placeholder.com/120"}
-                                alt="Foto de perfil"
-                                className="rounded-circle me-md-4 mb-3 mb-md-0"
-                                style={{ width: "120px", height: "120px", objectFit: "cover" }}
-                            />
+                <div className="card mb-4 p-4">
+                    <div className="d-flex align-items-center flex-column flex-md-row">
+                        <img
+                            src={profile.profile_picture || "https://via.placeholder.com/120"}
+                            alt="Foto de perfil"
+                            className="rounded-circle me-md-4 mb-3 mb-md-0"
+                            style={{ width: "120px", height: "120px", objectFit: "cover" }}
+                        />
 
-                            <div className="text-center text-md-start flex-grow-1">
-                                <h4>{fullName}</h4>
-                                <p className="text-muted mb-1">{profile.user?.email}</p>
-                                <p className="mb-2">
-                                    <strong>Descripción:</strong> {profile.bio || "Sin descripción aún."}
-                                </p>
-                            </div>
+                        <div className="text-center text-md-start flex-grow-1">
+                            <h4>{fullName}</h4>
+                            <p className="text-muted mb-1">{profile.user?.email}</p>
+                            <p className="mb-2">
+                                <strong>Descripción:</strong> {profile.bio || "Sin descripción aún."}
+                            </p>
+                        </div>
 
-                            <div className="text-center text-md-end">
-                                <button className="btn btn-outline-primary" onClick={handleEditProfile}>
-                                    Editar perfil
-                                </button>
-                            </div>
+                        <div className="text-center text-md-end">
+                            <button className="btn btn-outline-primary" onClick={handleEditProfile}>
+                                Editar perfil
+                            </button>
                         </div>
                     </div>
-                )}
+                </div>
             </div>
-
 
             {/* ACCIONES */}
             <div className="d-flex justify-content-center gap-3 mb-4">
