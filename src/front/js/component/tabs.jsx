@@ -5,7 +5,7 @@ import DashboardProjects from "./DashboardProjects.jsx";
 export const Tabs = () => {
     return (
         <div className="container mt-4">
-            <ul className="nav nav-tabs" id="myTab" role="tablist">
+            <ul className="nav nav-tabs ms-5" id="myTab" role="tablist">
                 <li className="nav-item" role="presentation">
                     <button
                         className="nav-link active"

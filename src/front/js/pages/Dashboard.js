@@ -29,9 +29,9 @@ export const Dashboard = () => {
         : "Nombre no disponible";
 
     return (
-        <div className="container">
+        <div className="container-fluid">
             <div className="row">
-                <div className="col-8">
+                <div className="col-8 ms-5">
                     <div className="d-flex">
                         <div className="container mb-5 background rounded-3 mx-5 mt-5">
                             <div className="ps-5 container-fluid py-5 text-start">
@@ -43,7 +43,7 @@ export const Dashboard = () => {
                     <Tabs />
                 </div>
 
-                <aside className="col-4 mt-5">
+                <aside className="col-3 mt-5 ms-5">
                     <div className="card mx-0 shadow-sm border border-0 background" style={{ maxWidth: "22rem" }}>
                         <div className="card-body d-flex pb-2 border-bottom align-items-center">
                             <img

@@ -14,5 +14,33 @@
 }
 
 .background {
-    background-color: #f0f0f0;
+    background-color: #f3f2f0;
+}
+
+.freelancer-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    background-color: #f3f2f0;
+}
+
+.freelancer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.Project-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    background-color: #f3f2f0;
+}
+
+.Project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.freelancer-profile {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    background-color: #f3f2f0;
 }

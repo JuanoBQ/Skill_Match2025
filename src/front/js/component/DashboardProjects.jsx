@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Context } from '../store/appContext';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import styles from "./../../styles/index.css"
 
 const DashboardProjects = () => {
     const { store, actions } = useContext(Context);
@@ -51,7 +52,7 @@ const DashboardProjects = () => {
                 <div>
                     {store.projects.map((project) => (
                         <div key={project.id}>
-                            <div className="card mb-3" style={{ width: '800px' }}>
+                            <div className="card mb-3 Project-card" style={{ width: '800px' }}>
                                 <div className="ms-3 row no-gutters">
                                     <div className="col-md-8">
                                         <div className="card-body">

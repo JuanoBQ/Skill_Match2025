@@ -2,6 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../../styles/home.css";
 import 'animate.css';
+import user01 from './../../../../public/user01.png';
+import user02 from './../../../../public/user02.png';
+import user03 from './../../../../public/user03.png';
+import Empresa1 from "./../../img/Empresas/Empresa 1.png"
+import Empresa2 from "./../../img/Empresas/Empresa 2.png"
+import Empresa3 from "./../../img/Empresas/Empresa 3.png"
+import Empresa4 from "./../../img/Empresas/Empresa 4.png"
+import Empresa5 from "./../../img/Empresas/Empresa 5.png"
 
 const Home = () => {
 	return (
@@ -47,11 +55,11 @@ const Home = () => {
 				<div className="container">
 					<h5 className="text-center">Empresas que confían en nosotros</h5>
 					<div className="logos-container">
-						<img src="https://via.placeholder.com/150x50?text=Logo1" alt="Company Logo" />
-						<img src="https://via.placeholder.com/150x50?text=Logo2" alt="Company Logo" />
-						<img src="https://via.placeholder.com/150x50?text=Logo3" alt="Company Logo" />
-						<img src="https://via.placeholder.com/150x50?text=Logo4" alt="Company Logo" />
-						<img src="https://via.placeholder.com/150x50?text=Logo5" alt="Company Logo" />
+						<img src="/Empresa 1.png" alt="Company Logo" style={{ width: "80px", height: "80px" }} />
+						<img src="/Empresa 2.png" alt="Company Logo" style={{ width: "80px", height: "80px" }} />
+						<img src="/Empresa 3.png" alt="Company Logo" style={{ width: "80px", height: "80px" }} />
+						<img src="/Empresa 4.png" alt="Company Logo" style={{ width: "80px", height: "80px" }} />
+						<img src="/Empresa 5.png" alt="Company Logo" style={{ width: "80px", height: "80px" }} />
 					</div>
 				</div>
 			</section>
@@ -123,7 +131,7 @@ const Home = () => {
 			{/* Testimonials */}
 			<section className="testimonials">
 				<div className="container">
-					<h2 className="text-center">Lo que dicen nuestros clientes</h2>
+					<h2 className="text-center">Lo que dicen nuestros usuarios</h2>
 					<div className="row">
 						<div className="col-lg-4 col-md-6">
 							<div className="testimonial-card">
@@ -145,7 +153,7 @@ const Home = () => {
 									<p>"La plataforma me permitió encontrar proyectos interesantes y clientes que valoran mi trabajo."</p>
 								</div>
 								<div className="testimonial-author">
-									<img src="/img/freelancer2.png" alt="Freelancer 2" className="author-img" />
+									<img src="/user01.png" alt="Freelancer 2" className="author-img" />
 									<div>
 										<h4>Carlos Rodríguez</h4>
 										<p>Diseñador UX/UI</p>
@@ -159,9 +167,9 @@ const Home = () => {
 									<p>"Skill Match nos ayudó a escalar nuestro equipo rápidamente con talento de alta calidad."</p>
 								</div>
 								<div className="testimonial-author">
-									<img src="/img/freelancer1.png" alt="Freelancer 1" className="author-img" />
+									<img src="/user03.png" alt="Freelancer 1" className="author-img" />
 									<div>
-										<h4>Andrea Silva</h4>
+										<h4>Andres Silva</h4>
 										<p>Director de Proyecto, GrowthCorp</p>
 									</div>
 								</div>

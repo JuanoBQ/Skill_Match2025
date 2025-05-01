@@ -1,4 +1,4 @@
-import React, { useContext,useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import logo from './../../../../public/Logo SkillMatch.png';
@@ -7,9 +7,9 @@ export const Navbar = () => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
   useEffect(() => {
-	console.log("🌀 STORE CAMBIÓ ->", store);
+    console.log("🌀 STORE CAMBIÓ ->", store);
   }, [store.isAuthenticated]);
-  
+
 
 
   const handleLogout = () => {
@@ -18,31 +18,31 @@ export const Navbar = () => {
   };
 
   const goToProfile = () => {
-	const currentRole = store.role;
-	console.log("Rol actual en el store:", currentRole);
-  
-	if (currentRole === "freelancer") {
-	  console.log("Redirigiendo a /freelancerProfile");
-	  navigate('/freelancerProfile');
-	} else if (currentRole === "employer") {
-	  console.log("Redirigiendo a /employerProfile");
-	  navigate('/employerProfile');
-	} else {
-	  console.log("Rol no encontrado. No se puede redirigir.");
-	}
+    const currentRole = store.role;
+    console.log("Rol actual en el store:", currentRole);
+
+    if (currentRole === "freelancer") {
+      console.log("Redirigiendo a /freelancerProfile");
+      navigate('/freelancerProfile');
+    } else if (currentRole === "employer") {
+      console.log("Redirigiendo a /employerProfile");
+      navigate('/employerProfile');
+    } else {
+      console.log("Rol no encontrado. No se puede redirigir.");
+    }
   };
-  
+
 
   const goToFreelancers = () => {
 
-      navigate('/Dashboard');
- 
-    };
+    navigate('/Dashboard');
+
+  };
 
   const goToProjects = () => {
 
-      navigate('/DashboardProjects');
- 
+    navigate('/DashboardProjects');
+
   };
 
   return (
@@ -56,25 +56,24 @@ export const Navbar = () => {
           </Link>
 
           <div className="navbar-nav navOptions col d-flex flex-row">
-            <Link to={"/dashboard"} className="nav-link active ms-2 me-3">Dashboard</Link>
-            <a className="nav-link me-3" href="#">About</a>
-            <a className="nav-link me-3" href="#">Services</a>
-            <a className="nav-link me-3" href="#">Contact</a>
+            <Link to={"/dashboard"} className="nav-link active ms-2 me-3 text-black">Dashboard</Link>
+            <a className="nav-link me-3 text-black" href="#">About</a>
+            <a className="nav-link me-3 text-black" href="#">Contact</a>
 
             {store.isAuthenticated ? (
-             <div class="dropdown">
-             <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-               Services
-             </button>
-             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-               <li><a class="dropdown-item" href="#" onClick={goToFreelancers}>Freelancers</a></li>
-               <li><a class="dropdown-item" href="#" onClick={goToProjects}>Projects</a></li>
-             </ul>
-           </div>
+              <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                  Services
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <li><a class="dropdown-item" href="#" onClick={goToFreelancers}>Freelancers</a></li>
+                  <li><a class="dropdown-item" href="#" onClick={goToProjects}>Projects</a></li>
+                </ul>
+              </div>
             ) : null}
           </div>
 
-         
+
           <form className="d-flex me-4" role="search">
             <input className="form-control me-2" type="search" aria-label="Search" />
             <button className="btn btn-outline-dark" type="submit" aria-label="Search">

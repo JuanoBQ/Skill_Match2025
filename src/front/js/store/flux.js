@@ -1,4 +1,4 @@
-const BASE_URL = "https://didactic-carnival-q7v6x6pvqw5q2x6jv-3001.app.github.dev/api";
+const BASE_URL = "https://improved-happiness-7v59ppx5pwgpfrwqr-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -13,7 +13,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			//  Bandera para saber si el usuario está autenticado
 			isAuthenticated: !!localStorage.getItem("token"), // true si hay token
 			user: [],
-			projects: []
+			projects: [],
+	
 
 		},
 		actions: {
@@ -106,7 +107,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			logout: () => {
-				
+
 				localStorage.removeItem("token");
 				localStorage.removeItem("role");
 
@@ -117,7 +118,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					isAuthenticated: false
 				});
 			},
-			
+
 			getFreelancerProfile: async (userId) => {
 				try {
 					const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
@@ -210,7 +211,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			
+
 			getEmployerProposals: async (employerId) => {
 				const token = localStorage.getItem("token");
 
@@ -299,7 +300,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							profile_picture: formData.profile_picture,
 						}),
 					});
-			
+
 					if (res.ok) {
 						const data = await res.json();
 						return { success: true, profile: data };
@@ -315,7 +316,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 								profile_picture: formData.profile_picture,
 							}),
 						});
-			
+
 						const createData = await createRes.json();
 						if (createRes.ok) {
 							return { success: true, profile: createData };
@@ -340,7 +341,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						},
 						body: JSON.stringify({ user_id: userId, profile_picture: pictureUrl })
 					});
-			
+
 					if (res.ok) {
 						const data = await res.json();
 						localStorage.setItem("profile_picture", pictureUrl);
@@ -398,11 +399,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
 					const data = await res.json();
-			
+
 					if (!res.ok || !data.skills) {
 						return { success: false, error: "No se pudieron obtener las skills actuales." };
 					}
-			
+
 					// Usamos Promise.all para esperar todos los DELETEs
 					const deleteRequests = data.skills.map(fs => {
 						const skillId = fs.id || fs.skill?.id;
@@ -413,15 +414,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 						}
 						return null;
 					}).filter(Boolean); // Filtra los null
-			
+
 					await Promise.all(deleteRequests);
-			
+
 					return { success: true };
 				} catch (error) {
 					return { success: false, error: "Error al limpiar skills." };
 				}
 			},
-			
+
 
 			getUsers: async () => {
 				try {
@@ -442,7 +443,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error(error)
 				}
-			}
+			},
 
 
 
