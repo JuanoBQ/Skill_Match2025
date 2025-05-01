@@ -2,11 +2,12 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Context } from '../store/appContext';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import styles from "./../../styles/index.css"
+import { useNavigate } from 'react-router-dom';  
+import styles from './../../styles/index.css';
 
 const DashboardProjects = () => {
     const { store, actions } = useContext(Context);
-
+    const navigate = useNavigate(); 
     const [showModal, setShowModal] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
     const [proposalMessage, setProposalMessage] = useState("");
@@ -17,21 +18,28 @@ const DashboardProjects = () => {
     }, []);
 
     const handleViewOffer = (project) => {
+ 
+        if (!store.isAuthenticated) {
+            alert("Debes estar logueado como freelancer para ver y aplicar a una oferta.");
+            navigate("/login"); 
+            return;
+        }
+
         setSelectedProject(project);
         setShowModal(true);
     };
 
     const handleApply = async () => {
-        const userId = localStorage.getItem("user_id");
-
-        if (!userId) {
+        
+        if (!store.isAuthenticated) {
             alert("Debes estar logueado como freelancer.");
+            navigate("/login"); 
             return;
         }
 
         const res = await actions.createProposal({
             project_id: selectedProject.id,
-            freelancer_id: userId,
+            freelancer_id: store.userId,
             message: proposalMessage,
             proposed_budget: proposedBudget
         });

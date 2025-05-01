@@ -59,18 +59,6 @@ export const Navbar = () => {
             <Link to={"/dashboard"} className="nav-link active ms-2 me-3 text-black">Dashboard</Link>
             <a className="nav-link me-3 text-black" href="#">About</a>
             <a className="nav-link me-3 text-black" href="#">Contact</a>
-
-            {store.isAuthenticated ? (
-              <div class="dropdown">
-                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                  Services
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <li><a class="dropdown-item" href="#" onClick={goToFreelancers}>Freelancers</a></li>
-                  <li><a class="dropdown-item" href="#" onClick={goToProjects}>Projects</a></li>
-                </ul>
-              </div>
-            ) : null}
           </div>
 
 
