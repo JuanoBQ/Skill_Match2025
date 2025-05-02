@@ -1,17 +1,14 @@
-const BASE_URL = "https://cuddly-cod-7v7wxwp79gw42x5x6-3001.app.github.dev/api";
+const BASE_URL = "https://urban-goggles-jjr9g9qrj5rrhr6-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			//  Guardamos el token si existe en localStorage (para mantener la sesión al recargar)
 			token: localStorage.getItem("token") || null,
-			//  Guardamos el email del usuario logueado (puede servir para mostrarlo en el UI)
 			email: null,
 			role: localStorage.getItem("role") || null,
 			userId: localStorage.getItem("user_id") || null,
-			//  Bandera para saber si el usuario está autenticado
-			isAuthenticated: !!localStorage.getItem("token"), // true si hay token
+			isAuthenticated: !!localStorage.getItem("token"),
 			user: [],
 			projects: [],
 	
@@ -20,7 +17,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 		actions: {
 			login: async (email, password) => {
 				try {
-					// Hacemos un POST a la API /login con email y password
 					const res = await fetch(`${BASE_URL}/login`, {
 						method: "POST",
 						headers: {
@@ -34,12 +30,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 					if (res.ok) {
-						// Guardamos el token en localStorage
 						localStorage.setItem("token", data.access_token);
 						localStorage.setItem("role", data.role);
 						localStorage.setItem("user_id", data.user_id);
 
-						// ✅ Actualizamos el store con toda la info
 						setStore({
 							token: data.access_token,
 							email: data.email,
@@ -48,18 +42,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 							isAuthenticated: true,
 						});
 
-						console.log("✅ Después de login:");
-						console.log("user_id:", localStorage.getItem("user_id"));
-						console.log("token:", localStorage.getItem("token"));
-						console.log("role:", localStorage.getItem("role"));
-
 						return { success: true };
 					} else {
-						// Si hubo error de autenticación
 						return { success: false, error: data.msg };
 					}
 				} catch (error) {
-					// Si hubo error de red o servidor
 					return { success: false, error: "Error de conexión al servidor" };
 				}
 			},
@@ -404,7 +391,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						return { success: false, error: "No se pudieron obtener las skills actuales." };
 					}
 
-					// Usamos Promise.all para esperar todos los DELETEs
 					const deleteRequests = data.skills.map(fs => {
 						const skillId = fs.id || fs.skill?.id;
 						if (skillId) {

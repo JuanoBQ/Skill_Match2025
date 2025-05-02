@@ -6,21 +6,31 @@ const EmployerForm = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
+    // Estados del formulario
     const [bio, setBio] = useState("");
     const [profilePicture, setProfilePicture] = useState("");
+    const [industry, setIndustry] = useState("");
+    const [location, setLocation] = useState("");
+    const [website, setWebsite] = useState("");
+    const [phone, setPhone] = useState("");
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         const loadEmployerProfile = async () => {
             const userId = store.userId;
-            if (!userId) return;
+            if (!userId) return setLoading(false);
 
             const res = await actions.getEmployerProfile(userId);
             if (res.success && res.profile) {
                 const profile = res.profile;
                 setBio(profile.bio || "");
                 setProfilePicture(profile.profile_picture || "");
+                setIndustry(profile.industry || "");
+                setLocation(profile.location || "");
+                setWebsite(profile.website || "");
+                setPhone(profile.phone || "");
             }
             setLoading(false);
         };
@@ -30,20 +40,27 @@ const EmployerForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!bio.trim()) {
             return alert("Por favor, ingresa una descripción válida.");
         }
 
         setSaving(true);
         const userId = store.userId;
-        if (!userId) return alert("No hay usuario activo");
+        if (!userId) {
+            setSaving(false);
+            return alert("No hay usuario activo");
+        }
 
-        const resProfile = await actions.createOrUpdateEmployerProfile(userId, {
+        const payload = {
             bio,
-            profile_picture: profilePicture
-        });
+            profile_picture: profilePicture,
+            industry,
+            location,
+            website,
+            phone
+        };
 
+        const resProfile = await actions.createOrUpdateEmployerProfile(userId, payload);
         setSaving(false);
 
         if (!resProfile.success) {
@@ -60,8 +77,11 @@ const EmployerForm = () => {
     return (
         <div className="container mt-5">
             <h2 className="mb-4 text-center fw-bold">Editar Perfil</h2>
-            <form onSubmit={handleSubmit} className="card shadow-sm p-4 animate__animated animate__fadeIn">
-
+            <form
+                onSubmit={handleSubmit}
+                className="card shadow-sm p-4 animate__animated animate__fadeIn"
+            >
+                {/* Foto de perfil */}
                 <div className="mb-4 text-center">
                     <div className="position-relative d-inline-block">
                         <img
@@ -96,7 +116,7 @@ const EmployerForm = () => {
                                 if (file) {
                                     const result = await actions.uploadEmployerPicture(store.userId, file);
                                     if (result.success) {
-                                        setProfilePicture(`${process.env.PUBLIC_URL}${result.pictureUrl}`);
+                                        setProfilePicture(result.pictureUrl);
                                         localStorage.setItem("profile_picture", result.pictureUrl);
                                     } else {
                                         alert("Error al subir la imagen");
@@ -107,6 +127,7 @@ const EmployerForm = () => {
                     </div>
                 </div>
 
+                {/* Descripción */}
                 <div className="mb-3">
                     <label className="form-label">Descripción</label>
                     <textarea
@@ -117,16 +138,68 @@ const EmployerForm = () => {
                         rows={4}
                         required
                     />
-                    <div className="invalid-feedback">
-                        Este campo es obligatorio.
-                    </div>
                     <small className="form-text text-muted">
                         Describe la misión de tu empresa, tus valores o el tipo de talento que buscas.
                     </small>
                 </div>
 
+                {/* Industria */}
+                <div className="mb-3">
+                    <label className="form-label">Industria</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={industry}
+                        onChange={(e) => setIndustry(e.target.value)}
+                        placeholder="Ej. Tecnología, Marketing, Educación..."
+                    />
+                </div>
+
+                {/* Ubicación */}
+                <div className="mb-3">
+                    <label className="form-label">Ubicación</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                        placeholder="Ciudad, País"
+                    />
+                </div>
+
+                {/* Sitio web */}
+                <div className="mb-3">
+                    <label className="form-label">Sitio web</label>
+                    <input
+                        type="url"
+                        className="form-control"
+                        value={website}
+                        onChange={(e) => setWebsite(e.target.value)}
+                        placeholder="https://miempresa.com"
+                    />
+                </div>
+
+                {/* Teléfono */}
+                <div className="mb-3">
+                    <label className="form-label">Teléfono de contacto</label>
+                    <input
+                        type="tel"
+                        className="form-control"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+52 1 234 567 890"
+                    />
+                </div>
+
                 <button type="submit" className="btn btn-dark w-100" disabled={saving}>
-                    {saving ? <><span className="spinner-border spinner-border-sm me-2"></span>Guardando...</> : "Guardar Perfil"}
+                    {saving ? (
+                        <>
+                            <span className="spinner-border spinner-border-sm me-2"></span>
+                            Guardando...
+                        </>
+                    ) : (
+                        "Guardar Perfil"
+                    )}
                 </button>
             </form>
         </div>
