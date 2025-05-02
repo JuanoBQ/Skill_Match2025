@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
+import Select from "react-select";
 
 const EmployerProfile = () => {
     const navigate = useNavigate();

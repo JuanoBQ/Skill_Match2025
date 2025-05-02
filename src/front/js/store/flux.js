@@ -1,4 +1,4 @@
-const BASE_URL = "https://improved-happiness-7v59ppx5pwgpfrwqr-3001.app.github.dev/api";
+const BASE_URL = "https://cuddly-cod-7v7wxwp79gw42x5x6-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
