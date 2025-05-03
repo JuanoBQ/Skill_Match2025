@@ -424,7 +424,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			getEmployerStats: async () => {
 				try {
 					const token = localStorage.getItem("token");
-					const res = await fetch(`${BASE_URL}/employers/stats`, {
+					const res = await fetch(`${BASE_URL}/employer/stats`, {
 						headers: {
 							"Content-Type": "application/json",
 							"Authorization": `Bearer ${token}`
@@ -447,7 +447,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			getEmployerProjects: async () => {
 				try {
 					const token = localStorage.getItem("token");
-					const res = await fetch(`${BASE_URL}/employers/projects`, {
+					const res = await fetch(`${BASE_URL}/employer/projects`, {
 						headers: {
 							"Content-Type": "application/json",
 							"Authorization": `Bearer ${token}`
