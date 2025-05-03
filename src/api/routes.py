@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import func
 import stripe
 from dotenv import load_dotenv
 
@@ -603,6 +604,10 @@ def get_employer_profile():
         "id": profile.id,
         "bio": profile.bio,
         "profile_picture": profile.profile_picture,
+        "industry": profile.industry,
+        "location": profile.location,
+        "website": profile.website,
+        "phone": profile.phone,
         "user": {
             "first_name": profile.user.first_name,
             "last_name": profile.user.last_name,
@@ -612,41 +617,47 @@ def get_employer_profile():
 
 
 @routes.route('/employer/profile', methods=['POST'])
+@jwt_required()
 def create_employer_profile():
-    data = request.json
-    user_id = data.get('user_id')
+    data = request.get_json()
+    user_id = int(get_jwt_identity())
 
-    if not user_id:
-        return jsonify({"msg": "user_id es requerido"}), 400
-
-    profile = Profile.query.filter_by(user_id=user_id).first()
-    if profile:
+    # No permitimos crear si ya existe
+    if Profile.query.filter_by(user_id=user_id).first():
         return jsonify({"msg": "El perfil ya existe"}), 400
 
     profile = Profile(
-        user_id=user_id,
-        bio=data.get('bio'),
-        profile_picture=data.get('profile_picture'),
-        rating=0
+        user_id= user_id,
+        bio= data.get('bio'),
+        profile_picture= data.get('profile_picture'),
+        industry= data.get('industry'),
+        location= data.get('location'),
+        website= data.get('website'),
+        phone= data.get('phone'),
+        rating= 0
     )
 
     db.session.add(profile)
     db.session.commit()
-
     return jsonify(profile.serialize()), 201
 
 
 @routes.route('/employer/profile', methods=['PATCH'])
+@jwt_required()
 def update_employer_profile():
-    data = request.json
-    user_id = data.get('user_id')
+    data    = request.get_json()
+    user_id = int(get_jwt_identity())
 
     profile = Profile.query.filter_by(user_id=user_id).first()
     if not profile:
         return jsonify({"msg": "Perfil no encontrado"}), 404
 
-    profile.bio = data.get('bio', profile.bio)
+    profile.bio             = data.get('bio',             profile.bio)
     profile.profile_picture = data.get('profile_picture', profile.profile_picture)
+    profile.industry        = data.get('industry',        profile.industry)
+    profile.location        = data.get('location',        profile.location)
+    profile.website         = data.get('website',         profile.website)
+    profile.phone           = data.get('phone',           profile.phone)
 
     db.session.commit()
     return jsonify(profile.serialize()), 200
@@ -669,3 +680,37 @@ def update_employer_picture():
     db.session.commit()
 
     return jsonify({ "success": True, "picture": picture_url }), 200
+
+
+@routes.route('/employer/stats', methods=['GET'])
+@jwt_required()
+def get_employer_stats():
+    user_id = int(get_jwt_identity())
+    offers     = Project.query.filter_by(employer_id=user_id).count()
+    proposals  = Proposal.query.join(Project).filter(Project.employer_id==user_id).count()
+    completed  = Project.query.filter_by(employer_id=user_id, status="completed").count()
+    avg_rating = db.session.query(func.avg(Profile.rating)).filter(Profile.user_id==user_id).scalar() or 0
+    return jsonify({
+      "offers": offers,
+      "proposals": proposals,
+      "completed": completed,
+      "rating": round(avg_rating,2)
+    }), 200
+
+
+@routes.route('/employer/projects', methods=['GET'])
+@jwt_required()
+def get_employer_projects():
+    user_id = int(get_jwt_identity())
+    projects = Project.query.filter_by(employer_id=user_id).all()
+    data = []
+    for p in projects:
+        count = Proposal.query.filter_by(project_id=p.id).count()
+        data.append({
+          "id": p.id,
+          "title": p.title,
+          "budget": p.budget,
+          "created_at": p.created_at.isoformat(),
+          "proposals_count": count
+        })
+    return jsonify({ "offers": data }), 200

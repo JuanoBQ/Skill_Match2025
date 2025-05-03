@@ -7,19 +7,25 @@ const EmployerProfile = () => {
     const navigate = useNavigate();
     const { actions } = useContext(Context);
 
+    // Estados
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [profileImage, setProfileImage] = useState("");
+    const [stats, setStats] = useState({
+        offers: 0,
+        proposals: 0,
+        completed: 0,
+        rating: 0,
+    });
+    const [offers, setOffers] = useState([]);
     const [proposals, setProposals] = useState([]);
-
+    const [availableSkills, setAvailableSkills] = useState([]);
+    const [selectedSkills, setSelectedSkills] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [showProposals, setShowProposals] = useState(false);
-
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [budget, setBudget] = useState("");
-    const [availableSkills, setAvailableSkills] = useState([]);
-    const [selectedSkills, setSelectedSkills] = useState([]);
 
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
@@ -29,43 +35,52 @@ const EmployerProfile = () => {
             return;
         }
 
-        const fetchProfile = async () => {
-            const res = await actions.getEmployerProfile(userId);
-            if (res.success && res.profile) {
-                setProfile(res.profile);
+        const loadAll = async () => {
+            // Perfil
+            const profileRes = await actions.getEmployerProfile(userId);
+            if (profileRes.success) {
+                setProfile(profileRes.profile);
                 const stored = localStorage.getItem("profile_picture");
                 setProfileImage(
                     stored ||
-                    res.profile.profile_picture ||
+                    profileRes.profile.profile_picture ||
                     "https://via.placeholder.com/120"
                 );
             } else {
                 navigate("/employerForm");
+                return;
             }
-        };
 
-        const fetchSkillsAndProposals = async () => {
-            // Habilidades disponibles
+            // Estadísticas
+            const statsRes = await actions.getEmployerStats();
+            if (statsRes.success) {
+                setStats(statsRes.stats);
+            }
+
+            // Ofertas activas
+            const projRes = await actions.getEmployerProjects();
+            if (projRes.success) {
+                setOffers(projRes.projects);
+            }
+
+            // Propuestas
+            const propsRes = await actions.getEmployerProposals(userId);
+            if (propsRes.success) {
+                setProposals(propsRes.proposals);
+            }
+
+            // Skills
             const skillsRes = await actions.getSkills();
             if (skillsRes.success) {
                 setAvailableSkills(
-                    skillsRes.skills.map((skill) => ({
-                        value: skill.id,
-                        label: skill.name,
-                    }))
+                    skillsRes.skills.map((s) => ({ value: s.id, label: s.name }))
                 );
             }
-            // Propuestas del empleador
-            const employerId = localStorage.getItem("user_id");
-            const res = await actions.getEmployerProposals(employerId);
-            if (res.success) {
-                setProposals(res.proposals);
-            }
+
+            setLoading(false);
         };
 
-        Promise.all([fetchProfile(), fetchSkillsAndProposals()]).then(() =>
-            setLoading(false)
-        );
+        loadAll();
     }, [actions, navigate]);
 
     const handleEditProfile = () => navigate("/employerForm");
@@ -85,6 +100,11 @@ const EmployerProfile = () => {
             setDescription("");
             setBudget("");
             setSelectedSkills([]);
+            // refrescar ofertas y stats
+            const statsRes = await actions.getEmployerStats();
+            if (statsRes.success) setStats(statsRes.stats);
+            const projRes = await actions.getEmployerProjects();
+            if (projRes.success) setOffers(projRes.projects);
         } else {
             alert("Error al crear la oferta: " + res.error);
         }
@@ -117,6 +137,7 @@ const EmployerProfile = () => {
 
     return (
         <div className="container mt-5" style={{ minHeight: "100vh" }}>
+            {/* Header */}
             <div className="text-center mb-5">
                 <h2 className="fw-bold">Perfil del Empleador</h2>
                 <div className="card mb-4 p-4">
@@ -152,31 +173,23 @@ const EmployerProfile = () => {
                                 onChange={handlePictureChange}
                             />
                         </div>
-
                         {/* Datos */}
                         <div className="text-center text-md-start flex-grow-1">
                             <h4>{fullName}</h4>
                             <p className="text-muted mb-1">{profile.user?.email}</p>
                             <p className="mb-2">
-                                <strong>Descripción:</strong>{" "}
-                                {profile.bio || "Sin descripción."}
+                                <strong>Descripción:</strong> {profile.bio || "Sin descripción."}
                             </p>
                             <p className="mb-1">
-                                <strong>Industria:</strong>{" "}
-                                {profile.industry || "No especificada"}
+                                <strong>Industria:</strong> {profile.industry || "No especificada"}
                             </p>
                             <p className="mb-1">
-                                <strong>Ubicación:</strong>{" "}
-                                {profile.location || "No especificada"}
+                                <strong>Ubicación:</strong> {profile.location || "No especificada"}
                             </p>
                             {profile.website && (
                                 <p className="mb-1">
                                     <strong>Web:</strong>{" "}
-                                    <a
-                                        href={profile.website}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
+                                    <a href={profile.website} target="_blank" rel="noreferrer">
                                         {profile.website}
                                     </a>
                                 </p>
@@ -187,13 +200,9 @@ const EmployerProfile = () => {
                                 </p>
                             )}
                         </div>
-
-                        {/* Botón editar */}
+                        {/* Editar */}
                         <div className="text-center text-md-end">
-                            <button
-                                className="btn btn-outline-primary"
-                                onClick={handleEditProfile}
-                            >
+                            <button className="btn btn-outline-primary" onClick={handleEditProfile}>
                                 Editar perfil
                             </button>
                         </div>
@@ -203,23 +212,37 @@ const EmployerProfile = () => {
 
             {/* Acciones */}
             <div className="d-flex justify-content-center gap-3 mb-4">
-                <button
-                    className="btn btn-dark"
-                    onClick={() => setShowForm((f) => !f)}
-                >
+                <button className="btn btn-dark" onClick={() => setShowForm((f) => !f)}>
                     {showForm ? "Cancelar" : "Crear nueva oferta"}
                 </button>
                 <button
                     className="btn btn-outline-primary"
                     onClick={() => setShowProposals((p) => !p)}
                 >
-                    {showProposals
-                        ? "Ocultar solicitudes"
-                        : "Ver solicitudes recibidas"}
+                    {showProposals ? "Ocultar solicitudes" : "Ver solicitudes recibidas"}
                 </button>
             </div>
 
-            {/* Formulario oferta */}
+            {/* Estadísticas */}
+            <div className="row mb-5">
+                {[
+                    { label: "Ofertas publicadas", value: stats.offers },
+                    { label: "Propuestas recibidas", value: stats.proposals },
+                    { label: "Proyectos completados", value: stats.completed },
+                    { label: "Valoración promedio", value: `${stats.rating.toFixed(1)}★` },
+                ].map((s, i) => (
+                    <div key={i} className="col-md-3 mb-3">
+                        <div className="card text-center h-100">
+                            <div className="card-body">
+                                <h5 className="card-title">{s.value}</h5>
+                                <p className="card-text text-muted">{s.label}</p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Formulario de nueva oferta */}
             {showForm && (
                 <div className="card shadow mb-4">
                     <div className="card-body">
@@ -255,9 +278,7 @@ const EmployerProfile = () => {
                                 />
                             </div>
                             <div className="mb-3">
-                                <label className="form-label">
-                                    Habilidades requeridas
-                                </label>
+                                <label className="form-label">Habilidades requeridas</label>
                                 <Select
                                     isMulti
                                     options={availableSkills}
@@ -266,10 +287,7 @@ const EmployerProfile = () => {
                                     placeholder="Selecciona las habilidades"
                                 />
                             </div>
-                            <button
-                                type="submit"
-                                className="btn btn-success w-100"
-                            >
+                            <button type="submit" className="btn btn-success w-100">
                                 Publicar proyecto
                             </button>
                         </form>
@@ -277,33 +295,54 @@ const EmployerProfile = () => {
                 </div>
             )}
 
-            {/* Solicitudes */}
+            {/* Ofertas activas */}
+            <div className="mb-5">
+                <h4>Ofertas activas</h4>
+                {offers.length > 0 ? (
+                    <div className="row">
+                        {offers.map((o) => (
+                            <div key={o.id} className="col-md-6 mb-4">
+                                <div className="card h-100">
+                                    <div className="card-body d-flex flex-column">
+                                        <h5>{o.title}</h5>
+                                        <p className="mb-1">
+                                            <strong>Presupuesto:</strong> ${o.budget}
+                                        </p>
+                                        <p className="mb-1">
+                                            <strong>Publicada:</strong>{" "}
+                                            {new Date(o.created_at).toLocaleDateString()}
+                                        </p>
+                                        <p className="text-muted mt-auto">
+                                            {o.proposals_count} postulantes
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-center text-muted">No hay ofertas activas.</p>
+                )}
+            </div>
+
+            {/* Solicitudes recibidas */}
             {showProposals && (
                 <div className="card shadow mb-5">
                     <div className="card-body">
-                        <h5 className="mb-4 text-center">
-                            Solicitudes Recibidas
-                        </h5>
+                        <h5 className="mb-4 text-center">Solicitudes Recibidas</h5>
                         {proposals.length > 0 ? (
                             proposals.map((p) => (
-                                <div
-                                    key={p.id}
-                                    className="border rounded p-3 mb-3"
-                                >
-                                    <h6>
-                                        Proyecto: {p.project?.title || "Sin título"}
-                                    </h6>
+                                <div key={p.id} className="border rounded p-3 mb-3">
+                                    <h6>Proyecto: {p.project?.title || "Sin título"}</h6>
                                     <p>
-                                        <strong>Freelancer:</strong>{" "}
-                                        {p.freelancer?.first_name}{" "}
+                                        <strong>Freelancer:</strong> {p.freelancer?.first_name}{" "}
                                         {p.freelancer?.last_name}
                                     </p>
                                     <p>
                                         <strong>Mensaje:</strong> {p.message}
                                     </p>
                                     <p>
-                                        <strong>Oferta:</strong> $
-                                        {p.proposed_budget}
+                                        <strong>Oferta:</strong> ${p.proposed_budget}
                                     </p>
                                     <button
                                         className="btn btn-sm btn-outline-success w-100"

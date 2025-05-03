@@ -58,6 +58,10 @@ class Profile(db.Model):
     profile_picture: Mapped[Optional[str]] = mapped_column(String(255))
     hourly_rate: Mapped[Optional[float]] = mapped_column(Float)
     rating: Mapped[Optional[float]] = mapped_column(Float)
+    industry: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    location: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    website: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
 
     # Relaciones
     user: Mapped["User"] = relationship("User", back_populates="profile")
@@ -75,6 +79,10 @@ class Profile(db.Model):
             "profile_picture": self.profile_picture,
             "hourly_rate": self.hourly_rate,
             "rating": self.rating,
+            "industry": self.industry,
+            "location": self.location,
+            "website": self.website,
+            "phone": self.phone,
             "skills": [fs.skill.serialize() for fs in self.skills if fs.skill is not None]
         }
 
