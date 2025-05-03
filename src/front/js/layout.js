@@ -23,6 +23,8 @@ import DashboardFreelancer from "./component/DashboardFreelancer.jsx";
 import DashboardProjects from "./component/DashboardProjects.jsx";
 import PaymentPage from "./component/PaymentPage.jsx";
 import EmployerForm from "./component/EmployerForm.jsx";
+import SearchResults from "./component/SearchResults.jsx";
+import FreelancerPublicProfile from "./component/FreelancerPublicProfile.jsx";
 
 
 
@@ -57,7 +59,13 @@ const Layout = () => {
                         <Route element={<EmployerForm />} path="/employerForm" />
                         <Route path="*" element={<h1>Not found!</h1>} />
                         <Route element={<PaymentPage />} path="/payment/:proposalId" />
+                        <Route element={<SearchResults />} path="/search" />
+                        <Route element={<FreelancerPublicProfile />} path="/profile/:userId" />
                         <Route element={<Profile />} path="/Profile/:id" />
+
+
+
+                        
 
 
                         <Route element={<h1>Not found!</h1>} />

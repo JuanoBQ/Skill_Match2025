@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import logo from './../../../../public/Logo SkillMatch.png';
@@ -6,11 +6,12 @@ import logo from './../../../../public/Logo SkillMatch.png';
 export const Navbar = () => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
+
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     console.log("🌀 STORE CAMBIÓ ->", store);
   }, [store.isAuthenticated]);
-
-
 
   const handleLogout = () => {
     actions.logout();
@@ -32,18 +33,24 @@ export const Navbar = () => {
     }
   };
 
-
   const goToFreelancers = () => {
-
     navigate('/Dashboard');
-
   };
 
   const goToProjects = () => {
-
     navigate('/DashboardProjects');
-
   };
+
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();
+    const query = searchTerm.trim();
+    if (query) {
+      actions.setSearchQuery(query);                
+      await actions.searchBySkill(query);        
+      navigate(`/search?query=${encodeURIComponent(query)}`); 
+    }
+  };
+  
 
   return (
     <div className="container-fluid">
@@ -61,9 +68,15 @@ export const Navbar = () => {
             <a className="nav-link me-3 text-black" href="#">Contact</a>
           </div>
 
-
-          <form className="d-flex me-4" role="search">
-            <input className="form-control me-2" type="search" aria-label="Search" />
+          <form className="d-flex me-4" role="search" onSubmit={handleSearchSubmit}>
+            <input
+              className="form-control me-2"
+              type="search"
+              placeholder="Buscar skills..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Search"
+            />
             <button className="btn btn-outline-dark" type="submit" aria-label="Search">
               <i className="fa-solid fa-magnifying-glass"></i>
             </button>
@@ -90,7 +103,6 @@ export const Navbar = () => {
               </>
             )}
           </div>
-
         </div>
       </nav>
     </div>

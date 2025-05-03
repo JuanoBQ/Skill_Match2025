@@ -1,4 +1,4 @@
-const BASE_URL = "https://urban-goggles-jjr9g9qrj5rrhr6-3001.app.github.dev/api";
+const BASE_URL = "https://congenial-fiesta-x5w5jgwpqjjj36pgw-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -11,6 +11,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 			isAuthenticated: !!localStorage.getItem("token"),
 			user: [],
 			projects: [],
+			searchQuery: "",
+			searchResults: {
+			freelancers: [],
+			projects: []
+			},
+
 
 
 		},
@@ -488,6 +494,34 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error(error)
 				}
 			},
+
+			
+			setSearchQuery: (query) => {
+				setStore({ searchQuery: query });
+			  },
+			  
+			  searchBySkill: async (skillName) => {
+				try {
+				  const res = await fetch(`${BASE_URL}/search/freelancers?skill=${encodeURIComponent(skillName)}`);
+				  const data = await res.json();
+			  
+				  if (res.ok) {
+					setStore({
+					  searchResults: {
+						freelancers: data,  // ← Asegúrate de que esto es un array
+						projects: []        // Puedes dejarlo vacío si no estás usando aún
+					  }
+					});
+					return { success: true };
+				  } else {
+					return { success: false, error: data.msg };
+				  }
+				} catch (error) {
+				  return { success: false, error: "Error al buscar skill" };
+				}
+			  }
+			  
+			  
 
 
 
