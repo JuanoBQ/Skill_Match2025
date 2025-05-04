@@ -48,6 +48,7 @@ export const Navbar = () => {
       actions.setSearchQuery(query);                
       await actions.searchBySkill(query);        
       navigate(`/search?query=${encodeURIComponent(query)}`); 
+      setSearchTerm("");
     }
   };
   
