@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
-const BASE_URL = "https://urban-goggles-jjr9g9qrj5rrhr6-3001.app.github.dev/api";
+const BASE_URL = "https://verbose-orbit-4jq6r6wq7xwv2j6j6-3001.app.github.dev/api";
 
 const PaymentPage = () => {
     const { proposalId } = useParams();

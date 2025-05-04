@@ -8,7 +8,7 @@ const EmployerForm = () => {
 
     // Estados del formulario
     const [bio, setBio] = useState("");
-    const [profilePicture, setProfilePicture] = useState("");
+    const [profileImage, setProfileImage] = useState("");
     const [industry, setIndustry] = useState("");
     const [location, setLocation] = useState("");
     const [website, setWebsite] = useState("");
@@ -26,7 +26,7 @@ const EmployerForm = () => {
             if (res.success && res.profile) {
                 const profile = res.profile;
                 setBio(profile.bio || "");
-                setProfilePicture(profile.profile_picture || "");
+                setProfileImage(profile.profile_image || "");
                 setIndustry(profile.industry || "");
                 setLocation(profile.location || "");
                 setWebsite(profile.website || "");
@@ -37,6 +37,22 @@ const EmployerForm = () => {
 
         loadEmployerProfile();
     }, [store.userId, actions]);
+
+    const handlePictureChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const imageUrl = reader.result;
+            const userId = localStorage.getItem("user_id");
+            const res = await actions.uploadEmployerPicture(userId, imageUrl);
+            if (res.success) {
+                setProfileImage(imageUrl);
+                alert("Foto actualizada");
+            }
+        };
+        reader.readAsDataURL(file);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -53,7 +69,7 @@ const EmployerForm = () => {
 
         const payload = {
             bio,
-            profile_picture: profilePicture,
+            profile_image: profileImage,
             industry,
             location,
             website,
@@ -85,44 +101,32 @@ const EmployerForm = () => {
                 <div className="mb-4 text-center">
                     <div className="position-relative d-inline-block">
                         <img
-                            src={profilePicture || "/default-avatar.png"}
+                            src={profileImage}
                             alt="Foto de perfil"
-                            className="rounded-circle border"
-                            style={{ width: "120px", height: "120px", objectFit: "cover" }}
+                            className="rounded-circle"
+                            style={{ width: 120, height: 120, objectFit: "cover" }}
                         />
                         <label
-                            htmlFor="uploadProfile"
-                            className="position-absolute bg-light border rounded-circle"
+                            htmlFor="upload-photo"
+                            className="position-absolute bottom-0 end-0 bg-light rounded-circle p-1 border"
                             style={{
-                                bottom: 0,
-                                right: 0,
-                                width: "30px",
-                                height: "30px",
+                                cursor: "pointer",
+                                width: 30,
+                                height: 30,
                                 display: "flex",
-                                alignItems: "center",
                                 justifyContent: "center",
-                                cursor: "pointer"
+                                alignItems: "center",
                             }}
+                            title="Cambiar foto"
                         >
                             <i className="fas fa-camera"></i>
                         </label>
                         <input
+                            id="upload-photo"
                             type="file"
-                            id="uploadProfile"
                             accept="image/*"
                             style={{ display: "none" }}
-                            onChange={async (e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                    const result = await actions.uploadEmployerPicture(store.userId, file);
-                                    if (result.success) {
-                                        setProfilePicture(result.pictureUrl);
-                                        localStorage.setItem("profile_picture", result.pictureUrl);
-                                    } else {
-                                        alert("Error al subir la imagen");
-                                    }
-                                }
-                            }}
+                            onChange={handlePictureChange}
                         />
                     </div>
                 </div>
@@ -143,9 +147,9 @@ const EmployerForm = () => {
                     </small>
                 </div>
 
-                {/* Industria */}
+                {/* Categoria */}
                 <div className="mb-3">
-                    <label className="form-label">Industria</label>
+                    <label className="form-label">Categoría</label>
                     <input
                         type="text"
                         className="form-control"
