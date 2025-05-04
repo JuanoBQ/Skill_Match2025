@@ -59,7 +59,6 @@ class Profile(db.Model):
     hourly_rate: Mapped[Optional[float]] = mapped_column(Float)
     rating: Mapped[Optional[float]] = mapped_column(Float)
     industry: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    location: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     website: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
 
@@ -80,7 +79,6 @@ class Profile(db.Model):
             "hourly_rate": self.hourly_rate,
             "rating": self.rating,
             "industry": self.industry,
-            "location": self.location,
             "website": self.website,
             "phone": self.phone,
             "skills": [fs.skill.serialize() for fs in self.skills if fs.skill is not None]
