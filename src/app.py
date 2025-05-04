@@ -35,7 +35,9 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hora
 bcrypt = Bcrypt(app)
 
 # Flask-CORS
+
 CORS(app)
+
 
 # Setup JWT
 jwt = JWTManager(app)

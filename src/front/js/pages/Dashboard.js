@@ -3,6 +3,7 @@ import { Context } from "../store/appContext";
 import { Tabs } from "../component/tabs.jsx";
 import { UsefullCard } from "../component/usefullCard.jsx";
 import { DashAccordion } from "../component/dashAccordion.jsx";
+import DashboardFilter from "../component/DashboardFilter.jsx"
 import undefined from "./../../../front/img/User_Undefined.jpg"
 
 export const Dashboard = () => {
@@ -74,6 +75,7 @@ export const Dashboard = () => {
                             <UsefullCard />
                         </>
                     )}
+                    <DashboardFilter/>
                 </aside>
             </div>
         </div>
