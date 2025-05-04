@@ -26,7 +26,7 @@ const EmployerForm = () => {
             if (res.success && res.profile) {
                 const profile = res.profile;
                 setBio(profile.bio || "");
-                setProfileImage(profile.profile_image || "");
+                setProfileImage(profile.profile_picture || "");
                 setIndustry(profile.industry || "");
                 setLocation(profile.location || "");
                 setWebsite(profile.website || "");

@@ -150,28 +150,6 @@ const EmployerProfile = () => {
                                 className="rounded-circle"
                                 style={{ width: 120, height: 120, objectFit: "cover" }}
                             />
-                            <label
-                                htmlFor="upload-photo"
-                                className="position-absolute bottom-0 end-0 bg-light rounded-circle p-1 border"
-                                style={{
-                                    cursor: "pointer",
-                                    width: 30,
-                                    height: 30,
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                }}
-                                title="Cambiar foto"
-                            >
-                                <i className="fas fa-camera"></i>
-                            </label>
-                            <input
-                                id="upload-photo"
-                                type="file"
-                                accept="image/*"
-                                style={{ display: "none" }}
-                                onChange={handlePictureChange}
-                            />
                         </div>
                         {/* Datos */}
                         <div className="text-center text-md-start flex-grow-1">
