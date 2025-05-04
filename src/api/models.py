@@ -26,11 +26,12 @@ class User(db.Model):
 
     # Relaciones
     profile: Mapped[Optional["Profile"]] = relationship(
-        "Profile", back_populates="user", uselist=False)
+        "Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     projects: Mapped[List["Project"]] = relationship(
-        "Project", back_populates="employer")
+        "Project", back_populates="employer", cascade="all, delete-orphan")
     proposals: Mapped[List["Proposal"]] = relationship(
-        "Proposal", back_populates="freelancer")
+        "Proposal", back_populates="freelancer", cascade="all, delete-orphan")
+
 
     def __repr__(self):
         return f"<User {self.email} - {self.role}>"
@@ -61,6 +62,10 @@ class Profile(db.Model):
     industry: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     website: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    career: Mapped[Optional[str]] = mapped_column(Text)
+    language: Mapped[Optional[str]] = mapped_column(Text)
+    location: Mapped[Optional[str]] = mapped_column(Text)
+    education: Mapped[Optional[str]] = mapped_column(Text)
 
     # Relaciones
     user: Mapped["User"] = relationship("User", back_populates="profile")
@@ -81,6 +86,10 @@ class Profile(db.Model):
             "industry": self.industry,
             "website": self.website,
             "phone": self.phone,
+            "career": self.career,
+            "language": self.language,
+            "location": self.location,
+            "education": self.education,
             "skills": [fs.skill.serialize() for fs in self.skills if fs.skill is not None]
         }
 
@@ -191,7 +200,8 @@ class Proposal(db.Model):
     freelancer: Mapped["User"] = relationship(
         "User", back_populates="proposals")
     payment: Mapped[Optional["Payment"]] = relationship(
-        "Payment", back_populates="proposal", uselist=False)
+        "Payment", back_populates="proposal", uselist=False, cascade="all, delete-orphan")
+
 
     def __repr__(self):
         return f"<Proposal ProjectID={self.project_id} FreelancerID={self.freelancer_id}>"

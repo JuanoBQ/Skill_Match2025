@@ -170,6 +170,10 @@ def get_freelancer_profile():
             "last_name": user.last_name if user else None,
             "email": user.email if user else None
         },
+        "career": profile.career,
+        "language": profile.language,
+        "location": profile.location,
+        "education": profile.education,
         "skills": []
     }
 
@@ -204,13 +208,21 @@ def create_profile():
             'profile_picture', profile.profile_picture)
         profile.hourly_rate = data.get('hourly_rate', profile.hourly_rate)
         profile.rating = data.get('rating', profile.rating)
+        profile.career = data.get('career', profile.career)
+        profile.language = data.get('language', profile.language)
+        profile.location = data.get('location', profile.location)
+        profile.education = data.get('education', profile.education)
     else:
         profile = Profile(
             user_id=user_id,
             bio=data.get('bio'),
             profile_picture=data.get('profile_picture'),
             hourly_rate=data.get('hourly_rate'),
-            rating=data.get('rating', 0)
+            rating=data.get('rating', 0),
+            career=data.get('career'),
+            language=data.get('language'),
+            location=data.get('location'),
+            education=data.get('education')
         )
         db.session.add(profile)
 
@@ -237,6 +249,10 @@ def update_profile():
     profile.hourly_rate = data.get('hourly_rate', profile.hourly_rate)
     profile.profile_picture = data.get(
         'profile_picture', profile.profile_picture)
+    profile.career = data.get('career', profile.career)
+    profile.language = data.get('language', profile.language)
+    profile.location = data.get('location', profile.location)
+    profile.education = data.get('education', profile.education)
     db.session.commit()
     return jsonify(profile.serialize())
 

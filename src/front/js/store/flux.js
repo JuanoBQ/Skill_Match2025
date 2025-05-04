@@ -77,12 +77,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 						// Actualiza el store
 						setStore({
-							token: null,
+							token: data.access_token,
 							email: data.email,
-							role: null,
-							userId: null,
+							role: data.role,
+							userId: data.user_id,
 							isAuthenticated: false,
 						});
+						
 
 						return { success: true };
 					} else {
@@ -236,7 +237,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			createOrUpdateProfile: async (userId, formData) => {
 				try {
 
-					const res = await fetch(`${BASE_URL}/freelancer/profile`, {
+					const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`, {
 						method: "PATCH",
 						headers: {
 							"Content-Type": "application/json",
@@ -246,6 +247,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 							bio: formData.bio,
 							profile_picture: formData.profile_picture,
 							hourly_rate: formData.hourly_rate,
+							career: formData.career,
+							language: formData.language,
+							location: formData.location,
+							education: formData.education
 						}),
 					});
 
@@ -264,6 +269,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 								bio: formData.bio,
 								profile_picture: formData.profile_picture,
 								hourly_rate: formData.hourly_rate,
+								career: formData.career,
+								language: formData.language,
+								location: formData.location,
+								education: formData.education
 							}),
 						});
 

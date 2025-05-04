@@ -32,60 +32,71 @@ export const Profile = () => {
 
     return (
         <div className="container mt-5">
-            <div className="row justify-content-center">
-                <div className="col-md-8">
-                    <div className="card shadow-sm border-light freelancer-profile">
-                        <div className="card-body">
-                            <div className="text-center">
-                                <img
-                                    src={profile.profile_picture || undefinedImg}
-                                    alt="Foto de perfil"
-                                    className="rounded-circle mb-4"
-                                    width="250"
-                                    height="250"
-                                    style={{ objectFit: "cover" }}
-                                />
-                                <h2 className="card-title mb-3">
+
+            <div >
+                <div className="card shadow-sm border-light freelancer-profile" >
+                    <div className="card-body">
+
+
+                        <div className="d-flex align-items-center mb-4">
+                            <img
+                                src={profile.profile_picture || undefined}
+                                alt="Foto de perfil"
+                                className="ms-1 rounded-circle border border-3 border-primary shadow-lg"
+                                style={{
+                                    width: "150px",
+                                    height: "150px",
+                                    borderRadius: "50%",
+                                    objectFit: "cover",
+                                }}
+                            />
+
+                            <div className="d-flex flex-column ms-3">
+                                <h4 className="mb-0" style={{ fontSize: "2rem" }}>
                                     {profile.user.first_name} {profile.user.last_name}
-                                </h2>
-                                <p className="text-muted mb-3">
-                                    <strong>Desarrollador web</strong>
-                                </p>
-                                <p className="card-text text-justify">
-                                    {profile.bio || "Sin biografía disponible."}
-                                </p>
-                            </div>
+                                </h4>
+                                <h4 className="text-dark mt-0 mb-1" style={{ fontSize: "1.1rem" }}>
+                                    {profile.career}
+                                </h4>
 
-                            <ul className="list-group list-group-flush">
-                                <li className="list-group-item">
-                                    <strong>Ubicación:</strong> Madrid, España
-                                </li>
-                                <li className="list-group-item">
-                                    <strong>Habilidades:</strong>{" "}
-                                    {profile.skills.length > 0 ? (
-                                        profile.skills.map((skill, idx) => (
-                                            <span key={idx} className="badge bg-secondary me-1">
-                                                {skill.name}
-                                            </span>
-                                        ))
-                                    ) : (
-                                        "Sin habilidades"
-                                    )}
-                                </li>
-                                <li className="list-group-item">
-                                    <strong>Rating:</strong>{" "}
-                                    {profile.rating ? `⭐ ${profile.rating}` : "No rating"}
-                                </li>
-                            </ul>
-
-                            <div className="card-body text-center">
-                                <button className="btn btn-primary me-2">Mensaje</button>
-                                <button className="btn btn-success">Conectar</button>
                             </div>
+                        </div>
+
+
+
+                        <p className="card-text text-justify">
+                            {profile.bio || "Sin biografía disponible."}
+                        </p>
+                        <ul className="list-group list-group-flush">
+                            <li className="list-group-item">
+                                <strong>Ubicación:</strong> {profile.location}
+                            </li>
+                            <li className="list-group-item">
+                                <strong>Habilidades:</strong>{" "}
+                                {profile.skills.length > 0 ? (
+                                    profile.skills.map((skill, idx) => (
+                                        <span key={idx} className="badge bg-secondary me-1">
+                                            {skill.name}
+                                        </span>
+                                    ))
+                                ) : (
+                                    "Sin habilidades"
+                                )}
+                            </li>
+                            <li className="list-group-item">
+                                <strong>Rating:</strong>{" "}
+                                {profile.rating ? `⭐ ${profile.rating}` : "No rating"}
+                            </li>
+                        </ul>
+
+                        <div className="card-body text-center">
+                            <button className="btn btn-primary me-2">Mensaje</button>
+                            <button className="btn btn-success">Conectar</button>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     );
 };
