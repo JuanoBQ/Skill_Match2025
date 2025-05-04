@@ -750,3 +750,50 @@ def get_employer_projects():
           "proposals_count": count
         })
     return jsonify({ "offers": data }), 200
+
+@routes.route("/search/freelancers", methods=["GET"])
+def search_freelancers_by_skill():
+    skill_name = request.args.get("skill")
+
+    if not skill_name:
+        return jsonify({"msg": "Skill no proporcionada"}), 400
+
+    # Buscar la skill exacta
+    skill = Skill.query.filter(Skill.name.ilike(f"%{skill_name}%")).first()
+
+    if not skill:
+        return jsonify([]), 200  # Skill no encontrada
+
+    # Buscar todos los perfiles que tienen esa skill
+    freelancer_skills = FreelancerSkill.query.filter_by(skill_id=skill.id).all()
+
+    profile_ids = [fs.profile_id for fs in freelancer_skills]
+    profiles = Profile.query.filter(Profile.id.in_(profile_ids)).options(
+        joinedload(Profile.skills).joinedload(FreelancerSkill.skill),
+        joinedload(Profile.user)
+    ).all()
+
+    results = []
+    for profile in profiles:
+        skills = [
+            {"id": fs.skill.id, "name": fs.skill.name}
+            for fs in profile.skills if fs.skill
+        ]
+        results.append({
+            "id": profile.id,
+            "bio": profile.bio,
+            "hourly_rate": profile.hourly_rate,
+            "profile_picture": profile.profile_picture,
+            "rating": profile.rating,
+            "user": {
+                 "id": profile.user.id,
+                "first_name": profile.user.first_name,
+                "last_name": profile.user.last_name,
+                "email": profile.user.email
+            },
+            "skills": skills
+        })
+
+    return jsonify(results), 200
+
+
