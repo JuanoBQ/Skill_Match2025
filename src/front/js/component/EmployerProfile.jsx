@@ -275,24 +275,43 @@ const EmployerProfile = () => {
 
             {/* Ofertas activas */}
             <div className="mb-5">
-                <h4>Ofertas activas</h4>
+                <h4>Ofertas de Trabajo Activas</h4>
                 {offers.length > 0 ? (
                     <div className="row">
                         {offers.map((o) => (
-                            <div key={o.id} className="col-md-6 mb-4">
-                                <div className="card h-100">
+                            <div key={o.id} className="col-sm-6 col-lg-4 mb-3">
+                                <div className="card h-100 p-2">
                                     <div className="card-body d-flex flex-column">
-                                        <h5>{o.title}</h5>
-                                        <p className="mb-1">
+                                        <h6 className="mb-2">{o.title}</h6>
+                                        <p className="small mb-1">
                                             <strong>Presupuesto:</strong> ${o.budget}
                                         </p>
-                                        <p className="mb-1">
+                                        <p className="small mb-1">
                                             <strong>Publicada:</strong>{" "}
                                             {new Date(o.created_at).toLocaleDateString()}
                                         </p>
-                                        <p className="text-muted mt-auto">
+                                        <p className="text-muted mt-auto small">
                                             {o.proposals_count} postulantes
                                         </p>
+
+                                        <button
+                                            type="button"
+                                            className="btn btn-sm btn-outline-danger mt-2"
+                                            onClick={async () => {
+                                                const ok = window.confirm("¿Estás seguro de que quieres eliminar esta oferta?");
+                                                if (!ok) return;
+
+                                                const res = await actions.deleteProject(o.id);
+                                                if (res.success) {
+                                                    const proj = await actions.getEmployerProjects();
+                                                    if (proj.success) setOffers(proj.projects);
+                                                } else {
+                                                    alert("Error al eliminar: " + res.error);
+                                                }
+                                            }}
+                                        >
+                                            Eliminar
+                                        </button>
                                     </div>
                                 </div>
                             </div>

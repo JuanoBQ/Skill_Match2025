@@ -467,6 +467,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			deleteProject: async (projectId) => {
+				try {
+					const token = localStorage.getItem("token");
+					const res = await fetch(`${BASE_URL}/projects/${projectId}`, {
+						method: "DELETE",
+						headers: {
+							"Authorization": `Bearer ${token}`
+						}
+					});
+					if (res.status === 204) {
+						return { success: true };
+					} else {
+						const data = await res.json();
+						return { success: false, error: data.msg };
+					}
+				} catch (error) {
+					console.error("deleteProject network error:", error);
+					return { success: false, error: error.message };
+				}
+			},
 
 			getUsers: async () => {
 				try {

@@ -459,6 +459,24 @@ def create_project():
     return jsonify(project.serialize()), 201
 
 
+@routes.route('/projects/<int:project_id>', methods=['DELETE'])
+@jwt_required()
+def delete_project(project_id):
+    current_user = int(get_jwt_identity())
+    project = Project.query.get(project_id)
+    print(">>> get_jwt_identity():", current_user, type(current_user))
+    print(">>> project.employer_id:", project.employer_id, type(project.employer_id))
+
+    if not project:
+        return jsonify({"msg": "Proyecto no encontrado"}), 404
+    if project.employer_id != current_user:
+        return jsonify({"msg": "No tienes permiso para eliminar este proyecto"}), 403
+
+    project.status = 'cancelled'
+    db.session.commit()
+    return '', 204
+
+
 @routes.route('/projects/<int:id>', methods=['GET'])
 def get_project(id):
     project = Project.query.get(id)
@@ -702,7 +720,9 @@ def get_employer_stats():
 @jwt_required()
 def get_employer_projects():
     user_id = int(get_jwt_identity())
-    projects = Project.query.filter_by(employer_id=user_id).all()
+    projects = Project.query \
+        .filter(Project.employer_id == user_id, Project.status != 'cancelled') \
+        .all()
     data = []
     for p in projects:
         count = Proposal.query.filter_by(project_id=p.id).count()
