@@ -57,13 +57,13 @@ const EmployerProfile = () => {
                 setStats(statsRes.stats);
             }
 
-            // Ofertas activas
+            // Ofertas de trabajo activas
             const projRes = await actions.getEmployerProjects();
             if (projRes.success) {
                 setOffers(projRes.projects);
             }
 
-            // Propuestas
+            // Solicitudes
             const propsRes = await actions.getEmployerProposals(userId);
             if (propsRes.success) {
                 setProposals(propsRes.proposals);
@@ -100,7 +100,7 @@ const EmployerProfile = () => {
             setDescription("");
             setBudget("");
             setSelectedSkills([]);
-            // refrescar ofertas y stats
+
             const statsRes = await actions.getEmployerStats();
             if (statsRes.success) setStats(statsRes.stats);
             const projRes = await actions.getEmployerProjects();
