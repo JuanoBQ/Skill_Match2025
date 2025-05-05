@@ -1,4 +1,4 @@
-const BASE_URL = "https://improved-happiness-7v59ppx5pwgpfrwqr-3001.app.github.dev/api";
+const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
