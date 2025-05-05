@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 
 const DashboardFilter = () => {
   const [category, setCategory] = useState('');
   const [rating, setRating] = useState('');
   const [hourlyRate, setHourlyRate] = useState('');
   const [skills, setSkills] = useState('');
-  const [profiles, setProfiles] = useState([]);
+
+  useEffect(()=>{
+    
+  },[])
 
 
   return (
-    <div className="card m-0 mt-5 shadow-sm border border-0 background" style={{maxWidth: "22rem"}}>
+    <div className="card m-0 mt-4 shadow-sm border border-0 background" style={{ maxWidth: "22rem" }}>
       <div className="row">
-   
+
         <div>
           <div className="card shadow-sm rounded-3">
             <div className="card-body">
               <h5 className="card-title mb-4">Filtrar por</h5>
-              
-            
+
+
               <div className="mb-3">
                 <label htmlFor="category" className="form-label">Categoría</label>
                 <select
@@ -27,11 +29,34 @@ const DashboardFilter = () => {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
-                  <option value="">Selecciona una categoría</option>
-                  <option value="web">Web Development</option>
-                  <option value="design">Diseño</option>
-                  <option value="python">Python</option>
-                  <option value="marketing">Marketing</option>
+                  <option value="Web Development">Web Development</option>
+                  <option value="Frontend Developer">Frontend Developer</option>
+                  <option value="Backend Developer">Backend Developer</option>
+                  <option value="Fullstack Developer">Fullstack Developer</option>
+                  <option value="Devops Engineer">Devops Engineer</option>
+
+                  
+                  <option value="Graphic Designer">Graphic Designer</option>
+                  <option value="UI/UX Designer">UI/UX Designer</option>
+                  <option value="Illustrator">Illustrator</option>
+
+              
+                  <option value="SEO Specialist">SEO Specialist</option>
+                  <option value="Digital Marketer">Digital Marketer</option>
+
+                 
+                  <option value="Content Writer">Content Writer</option>
+                  <option value="Copywriter">Copywriter</option>
+
+                  <option value="Video Editor">Video Editor</option>
+                  <option value="Photographer">Photographer</option>
+
+             
+                  <option value="Translator">Translator</option>
+                  <option value="Virtual Assistant">Virtual Assistant</option>
+
+                
+                  <option value="Project Manager">Project Manager</option>
                 </select>
               </div>
 
@@ -64,7 +89,7 @@ const DashboardFilter = () => {
                 />
               </div>
 
-   
+
               <div className="mb-3">
                 <label htmlFor="skills" className="form-label">Skills</label>
                 <input
@@ -80,7 +105,7 @@ const DashboardFilter = () => {
           </div>
         </div>
 
-    
+
       </div>
     </div>
   );

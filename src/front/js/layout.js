@@ -23,10 +23,9 @@ import DashboardFreelancer from "./component/DashboardFreelancer.jsx";
 import DashboardProjects from "./component/DashboardProjects.jsx";
 import PaymentPage from "./component/PaymentPage.jsx";
 import EmployerForm from "./component/EmployerForm.jsx";
+import SearchResults from "./component/SearchResults.jsx";
 
 
-
-//create your first component
 const Layout = () => {
     const basename = process.env.BASENAME || "";
 
@@ -57,7 +56,12 @@ const Layout = () => {
                         <Route element={<EmployerForm />} path="/employerForm" />
                         <Route path="*" element={<h1>Not found!</h1>} />
                         <Route element={<PaymentPage />} path="/payment/:proposalId" />
+                        <Route element={<SearchResults />} path="/search" />
                         <Route element={<Profile />} path="/Profile/:id" />
+
+
+
+                        
 
 
                         <Route element={<h1>Not found!</h1>} />

@@ -4,23 +4,25 @@ const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			//  Guardamos el token si existe en localStorage (para mantener la sesión al recargar)
 			token: localStorage.getItem("token") || null,
-			//  Guardamos el email del usuario logueado (puede servir para mostrarlo en el UI)
 			email: null,
 			role: localStorage.getItem("role") || null,
 			userId: localStorage.getItem("user_id") || null,
-			//  Bandera para saber si el usuario está autenticado
-			isAuthenticated: !!localStorage.getItem("token"), // true si hay token
+			isAuthenticated: !!localStorage.getItem("token"),
 			user: [],
 			projects: [],
+			searchQuery: "",
+			searchResults: {
+			freelancers: [],
+			projects: []
+			},
+
 
 
 		},
 		actions: {
 			login: async (email, password) => {
 				try {
-					// Hacemos un POST a la API /login con email y password
 					const res = await fetch(`${BASE_URL}/login`, {
 						method: "POST",
 						headers: {
@@ -34,12 +36,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 					if (res.ok) {
-						// Guardamos el token en localStorage
 						localStorage.setItem("token", data.access_token);
 						localStorage.setItem("role", data.role);
 						localStorage.setItem("user_id", data.user_id);
 
-						// ✅ Actualizamos el store con toda la info
 						setStore({
 							token: data.access_token,
 							email: data.email,
@@ -48,18 +48,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 							isAuthenticated: true,
 						});
 
-						console.log("✅ Después de login:");
-						console.log("user_id:", localStorage.getItem("user_id"));
-						console.log("token:", localStorage.getItem("token"));
-						console.log("role:", localStorage.getItem("role"));
-
 						return { success: true };
 					} else {
-						// Si hubo error de autenticación
 						return { success: false, error: data.msg };
 					}
 				} catch (error) {
-					// Si hubo error de red o servidor
 					return { success: false, error: "Error de conexión al servidor" };
 				}
 			},
@@ -137,7 +130,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			getEmployerProfile: async (userId) => {
 				try {
-					const res = await fetch(`${BASE_URL}/employer/profile?user_id=${userId}`);
+					const token = localStorage.getItem("token");
+					const res = await fetch(
+						`${BASE_URL}/employer/profile?user_id=${userId}`,
+						{
+							headers: {
+								"Content-Type": "application/json",
+								"Authorization": `Bearer ${token}`
+							}
+						}
+					);
+
 					const data = await res.json();
 
 					if (res.ok) {
@@ -158,7 +161,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
-							"Authorization": "Bearer " + token
+							"Authorization": `Bearer ${token}`
 						},
 						body: JSON.stringify({
 							title: formData.title,
@@ -296,51 +299,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			createOrUpdateEmployerProfile: async (userId, formData) => {
-				try {
-					const res = await fetch(`${BASE_URL}/employer/profile`, {
-						method: "PATCH",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						body: JSON.stringify({
-							user_id: userId,
-							bio: formData.bio,
-							profile_picture: formData.profile_picture,
-						}),
-					});
-
-					if (res.ok) {
-						const data = await res.json();
-						return { success: true, profile: data };
-					} else if (res.status === 404) {
-						const createRes = await fetch(`${BASE_URL}/employer/profile`, {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-							},
-							body: JSON.stringify({
-								user_id: userId,
-								bio: formData.bio,
-								profile_picture: formData.profile_picture,
-							}),
-						});
-
-						const createData = await createRes.json();
-						if (createRes.ok) {
-							return { success: true, profile: createData };
-						} else {
-							return { success: false, error: createData.msg };
-						}
-					} else {
-						const errorData = await res.json();
-						return { success: false, error: errorData.msg };
-					}
-				} catch (error) {
-					return { success: false, error: "Error de red" };
-				}
-			},
-
 			uploadEmployerPicture: async (userId, pictureUrl) => {
 				try {
 					const res = await fetch(`${BASE_URL}/employer/profile/picture`, {
@@ -413,7 +371,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						return { success: false, error: "No se pudieron obtener las skills actuales." };
 					}
 
-					// Usamos Promise.all para esperar todos los DELETEs
 					const deleteRequests = data.skills.map(fs => {
 						const skillId = fs.id || fs.skill?.id;
 						if (skillId) {
@@ -432,6 +389,119 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			createOrUpdateEmployerProfile: async (userId, formData) => {
+				try {
+					const token = localStorage.getItem("token");
+					const payload = {
+						bio: formData.bio,
+						profile_picture: formData.profile_picture,
+						industry: formData.industry,
+						location: formData.location,
+						website: formData.website,
+						phone: formData.phone,
+					};
+
+					// Intento PATCH
+					let res = await fetch(`${BASE_URL}/employer/profile`, {
+						method: "PATCH",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`
+						},
+						body: JSON.stringify(payload),
+					});
+
+					// Si no existe aún (404), creamos con POST
+					if (res.status === 404) {
+						res = await fetch(`${BASE_URL}/employer/profile`, {
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								"Authorization": `Bearer ${token}`
+							},
+							body: JSON.stringify(payload),
+						});
+					}
+
+					const data = await res.json();
+					if (res.ok) {
+						return { success: true, profile: data };
+					} else {
+						return { success: false, error: data.msg };
+					}
+
+				} catch (err) {
+					console.error("Error al crear o actualizar perfil:", err);
+					return { success: false, error: "Error de red" };
+				}
+			},
+
+			getEmployerStats: async () => {
+				try {
+					const token = localStorage.getItem("token");
+					const res = await fetch(`${BASE_URL}/employer/stats`, {
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`
+						}
+					});
+					const data = await res.json();
+					if (res.ok) {
+						return { success: true, stats: data };
+					} else {
+						console.error("getEmployerStats error:", data.msg);
+						return { success: false, error: data.msg };
+					}
+				} catch (error) {
+					console.error("getEmployerStats network error:", error);
+					return { success: false, error: error.message };
+				}
+			},
+
+			// Obtener proyectos activos del empleador
+			getEmployerProjects: async () => {
+				try {
+					const token = localStorage.getItem("token");
+					const res = await fetch(`${BASE_URL}/employer/projects`, {
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`
+						}
+					});
+					const data = await res.json();
+					if (res.ok) {
+						// data.offers es el array de proyectos
+						return { success: true, projects: data.offers };
+					} else {
+						console.error("getEmployerProjects error:", data.msg);
+						return { success: false, error: data.msg };
+					}
+				} catch (error) {
+					console.error("getEmployerProjects network error:", error);
+					return { success: false, error: error.message };
+				}
+			},
+
+			deleteProject: async (projectId) => {
+				try {
+					const token = localStorage.getItem("token");
+					const res = await fetch(`${BASE_URL}/projects/${projectId}`, {
+						method: "DELETE",
+						headers: {
+							"Authorization": `Bearer ${token}`
+						}
+					});
+					if (res.status === 204) {
+						return { success: true };
+					} else {
+						const data = await res.json();
+						return { success: false, error: data.msg };
+					}
+				} catch (error) {
+					console.error("deleteProject network error:", error);
+					return { success: false, error: error.message };
+				}
+			},
 
 			getUsers: async () => {
 				try {
@@ -453,6 +523,34 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error(error)
 				}
 			},
+
+			
+			setSearchQuery: (query) => {
+				setStore({ searchQuery: query });
+			  },
+			  
+			  searchBySkill: async (skillName) => {
+				try {
+				  const res = await fetch(`${BASE_URL}/search/freelancers?skill=${encodeURIComponent(skillName)}`);
+				  const data = await res.json();
+			  
+				  if (res.ok) {
+					setStore({
+					  searchResults: {
+						freelancers: data,  // ← Asegúrate de que esto es un array
+						projects: []        // Puedes dejarlo vacío si no estás usando aún
+					  }
+					});
+					return { success: true };
+				  } else {
+					return { success: false, error: data.msg };
+				  }
+				} catch (error) {
+				  return { success: false, error: "Error al buscar skill" };
+				}
+			  }
+			  
+			  
 
 
 

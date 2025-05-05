@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import func
 import stripe
 from dotenv import load_dotenv
 
@@ -474,6 +475,24 @@ def create_project():
     return jsonify(project.serialize()), 201
 
 
+@routes.route('/projects/<int:project_id>', methods=['DELETE'])
+@jwt_required()
+def delete_project(project_id):
+    current_user = int(get_jwt_identity())
+    project = Project.query.get(project_id)
+    print(">>> get_jwt_identity():", current_user, type(current_user))
+    print(">>> project.employer_id:", project.employer_id, type(project.employer_id))
+
+    if not project:
+        return jsonify({"msg": "Proyecto no encontrado"}), 404
+    if project.employer_id != current_user:
+        return jsonify({"msg": "No tienes permiso para eliminar este proyecto"}), 403
+
+    project.status = 'cancelled'
+    db.session.commit()
+    return '', 204
+
+
 @routes.route('/projects/<int:id>', methods=['GET'])
 def get_project(id):
     project = Project.query.get(id)
@@ -619,6 +638,10 @@ def get_employer_profile():
         "id": profile.id,
         "bio": profile.bio,
         "profile_picture": profile.profile_picture,
+        "industry": profile.industry,
+        "location": profile.location,
+        "website": profile.website,
+        "phone": profile.phone,
         "user": {
             "first_name": profile.user.first_name,
             "last_name": profile.user.last_name,
@@ -628,41 +651,47 @@ def get_employer_profile():
 
 
 @routes.route('/employer/profile', methods=['POST'])
+@jwt_required()
 def create_employer_profile():
-    data = request.json
-    user_id = data.get('user_id')
+    data = request.get_json()
+    user_id = int(get_jwt_identity())
 
-    if not user_id:
-        return jsonify({"msg": "user_id es requerido"}), 400
-
-    profile = Profile.query.filter_by(user_id=user_id).first()
-    if profile:
+    # No permitimos crear si ya existe
+    if Profile.query.filter_by(user_id=user_id).first():
         return jsonify({"msg": "El perfil ya existe"}), 400
 
     profile = Profile(
-        user_id=user_id,
-        bio=data.get('bio'),
-        profile_picture=data.get('profile_picture'),
-        rating=0
+        user_id= user_id,
+        bio= data.get('bio'),
+        profile_picture= data.get('profile_picture'),
+        industry= data.get('industry'),
+        location= data.get('location'),
+        website= data.get('website'),
+        phone= data.get('phone'),
+        rating= 0
     )
 
     db.session.add(profile)
     db.session.commit()
-
     return jsonify(profile.serialize()), 201
 
 
 @routes.route('/employer/profile', methods=['PATCH'])
+@jwt_required()
 def update_employer_profile():
-    data = request.json
-    user_id = data.get('user_id')
+    data    = request.get_json()
+    user_id = int(get_jwt_identity())
 
     profile = Profile.query.filter_by(user_id=user_id).first()
     if not profile:
         return jsonify({"msg": "Perfil no encontrado"}), 404
 
-    profile.bio = data.get('bio', profile.bio)
+    profile.bio             = data.get('bio',             profile.bio)
     profile.profile_picture = data.get('profile_picture', profile.profile_picture)
+    profile.industry        = data.get('industry',        profile.industry)
+    profile.location        = data.get('location',        profile.location)
+    profile.website         = data.get('website',         profile.website)
+    profile.phone           = data.get('phone',           profile.phone)
 
     db.session.commit()
     return jsonify(profile.serialize()), 200
@@ -685,3 +714,86 @@ def update_employer_picture():
     db.session.commit()
 
     return jsonify({ "success": True, "picture": picture_url }), 200
+
+
+@routes.route('/employer/stats', methods=['GET'])
+@jwt_required()
+def get_employer_stats():
+    user_id = int(get_jwt_identity())
+    offers     = Project.query.filter_by(employer_id=user_id).count()
+    proposals  = Proposal.query.join(Project).filter(Project.employer_id==user_id).count()
+    completed  = Project.query.filter_by(employer_id=user_id, status="completed").count()
+    avg_rating = db.session.query(func.avg(Profile.rating)).filter(Profile.user_id==user_id).scalar() or 0
+    return jsonify({
+      "offers": offers,
+      "proposals": proposals,
+      "completed": completed,
+      "rating": round(avg_rating,2)
+    }), 200
+
+
+@routes.route('/employer/projects', methods=['GET'])
+@jwt_required()
+def get_employer_projects():
+    user_id = int(get_jwt_identity())
+    projects = Project.query \
+        .filter(Project.employer_id == user_id, Project.status != 'cancelled') \
+        .all()
+    data = []
+    for p in projects:
+        count = Proposal.query.filter_by(project_id=p.id).count()
+        data.append({
+          "id": p.id,
+          "title": p.title,
+          "budget": p.budget,
+          "created_at": p.created_at.isoformat(),
+          "proposals_count": count
+        })
+    return jsonify({ "offers": data }), 200
+
+@routes.route("/search/freelancers", methods=["GET"])
+def search_freelancers_by_skill():
+    skill_name = request.args.get("skill")
+
+    if not skill_name:
+        return jsonify({"msg": "Skill no proporcionada"}), 400
+
+    # Buscar la skill exacta
+    skill = Skill.query.filter(Skill.name.ilike(f"%{skill_name}%")).first()
+
+    if not skill:
+        return jsonify([]), 200  # Skill no encontrada
+
+    # Buscar todos los perfiles que tienen esa skill
+    freelancer_skills = FreelancerSkill.query.filter_by(skill_id=skill.id).all()
+
+    profile_ids = [fs.profile_id for fs in freelancer_skills]
+    profiles = Profile.query.filter(Profile.id.in_(profile_ids)).options(
+        joinedload(Profile.skills).joinedload(FreelancerSkill.skill),
+        joinedload(Profile.user)
+    ).all()
+
+    results = []
+    for profile in profiles:
+        skills = [
+            {"id": fs.skill.id, "name": fs.skill.name}
+            for fs in profile.skills if fs.skill
+        ]
+        results.append({
+            "id": profile.id,
+            "bio": profile.bio,
+            "hourly_rate": profile.hourly_rate,
+            "profile_picture": profile.profile_picture,
+            "rating": profile.rating,
+            "user": {
+                 "id": profile.user.id,
+                "first_name": profile.user.first_name,
+                "last_name": profile.user.last_name,
+                "email": profile.user.email
+            },
+            "skills": skills
+        })
+
+    return jsonify(results), 200
+
+

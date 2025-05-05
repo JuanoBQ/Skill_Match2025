@@ -59,6 +59,9 @@ class Profile(db.Model):
     profile_picture: Mapped[Optional[str]] = mapped_column(String(255))
     hourly_rate: Mapped[Optional[float]] = mapped_column(Float)
     rating: Mapped[Optional[float]] = mapped_column(Float)
+    industry: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    website: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     career: Mapped[Optional[str]] = mapped_column(Text)
     language: Mapped[Optional[str]] = mapped_column(Text)
     location: Mapped[Optional[str]] = mapped_column(Text)
@@ -80,6 +83,9 @@ class Profile(db.Model):
             "profile_picture": self.profile_picture,
             "hourly_rate": self.hourly_rate,
             "rating": self.rating,
+            "industry": self.industry,
+            "website": self.website,
+            "phone": self.phone,
             "career": self.career,
             "language": self.language,
             "location": self.location,
