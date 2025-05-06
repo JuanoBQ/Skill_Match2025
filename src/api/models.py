@@ -105,6 +105,9 @@ class Skill(db.Model):
 
     freelancers: Mapped[List["FreelancerSkill"]] = relationship(
         "FreelancerSkill", back_populates="skill")
+    projects: Mapped[List["ProjectSkill"]] = relationship(
+    "ProjectSkill", back_populates="skill", cascade="all, delete-orphan"
+)
 
     def __repr__(self):
         return f"<Skill {self.name}>"
@@ -134,6 +137,28 @@ class FreelancerSkill(db.Model):
             "profile_id": self.profile_id,
             "skill": self.skill.serialize()
         }
+class ProjectSkill(db.Model):
+    __tablename__ = "project_skills"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
+    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.id"))
+
+    project: Mapped["Project"] = relationship("Project", back_populates="skills")
+    skill: Mapped["Skill"] = relationship("Skill", back_populates="projects")  
+
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "skill": self.skill.serialize()
+        }
+
+
+
+
+
 
 
 # --- PROYECTOS Y PROPUESTAS ---
@@ -157,6 +182,9 @@ class Project(db.Model):
     employer: Mapped["User"] = relationship("User", back_populates="projects")
     proposals: Mapped[List["Proposal"]] = relationship(
         "Proposal", back_populates="project", cascade="all, delete-orphan")
+    skills: Mapped[List["ProjectSkill"]] = relationship(
+    "ProjectSkill", back_populates="project", cascade="all, delete-orphan"
+)
 
     def __repr__(self):
         return f"<Project {self.title}>"
@@ -172,6 +200,7 @@ class Project(db.Model):
             "deadline": self.deadline.isoformat() if self.deadline else None,
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None,
+            "skills": [ps.skill.serialize() for ps in self.skills],
             "proposals": [p.serialize_basic() for p in self.proposals]
         }
     

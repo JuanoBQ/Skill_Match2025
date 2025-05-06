@@ -87,6 +87,12 @@ const EmployerProfile = () => {
 
     const handleCreateProject = async (e) => {
         e.preventDefault();
+        console.log("Payload enviado al backend:", {
+            title,
+            description,
+            budget: parseFloat(budget),
+            skills: selectedSkills.map((s) => s.value),
+          });
         const res = await actions.createProject({
             title,
             description,

@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Payment
+from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Payment, ProjectSkill 
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
@@ -442,10 +442,8 @@ def get_all_projects():
 @jwt_required()
 def create_project():
     data = request.get_json()
-
     current_user_id = get_jwt_identity()
 
-    # Verifica que sea un employer
     employer = User.query.get(current_user_id)
     if not employer or employer.role != "employer":
         return jsonify({"msg": "Solo los empleadores pueden crear proyectos."}), 403
@@ -464,13 +462,26 @@ def create_project():
         employer_id=current_user_id,
         title=data.get('title'),
         description=data.get('description'),
-        category=data.get('category'),
+        # category=data.get('category'),
         budget=data.get('budget'),
         deadline=deadline,
         status="open"
     )
 
     db.session.add(project)
+    db.session.flush()  # ← Necesario para obtener el ID antes de commit
+
+    # Relacionar skills si vienen en el payload
+    skill_ids = data.get("skills", [])
+    print("Skill IDs recibidos:", skill_ids)  # ← DEBUG
+
+    for skill_id in skill_ids:
+        print(f"Agregando skill_id {skill_id} al proyecto {project.id}")  # ← DEBUG
+        project_skill = ProjectSkill(project_id=project.id, skill_id=skill_id)
+        db.session.add(project_skill)
+
+
+
     db.session.commit()
     return jsonify(project.serialize()), 201
 
@@ -762,31 +773,30 @@ def search_freelancers_by_skill():
     skill = Skill.query.filter(Skill.name.ilike(f"%{skill_name}%")).first()
 
     if not skill:
-        return jsonify([]), 200  # Skill no encontrada
+        return jsonify({"freelancers": [], "projects": []}), 200  # Skill no encontrada
 
-    # Buscar todos los perfiles que tienen esa skill
+    # ---------- FREELANCERS ----------
     freelancer_skills = FreelancerSkill.query.filter_by(skill_id=skill.id).all()
-
     profile_ids = [fs.profile_id for fs in freelancer_skills]
     profiles = Profile.query.filter(Profile.id.in_(profile_ids)).options(
         joinedload(Profile.skills).joinedload(FreelancerSkill.skill),
         joinedload(Profile.user)
     ).all()
 
-    results = []
+    freelancer_results = []
     for profile in profiles:
         skills = [
             {"id": fs.skill.id, "name": fs.skill.name}
             for fs in profile.skills if fs.skill
         ]
-        results.append({
+        freelancer_results.append({
             "id": profile.id,
             "bio": profile.bio,
             "hourly_rate": profile.hourly_rate,
             "profile_picture": profile.profile_picture,
             "rating": profile.rating,
             "user": {
-                 "id": profile.user.id,
+                "id": profile.user.id,
                 "first_name": profile.user.first_name,
                 "last_name": profile.user.last_name,
                 "email": profile.user.email
@@ -794,6 +804,18 @@ def search_freelancers_by_skill():
             "skills": skills
         })
 
-    return jsonify(results), 200
+    # ---------- PROJECTS ----------
+    
+    project_skills = ProjectSkill.query.filter_by(skill_id=skill.id).all()
+    projects = [ps.project for ps in project_skills]
+
+    project_results = []
+    for p in projects:
+        project_results.append(p.serialize())  # Asegúrate de tener `skills` en serialize
+
+    return jsonify({
+        "freelancers": freelancer_results,
+        "projects": project_results
+    }), 200
 
 

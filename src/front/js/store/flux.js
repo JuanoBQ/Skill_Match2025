@@ -1,4 +1,4 @@
-const BASE_URL = "https://turbo-space-cod-7v7wxwp7v9wvcr779-3001.app.github.dev/api";
+const BASE_URL = "https://congenial-dollop-q7q7w5q4gr773xvrx-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -168,7 +168,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 							description: formData.description,
 							budget: formData.budget,
 							category: formData.category,
-							deadline: formData.deadline
+							deadline: formData.deadline,
+							skills: formData.skills
 						})
 					});
 
