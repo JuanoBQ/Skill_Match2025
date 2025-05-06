@@ -17,6 +17,8 @@ const SearchResults = () => {
   }, [query]);
 
   const freelancers = store.searchResults.freelancers;
+  const projects = store.searchResults.projects;
+
 
   return (
     <div className="container mt-5">
@@ -51,7 +53,7 @@ const SearchResults = () => {
                 <div className="text-center mt-auto">
                   <button
                     className="btn btn-dark w-100"
-                    onClick={() => navigate(`/profile/${f.user.id}`)}
+                    onClick={() => navigate(`/Profile/${f.user.id}`)}
                   >
                     Ver perfil
                   </button>
@@ -63,6 +65,32 @@ const SearchResults = () => {
           <div className="text-muted text-center mt-5">No se encontraron freelancers para esta skill.</div>
         )}
       </div>
+      <h4 className="mb-3 text-dark mt-5">Proyectos disponibles:</h4>
+
+        <div className="row">
+          {projects.length > 0 ? projects.map((p) => (
+            <div key={p.id} className="col-md-6 col-lg-4 mb-4">
+              <div className="card h-100 shadow-sm border border-light">
+                <div className="card-body d-flex flex-column">
+                  <h5 className="card-title text-dark">{p.title}</h5>
+                  <p className="card-text text-muted" style={{ minHeight: "60px" }}>
+                    {p.description || "Sin descripción disponible."}
+                  </p>
+                  <p className="small"><strong>Presupuesto:</strong> ${p.budget}</p>
+                  <p className="small"><strong>Estado:</strong> {p.status}</p>
+                  <div className="mt-auto text-end">
+                    <button className="btn btn-outline-dark btn-sm" disabled>
+                      Ver detalles
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )) : (
+            <div className="text-muted text-center mt-5">No se encontraron proyectos con esta skill.</div>
+          )}
+        </div>
+
     </div>
   );
 };

@@ -769,15 +769,15 @@ def search_freelancers_by_skill():
     if not skill_name:
         return jsonify({"msg": "Skill no proporcionada"}), 400
 
-    # Buscar la skill exacta
     skill = Skill.query.filter(Skill.name.ilike(f"%{skill_name}%")).first()
 
     if not skill:
-        return jsonify({"freelancers": [], "projects": []}), 200  # Skill no encontrada
+        return jsonify({"freelancers": [], "projects": []}), 200
 
     # ---------- FREELANCERS ----------
     freelancer_skills = FreelancerSkill.query.filter_by(skill_id=skill.id).all()
     profile_ids = [fs.profile_id for fs in freelancer_skills]
+
     profiles = Profile.query.filter(Profile.id.in_(profile_ids)).options(
         joinedload(Profile.skills).joinedload(FreelancerSkill.skill),
         joinedload(Profile.user)
@@ -805,17 +805,20 @@ def search_freelancers_by_skill():
         })
 
     # ---------- PROJECTS ----------
-    
     project_skills = ProjectSkill.query.filter_by(skill_id=skill.id).all()
-    projects = [ps.project for ps in project_skills]
+    project_ids = list(set(ps.project_id for ps in project_skills))
 
-    project_results = []
-    for p in projects:
-        project_results.append(p.serialize())  # Asegúrate de tener `skills` en serialize
+    projects = Project.query.filter(Project.id.in_(project_ids)).options(
+        joinedload(Project.skills).joinedload(ProjectSkill.skill),
+        joinedload(Project.employer)
+    ).all()
+
+    project_results = [p.serialize() for p in projects]
 
     return jsonify({
         "freelancers": freelancer_results,
         "projects": project_results
     }), 200
+
 
 

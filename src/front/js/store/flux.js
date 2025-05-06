@@ -537,11 +537,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 			  
 				  if (res.ok) {
 					setStore({
-					  searchResults: {
-						freelancers: data,  // ← Asegúrate de que esto es un array
-						projects: []        // Puedes dejarlo vacío si no estás usando aún
-					  }
-					});
+						searchResults: {
+						  freelancers: data.freelancers || [],
+						  projects: data.projects || [],
+						}
+					  });
+					  
 					return { success: true };
 				  } else {
 					return { success: false, error: data.msg };
