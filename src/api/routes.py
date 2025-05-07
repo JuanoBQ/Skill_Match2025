@@ -622,6 +622,18 @@ def create_payment():
         return jsonify(error=str(e)), 500
     
 
+@routes.route('/payments/<int:payment_id>/complete', methods=['POST'])
+@jwt_required()
+def complete_payment(payment_id):
+    payment = Payment.query.get(payment_id)
+    if not payment:
+        return jsonify({"error": "Pago no encontrado"}), 404
+
+    payment.status = "completed"
+    db.session.commit()
+    return jsonify(payment.serialize()), 200
+    
+
 @routes.route('/employer/profile', methods=['GET'])
 def get_employer_profile():
     user_id = request.args.get('user_id')

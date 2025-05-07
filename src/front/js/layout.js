@@ -24,9 +24,11 @@ import DashboardProjects from "./component/DashboardProjects.jsx";
 import PaymentPage from "./component/PaymentPage.jsx";
 import EmployerForm from "./component/EmployerForm.jsx";
 import SearchResults from "./component/SearchResults.jsx";
-import FreelancerPublicProfile from "./component/FreelancerPublicProfile.jsx";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 
 
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, { link: false });
 
 //create your first component
 const Layout = () => {
@@ -43,33 +45,26 @@ const Layout = () => {
                 <ScrollToTop>
                     <Navbar />
                     <div className="flex-grow-1">
-                    <Routes>
-                        <Route element={<Home />} path="/" />
-                        <Route element={<Demo />} path="/demo" />
-                        <Route element={<Single />} path="/single/:theid" />
-                        <Route element={<Login />} path="/login" />
-                        <Route element={<Login />} path="/login" />
-                        <Route element={<Register />} path="/register" />
-                        <Route element={<EmployerProfile />} path="/employerProfile" />
-                        <Route element={<FreelancerProfile />} path="/freelancerProfile" />
-                        <Route element={<ProfileForm />} path="/profileform" />
-                        <Route element={<DashboardFreelancer />} path="/DashboardFreelancer" />
-                        <Route element={<DashboardProjects />} path="/DashboardProjects" />
-                        <Route element={<Dashboard />} path="/Dashboard" />               
-                        <Route element={<EmployerForm />} path="/employerForm" />
-                        <Route path="*" element={<h1>Not found!</h1>} />
-                        <Route element={<PaymentPage />} path="/payment/:proposalId" />
-                        <Route element={<SearchResults />} path="/search" />
-                        <Route element={<FreelancerPublicProfile />} path="/profile/:userId" />
-                        <Route element={<Profile />} path="/Profile/:id" />
+                        <Routes>
+                            <Route element={<Home />} path="/" />
+                            <Route element={<Demo />} path="/demo" />
+                            <Route element={<Single />} path="/single/:theid" />
+                            <Route element={<Login />} path="/login" />
+                            <Route element={<Register />} path="/register" />
+                            <Route element={<EmployerProfile />} path="/employerProfile" />
+                            <Route element={<FreelancerProfile />} path="/freelancerProfile" />
+                            <Route element={<ProfileForm />} path="/profileform" />
+                            <Route element={<DashboardFreelancer />} path="/DashboardFreelancer" />
+                            <Route element={<DashboardProjects />} path="/DashboardProjects" />
+                            <Route element={<Dashboard />} path="/Dashboard" />
+                            <Route element={<EmployerForm />} path="/employerForm" />
+                            <Route path="*" element={<h1>Not found!</h1>} />
+                            <Route element={<SearchResults />} path="/search" />
+                            <Route element={<Profile />} path="/Profile/:id" />
+                            <Route element={<Elements stripe={stripePromise}><PaymentPage /></Elements>} path="/payment/:proposalId" />
 
-
-
-                        
-
-
-                        <Route element={<h1>Not found!</h1>} />
-                    </Routes>
+                            <Route element={<h1>Not found!</h1>} />
+                        </Routes>
                     </div>
                     <Footer />
                 </ScrollToTop>
