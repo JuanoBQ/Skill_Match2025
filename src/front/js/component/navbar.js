@@ -45,28 +45,26 @@ export const Navbar = () => {
     e.preventDefault();
     const query = searchTerm.trim();
     if (query) {
-      actions.setSearchQuery(query);                
-      await actions.searchBySkill(query);        
-      navigate(`/search?query=${encodeURIComponent(query)}`); 
+      actions.setSearchQuery(query);
+      await actions.searchBySkill(query);
+      navigate(`/search?query=${encodeURIComponent(query)}`);
       setSearchTerm("");
     }
   };
-  
+
 
   return (
     <div className="container-fluid">
       <nav className="navbar">
         <div className="container-fluid navStyles">
-          <Link to={"/"}>
-            <a className="navbar-brand" href="#">
-              <img src={logo} alt="Bootstrap" width="42" height="42" />
-            </a>
+          <Link to={"/"} className="navbar-brand">
+            <img src={logo} alt="Bootstrap" width="42" height="42" />
           </Link>
 
           <div className="navbar-nav navOptions col d-flex flex-row">
             <Link to={"/dashboard"} className="nav-link active ms-2 me-3 text-black">Dashboard</Link>
-            <a className="nav-link me-3 text-black" href="#">About</a>
-            <a className="nav-link me-3 text-black" href="#">Contact</a>
+            <Link to={"/About"} className="nav-link active ms-2 me-3 text-black">About</Link>
+            <Link to={"/Contact"} className="nav-link active ms-2 me-3 text-black">Contact</Link>
           </div>
 
           <form className="d-flex me-4" role="search" onSubmit={handleSearchSubmit}>

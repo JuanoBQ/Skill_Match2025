@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState, useContext } from "react";
+import { Context } from "../store/appContext.js";
 import DashboardFreelancer from "./DashboardFreelancer.jsx";
 import DashboardProjects from "./DashboardProjects.jsx";
 
 export const Tabs = () => {
+
+
+
     return (
         <div className="container mt-4">
             <ul className="nav nav-tabs ms-5" id="myTab" role="tablist">

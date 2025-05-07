@@ -9,7 +9,7 @@ export const DashAccordion = () => {
                     <h5>Contactos</h5>
                 </button>
                 </h2>
-                <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                <div id="flush-collapseOne" className="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
                 <div className="accordion-body">Sin contactos!</div>
                 </div>
             </div>

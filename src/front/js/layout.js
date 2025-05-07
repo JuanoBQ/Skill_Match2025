@@ -10,7 +10,7 @@ import { Dashboard } from "./pages/Dashboard.js";
 import { Profile } from "./pages/Profile.js";
 import { Helpcenter } from "./pages/helpcenter";
 import { ContactUs } from "./pages/contactus";
-import { Historial } from "./pages/historial";
+import { About } from "./pages/About.js";
 import injectContext from "./store/appContext";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
@@ -58,6 +58,9 @@ const Layout = () => {
                         <Route element={<PaymentPage />} path="/payment/:proposalId" />
                         <Route element={<SearchResults />} path="/search" />
                         <Route element={<Profile />} path="/Profile/:id" />
+                        <Route element={< ContactUs/>} path="/Contact" />
+                        <Route element={< Helpcenter/>} path="/Help" />
+                        <Route element={< About/>} path="/About" />
 
 
 
