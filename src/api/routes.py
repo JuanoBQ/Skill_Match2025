@@ -601,14 +601,14 @@ def create_payment():
         intent = stripe.PaymentIntent.create(
             amount=int(proposal.proposed_budget * 100),
             currency='usd',
-            automatic_payment_methods={"enabled": True},
+            payment_method_types=["card"],
         )
 
         # Guarda el intento en tu base de datos (opcional)
         payment = Payment(
             proposal_id=proposal_id,
             amount=proposal.proposed_budget,
-            status="pending"
+            status="pendiente"
         )
         db.session.add(payment)
         db.session.commit()
@@ -629,7 +629,7 @@ def complete_payment(payment_id):
     if not payment:
         return jsonify({"error": "Pago no encontrado"}), 404
 
-    payment.status = "completed"
+    payment.status = "completado"
     db.session.commit()
     return jsonify(payment.serialize()), 200
     
@@ -807,5 +807,27 @@ def search_freelancers_by_skill():
         })
 
     return jsonify(results), 200
+
+
+@routes.route('/employer/completed-projects', methods=['GET'])
+@jwt_required()
+def get_employer_completed_projects():
+    user_id = int(get_jwt_identity())
+
+    # Hacemos join desde Project → Proposal → Payment
+    completed_projects = (
+        db.session.query(Project)
+        .join(Proposal, Proposal.project_id == Project.id)
+        .join(Payment, Payment.proposal_id == Proposal.id)
+        .filter(
+            Project.employer_id == user_id,
+            Payment.status == "completed"
+        )
+        .all()
+    )
+
+    # Serializamos con serialize_basic (o crea uno nuevo si quieres más datos)
+    result = [p.serialize_basic() for p in completed_projects]
+    return jsonify(result), 200
 
 

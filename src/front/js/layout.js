@@ -27,7 +27,6 @@ import SearchResults from "./component/SearchResults.jsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 
-
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, { link: false });
 
 //create your first component
@@ -61,7 +60,7 @@ const Layout = () => {
                             <Route path="*" element={<h1>Not found!</h1>} />
                             <Route element={<SearchResults />} path="/search" />
                             <Route element={<Profile />} path="/Profile/:id" />
-                            <Route element={<Elements stripe={stripePromise}><PaymentPage /></Elements>} path="/payment/:proposalId" />
+                            <Route element={<Elements stripe={stripePromise} options={{ link: false }}><PaymentPage /></Elements>} path="/payment/:proposalId" />
 
                             <Route element={<h1>Not found!</h1>} />
                         </Routes>

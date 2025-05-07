@@ -13,8 +13,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			projects: [],
 			searchQuery: "",
 			searchResults: {
-			freelancers: [],
-			projects: []
+				freelancers: [],
+				projects: []
 			},
 
 
@@ -89,7 +89,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							userId: data.user_id,
 							isAuthenticated: false,
 						});
-						
+
 
 						return { success: true };
 					} else {
@@ -237,6 +237,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error al ver Solicitudes:", error);
 					return { success: false, error: "Error de conexión al servidor" };
+				}
+			},
+
+			getCompletedProjects: async () => {
+				try {
+					const token = localStorage.getItem("token");
+					const res = await fetch(`${BASE_URL}/employer/completed-projects`, {
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`
+						}
+					});
+					const data = await res.json();
+					if (res.ok) {
+						return { success: true, projects: data };
+					} else {
+						return { success: false, error: data.msg || "Error desconocido" };
+					}
+				} catch (error) {
+					return { success: false, error: "Error de conexión" };
 				}
 			},
 
@@ -524,33 +544,33 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			
+
 			setSearchQuery: (query) => {
 				setStore({ searchQuery: query });
-			  },
-			  
-			  searchBySkill: async (skillName) => {
+			},
+
+			searchBySkill: async (skillName) => {
 				try {
-				  const res = await fetch(`${BASE_URL}/search/freelancers?skill=${encodeURIComponent(skillName)}`);
-				  const data = await res.json();
-			  
-				  if (res.ok) {
-					setStore({
-					  searchResults: {
-						freelancers: data,  // ← Asegúrate de que esto es un array
-						projects: []        // Puedes dejarlo vacío si no estás usando aún
-					  }
-					});
-					return { success: true };
-				  } else {
-					return { success: false, error: data.msg };
-				  }
+					const res = await fetch(`${BASE_URL}/search/freelancers?skill=${encodeURIComponent(skillName)}`);
+					const data = await res.json();
+
+					if (res.ok) {
+						setStore({
+							searchResults: {
+								freelancers: data,  // ← Asegúrate de que esto es un array
+								projects: []        // Puedes dejarlo vacío si no estás usando aún
+							}
+						});
+						return { success: true };
+					} else {
+						return { success: false, error: data.msg };
+					}
 				} catch (error) {
-				  return { success: false, error: "Error al buscar skill" };
+					return { success: false, error: "Error al buscar skill" };
 				}
-			  }
-			  
-			  
+			}
+
+
 
 
 

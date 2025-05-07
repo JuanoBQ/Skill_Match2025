@@ -26,6 +26,7 @@ const EmployerProfile = () => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [budget, setBudget] = useState("");
+    const [completedProjects, setCompletedProjects] = useState([]);
 
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
@@ -67,6 +68,11 @@ const EmployerProfile = () => {
             const propsRes = await actions.getEmployerProposals(userId);
             if (propsRes.success) {
                 setProposals(propsRes.proposals);
+            }
+
+            const completedRes = await actions.getCompletedProjects();
+            if (completedRes.success) {
+                setCompletedProjects(completedRes.projects);
             }
 
             // Skills
@@ -206,7 +212,7 @@ const EmployerProfile = () => {
                 {[
                     { label: "Ofertas publicadas", value: stats.offers },
                     { label: "Propuestas recibidas", value: stats.proposals },
-                    { label: "Proyectos completados", value: stats.completed },
+                    { label: "Proyectos completados", value: completedProjects.length },
                     { label: "Valoración promedio", value: `${stats.rating.toFixed(1)}★` },
                 ].map((s, i) => (
                     <div key={i} className="col-md-3 mb-3">
