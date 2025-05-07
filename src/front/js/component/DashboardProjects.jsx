@@ -55,12 +55,12 @@ const DashboardProjects = () => {
     };
 
     return (
-        <div className="container-fluid d-flex justify-content-center mt-5">
+        <div className="container-fluid justify-content-center mt-5">
             {store.projects && store.projects.length > 0 ? (
                 <div>
                     {store.projects.map((project) => (
                         <div key={project.id}>
-                            <div className="card mb-3 Project-card" style={{ width: '800px' }}>
+                            <div className="card mb-3 Project-card" style={{ width: '100%' }}>
                                 <div className="ms-3 row no-gutters">
                                     <div className="col-md-8">
                                         <div className="card-body">

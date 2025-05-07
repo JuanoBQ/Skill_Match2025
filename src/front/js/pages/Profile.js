@@ -2,13 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Context } from "../store/appContext";
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
-import styles from "./../../styles/index.css"
+import styles from "./../../styles/index.css"; 
 
 export const Profile = () => {
     const { id } = useParams();
     const { actions } = useContext(Context);
     const [profile, setProfile] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -22,9 +23,11 @@ export const Profile = () => {
         loadProfile();
     }, [id]);
 
+  
     if (isLoading) {
         return <div className="text-center mt-5">Cargando perfil...</div>;
     }
+
 
     if (!profile) {
         return <div className="text-center mt-5">Perfil no encontrado</div>;
@@ -33,14 +36,14 @@ export const Profile = () => {
     return (
         <div className="container mt-5">
 
-            <div >
-                <div className="card shadow-sm border-light freelancer-profile" >
+            <div>
+                <div className="card shadow-sm border-light freelancer-profile">
                     <div className="card-body">
 
-
+                     
                         <div className="d-flex align-items-center mb-4">
                             <img
-                                src={profile.profile_picture || undefined}
+                                src={profile.profile_picture || undefinedImg}
                                 alt="Foto de perfil"
                                 className="ms-1 rounded-circle border border-3 border-primary shadow-lg"
                                 style={{
@@ -56,43 +59,65 @@ export const Profile = () => {
                                     {profile.user.first_name} {profile.user.last_name}
                                 </h4>
                                 <h4 className="text-dark mt-0 mb-1" style={{ fontSize: "1.1rem" }}>
-                                    {profile.career}
+                                    {profile.career || "Carrera no especificada"}
                                 </h4>
-
                             </div>
                         </div>
 
-
-
+                   
                         <p className="card-text text-justify">
                             {profile.bio || "Sin biografía disponible."}
                         </p>
+
+                   
                         <ul className="list-group list-group-flush">
+                   
                             <li className="list-group-item">
-                                <strong>Ubicación:</strong> {profile.location}
+                                <strong>Idioma:</strong> {profile.language || "Idioma no especificado"}
                             </li>
+
+                            
+                            <li className="list-group-item">
+                                <strong>Ubicación:</strong> {profile.location || "Ubicación no especificada"}
+                            </li>
+
+                           
                             <li className="list-group-item">
                                 <strong>Habilidades:</strong>{" "}
-                                {profile.skills.length > 0 ? (
+                                {profile.skills && profile.skills.length > 0 ? (
                                     profile.skills.map((skill, idx) => (
                                         <span key={idx} className="badge bg-secondary me-1">
-                                            {skill.name}
+                                            {skill.name || "Habilidad desconocida"}
                                         </span>
                                     ))
                                 ) : (
-                                    "Sin habilidades"
+                                    "Sin habilidades registradas"
                                 )}
                             </li>
+
+                           
                             <li className="list-group-item">
                                 <strong>Rating:</strong>{" "}
-                                {profile.rating ? `⭐ ${profile.rating}` : "No rating"}
+                                {profile.rating ?  `⭐ ${profile.rating}` :  "⭐ Sin calificación"}
+                            </li>
+
+                           
+                            <li className="list-group-item">
+                                <strong>Educación:</strong> {profile.education || "Educación no especificada"}
+                            </li>
+
+                          
+                            <li className="list-group-item">
+                                <strong>Tarifa por hora:</strong> ${profile.hourly_rate+" USD"|| "No definida"}
                             </li>
                         </ul>
 
+                    
                         <div className="card-body text-center">
                             <button className="btn btn-primary me-2">Mensaje</button>
                             <button className="btn btn-success">Conectar</button>
                         </div>
+
                     </div>
                 </div>
             </div>

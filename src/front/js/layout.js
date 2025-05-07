@@ -10,7 +10,7 @@ import { Dashboard } from "./pages/Dashboard.js";
 import { Profile } from "./pages/Profile.js";
 import { Helpcenter } from "./pages/helpcenter";
 import { ContactUs } from "./pages/contactus";
-import { Historial } from "./pages/historial";
+import { About } from "./pages/About.js";
 import injectContext from "./store/appContext";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
@@ -24,11 +24,8 @@ import DashboardProjects from "./component/DashboardProjects.jsx";
 import PaymentPage from "./component/PaymentPage.jsx";
 import EmployerForm from "./component/EmployerForm.jsx";
 import SearchResults from "./component/SearchResults.jsx";
-import FreelancerPublicProfile from "./component/FreelancerPublicProfile.jsx";
 
 
-
-//create your first component
 const Layout = () => {
     const basename = process.env.BASENAME || "";
 
@@ -60,8 +57,10 @@ const Layout = () => {
                         <Route path="*" element={<h1>Not found!</h1>} />
                         <Route element={<PaymentPage />} path="/payment/:proposalId" />
                         <Route element={<SearchResults />} path="/search" />
-                        <Route element={<FreelancerPublicProfile />} path="/profile/:userId" />
                         <Route element={<Profile />} path="/Profile/:id" />
+                        <Route element={< ContactUs/>} path="/Contact" />
+                        <Route element={< Helpcenter/>} path="/Help" />
+                        <Route element={< About/>} path="/About" />
 
 
 

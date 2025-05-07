@@ -41,8 +41,8 @@ export const Dashboard = () => {
             <div className="row">
                 <div className="col-8 ms-5">
                     <div className="d-flex">
-                        <div className="container mb-5 background rounded-3 mx-5 mt-5">
-                            <div className="ps-5 container-fluid py-5 text-start">
+                        <div className="container mb-2 background rounded-3 mx-5 mt-5">
+                            <div className="ps-5 container-fluid py-5 text-start" style={{height: "18rem"}}>
                                 <h1 className="display-6">Listo para comenzar!</h1>
                                 <p className="fs-5">Conecta con gente de todas partes del mundo!</p>
                             </div>
@@ -72,10 +72,11 @@ export const Dashboard = () => {
                     {store.isAuthenticated && (
                         <>
                             <DashAccordion />
-                            <UsefullCard />
+                            
                         </>
                     )}
-                    <DashboardFilter/>
+                    <DashboardFilter/>  
+                    <UsefullCard />
                 </aside>
             </div>
         </div>

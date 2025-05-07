@@ -1,15 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { Context } from '../store/appContext';
+
 
 const DashboardFilter = () => {
   const [category, setCategory] = useState('');
   const [rating, setRating] = useState('');
   const [hourlyRate, setHourlyRate] = useState('');
   const [skills, setSkills] = useState('');
-  const [profiles, setProfiles] = useState([]);
+
+  const { store, actions } = useContext(Context)
+
+  useEffect(() => {
+    actions.getSkills()
+    actions.dashboardFilterBy(category, rating, hourlyRate, skills)
+  }, [category, rating, hourlyRate, skills])
+
 
 
   return (
-    <div className="card m-0 mt-5 shadow-sm border border-0 background" style={{ maxWidth: "22rem" }}>
+    <div className="card m-0 mt-4 shadow-sm border border-0 background" style={{ maxWidth: "22rem" }}>
       <div className="row">
 
         <div>
@@ -26,11 +35,28 @@ const DashboardFilter = () => {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
-                  <option value="">Selecciona una categoría</option>
-                  <option value="web">Web Development</option>
-                  <option value="design">Diseño</option>
-                  <option value="python">Python</option>
-                  <option value="marketing">Marketing</option>
+                  <option value="">Selecciona una categoria</option>
+                  <option value="Web Developer">Web Developer</option>
+                  <option value="Graphic Designer">Graphic Designer</option>
+                  <option value="UI/UX Designer">UI/UX Designer</option>
+                  <option value="Mobile App Developer">Mobile App Developer</option>
+                  <option value="Data Scientist">Data Scientist</option>
+                  <option value="Software Engineer">Software Engineer</option>
+                  <option value="Backend Developer">Backend Developer</option>
+                  <option value="Frontend Developer">Frontend Developer</option>
+                  <option value="Fullstack Developer">Fullstack Developer</option>
+                  <option value="DevOps Engineer">DevOps Engineer</option>
+                  <option value="Content Writer">Content Writer</option>
+                  <option value="Copywriter">Copywriter</option>
+                  <option value="SEO Specialist">SEO Specialist</option>
+                  <option value="Digital Marketer">Digital Marketer</option>
+                  <option value="Video Editor">Video Editor</option>
+                  <option value="Photographer">Photographer</option>
+                  <option value="Illustrator">Illustrator</option>
+                  <option value="Translator">Translator</option>
+                  <option value="Virtual Assistant">Virtual Assistant</option>
+                  <option value="Project Manager">Project Manager</option>
+
                 </select>
               </div>
 
@@ -66,14 +92,15 @@ const DashboardFilter = () => {
 
               <div className="mb-3">
                 <label htmlFor="skills" className="form-label">Skills</label>
-                <input
-                  id="skills"
-                  type="text"
-                  className="form-control"
-                  placeholder="Ingresa habilidades separadas por coma"
+                <select
+                  id="rating"
+                  className="form-select"
                   value={skills}
                   onChange={(e) => setSkills(e.target.value)}
-                />
+                >
+                  <option value="">Selecciona una skill</option>
+                  {store.skills ? store.skills.map((skill) => { return <option key={skill.id} value={skill.name} >{skill.name}</option> }) : ("No options")}
+                </select>
               </div>
             </div>
           </div>

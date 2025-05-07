@@ -102,7 +102,7 @@ const FreelancerProfile = () => {
 
         <div className="container d-flex flex-row ms-5 mt-5">
 
-          <div className="basic col-3">
+          <div className="basic col-3 mb-5">
 
             <p className="mb-2 text-dark">
               <strong>Idiomas:</strong><br></br> {profile.language}
