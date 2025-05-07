@@ -608,7 +608,7 @@ def create_payment():
         payment = Payment(
             proposal_id=proposal_id,
             amount=proposal.proposed_budget,
-            status="pendiente"
+            status="pending"
         )
         db.session.add(payment)
         db.session.commit()
@@ -629,7 +629,7 @@ def complete_payment(payment_id):
     if not payment:
         return jsonify({"error": "Pago no encontrado"}), 404
 
-    payment.status = "completado"
+    payment.status = "completed"
     db.session.commit()
     return jsonify(payment.serialize()), 200
     
