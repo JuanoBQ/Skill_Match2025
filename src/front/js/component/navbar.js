@@ -2,12 +2,24 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import logo from './../../../../public/Logo SkillMatch.png';
+import Select from "react-select";
 
 export const Navbar = () => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSkill, setSelectedSkill] = useState(null);
+  const [availableSkills, setAvailableSkills] = useState([]);
+
+  useEffect(() => {
+    actions.getSkills().then(res => {
+      if (res.success) {
+        setAvailableSkills(
+          res.skills.map(s => ({ value: s.name, label: s.name }))
+        );
+      }
+    });
+  }, []);
 
   useEffect(() => {
     console.log("🌀 STORE CAMBIÓ ->", store);
@@ -43,15 +55,14 @@ export const Navbar = () => {
 
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
-    const query = searchTerm.trim();
-    if (query) {
+    if (selectedSkill) {
+      const query = selectedSkill.value;
       actions.setSearchQuery(query);
       await actions.searchBySkill(query);
       navigate(`/search?query=${encodeURIComponent(query)}`);
-      setSearchTerm("");
+      setSelectedSkill(null);
     }
   };
-
 
   return (
     <div className="container-fluid">
@@ -68,15 +79,16 @@ export const Navbar = () => {
           </div>
 
           <form className="d-flex me-4" role="search" onSubmit={handleSearchSubmit}>
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Buscar skills..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              aria-label="Search"
-            />
-            <button className="btn btn-outline-dark" type="submit" aria-label="Search">
+            <div style={{ width: "250px" }}>
+              <Select
+                options={availableSkills}
+                value={selectedSkill}
+                onChange={setSelectedSkill}
+                placeholder="Buscar skills..."
+                isClearable
+              />
+            </div>
+            <button className="btn btn-outline-dark ms-2" type="submit" aria-label="Search">
               <i className="fa-solid fa-magnifying-glass"></i>
             </button>
           </form>

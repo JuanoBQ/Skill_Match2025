@@ -103,23 +103,67 @@ const SearchResults = () => {
 
         <div className="row">
           {projects.length > 0 ? projects.map((p) => (
-            <div key={p.id} className="col-md-6 col-lg-4 mb-4">
-              <div className="card h-100 shadow-sm border border-light">
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title text-dark">{p.title}</h5>
-                  <p className="card-text text-muted" style={{ minHeight: "60px" }}>
-                    {p.description || "Sin descripción disponible."}
-                  </p>
-                  <p className="small"><strong>Presupuesto:</strong> ${p.budget}</p>
-                  <p className="small"><strong>Estado:</strong> {p.status}</p>
-                  <div className="mt-auto text-end">
-                    <button className="btn btn-outline-dark btn-sm" disabled>
-                      Ver detalles
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+           <div key={p.id} className="col-md-6 col-lg-4 mb-4">
+           <div
+             className="card shadow-sm border-0"
+             style={{
+               backgroundColor: "#F3F2F0",
+               borderRadius: "12px",
+               height: "100%",
+               display: "flex",
+               flexDirection: "column",
+             }}
+           >
+             <div className="card-body d-flex flex-column">
+         
+               {/* Título y descripción */}
+               <h5 className="text-dark fw-bold mb-2">{p.title}</h5>
+               <p className="text-muted mb-2" style={{ minHeight: "60px" }}>
+                 {p.description || "Sin descripción disponible."}
+               </p>
+         
+               {/* Presupuesto y estado */}
+               <p className="mb-1"><strong>Presupuesto:</strong> ${p.budget}</p>
+               <p className="mb-3"><strong>Estado:</strong> {p.status}</p>
+         
+               {/* Habilidades */}
+               {p.skills && p.skills.length > 0 && (
+                 <>
+                   <strong className="text-dark">Habilidades:</strong>
+                   <div className="mb-3 mt-1">
+                     {p.skills.map((skill) => (
+                       <span
+                         key={skill.id}
+                         className="badge bg-secondary me-1 mb-1"
+                         style={{ fontSize: "0.85rem" }}
+                       >
+                         {skill.name}
+                       </span>
+                     ))}
+                   </div>
+                 </>
+               )}
+         
+               {/* Botón */}
+               <div className="mt-auto">
+                 <button
+                   className="btn w-100"
+                   style={{
+                     backgroundColor: "#00cfff",
+                     color: "#000",
+                     fontWeight: "bold",
+                   }}
+                   disabled
+                 >
+                   Ver detalles
+                 </button>
+               </div>
+         
+             </div>
+           </div>
+         </div>
+         
+          
           )) : (
             <div className="text-muted text-center mt-5">No se encontraron proyectos con esta skill.</div>
           )}
