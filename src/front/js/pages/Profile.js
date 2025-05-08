@@ -1,14 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams ,useNavigate} from "react-router-dom";
 import { Context } from "../store/appContext";
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
 import styles from "./../../styles/index.css"; 
+
 
 export const Profile = () => {
     const { id } = useParams();
     const { actions } = useContext(Context);
     const [profile, setProfile] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -116,6 +118,12 @@ export const Profile = () => {
                         <div className="card-body text-center">
                             <button className="btn btn-primary me-2">Mensaje</button>
                             <button className="btn btn-success">Conectar</button>
+                         
+                        </div>
+                        <div className="text-center mt-4">
+                            <button className="btn btn-secondary" onClick={() => navigate(-1)}>
+                            Volver
+                            </button>
                         </div>
 
                     </div>

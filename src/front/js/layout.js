@@ -24,7 +24,7 @@ import DashboardProjects from "./component/DashboardProjects.jsx";
 import PaymentPage from "./component/PaymentPage.jsx";
 import EmployerForm from "./component/EmployerForm.jsx";
 import SearchResults from "./component/SearchResults.jsx";
-
+import ProjectDetails from "./component/ProjectDetails.jsx";
 
 const Layout = () => {
     const basename = process.env.BASENAME || "";
@@ -58,6 +58,7 @@ const Layout = () => {
                         <Route element={<PaymentPage />} path="/payment/:proposalId" />
                         <Route element={<SearchResults />} path="/search" />
                         <Route element={<Profile />} path="/Profile/:id" />
+                        <Route path="/project/:id" element={<ProjectDetails />} />
                         <Route element={< ContactUs/>} path="/Contact" />
                         <Route element={< Helpcenter/>} path="/Help" />
                         <Route element={< About/>} path="/About" />

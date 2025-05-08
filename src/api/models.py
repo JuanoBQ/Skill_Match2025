@@ -201,6 +201,11 @@ class Project(db.Model):
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "skills": [ps.skill.serialize() for ps in self.skills],
+            "employer_info": {  
+            "first_name": self.employer.first_name if self.employer else None,
+            "last_name": self.employer.last_name if self.employer else None,
+            "email": self.employer.email if self.employer else None
+        },
             "proposals": [p.serialize_basic() for p in self.proposals]
         }
     

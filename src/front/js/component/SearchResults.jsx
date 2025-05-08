@@ -148,12 +148,14 @@ const SearchResults = () => {
                <div className="mt-auto">
                  <button
                    className="btn w-100"
+                   onClick={() => navigate(`/project/${p.id}`)}
                    style={{
                      backgroundColor: "#00cfff",
                      color: "#000",
                      fontWeight: "bold",
                    }}
-                   disabled
+                
+
                  >
                    Ver detalles
                  </button>
