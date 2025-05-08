@@ -7,19 +7,15 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-# --- MODELOS BASE ---
-
 
 class User(db.Model):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(
-        String(120), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(200), nullable=False)
     first_name: Mapped[str] = mapped_column(String(80), nullable=True)
     last_name: Mapped[str] = mapped_column(String(80), nullable=True)
-    # 'freelancer', 'employer', 'admin'
     role: Mapped[str] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now())
@@ -123,10 +119,8 @@ class FreelancerSkill(db.Model):
     profile_id: Mapped[int] = mapped_column(ForeignKey("profiles.id"))
     skill_id: Mapped[int] = mapped_column(ForeignKey("skills.id"))
 
-    profile: Mapped["Profile"] = relationship(
-        "Profile", back_populates="skills")
-    skill: Mapped["Skill"] = relationship(
-        "Skill", back_populates="freelancers")
+    profile: Mapped["Profile"] = relationship("Profile", back_populates="skills")
+    skill: Mapped["Skill"] = relationship("Skill", back_populates="freelancers")
 
     def serialize(self):
         return {
@@ -149,14 +143,11 @@ class Project(db.Model):
     category: Mapped[Optional[str]] = mapped_column(String(100))
     budget: Mapped[Optional[float]] = mapped_column(Float)
     deadline: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    # open, in_progress, completed, cancelled
     status: Mapped[str] = mapped_column(String(20), default="open")
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     employer: Mapped["User"] = relationship("User", back_populates="projects")
-    proposals: Mapped[List["Proposal"]] = relationship(
-        "Proposal", back_populates="project", cascade="all, delete-orphan")
+    proposals: Mapped[List["Proposal"]] = relationship("Proposal", back_populates="project", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Project {self.title}>"
@@ -190,17 +181,14 @@ class Proposal(db.Model):
     freelancer_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     message: Mapped[str] = mapped_column(Text, nullable=False)
     proposed_budget: Mapped[Optional[float]] = mapped_column(Float)
-    status: Mapped[str] = mapped_column(
-        String(20), default="pending")  # pending, accepted, rejected
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now())
-
-    project: Mapped["Project"] = relationship(
-        "Project", back_populates="proposals")
-    freelancer: Mapped["User"] = relationship(
-        "User", back_populates="proposals")
-    payment: Mapped[Optional["Payment"]] = relationship(
-        "Payment", back_populates="proposal", uselist=False, cascade="all, delete-orphan")
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relaciones
+    project: Mapped["Project"] = relationship("Project", back_populates="proposals")
+    freelancer: Mapped["User"] = relationship("User", back_populates="proposals")
+    payment: Mapped[Optional["Payment"]] = relationship("Payment", back_populates="proposal", uselist=False, cascade="all, delete-orphan")
+    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="proposal", cascade="all, delete-orphan")
 
 
     def __repr__(self):
@@ -234,7 +222,7 @@ class Payment(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     proposal_id: Mapped[int] = mapped_column(ForeignKey("proposals.id"), nullable=False)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
-    status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)  # pending, completed, failed
+    status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     proposal: Mapped["Proposal"] = relationship("Proposal", back_populates="payment")
@@ -250,3 +238,20 @@ class Payment(db.Model):
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+    
+
+class Review(db.Model):
+    __tablename__ = "reviews"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reviewer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    reviewee_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    proposal_id: Mapped[int] = mapped_column(ForeignKey("proposals.id"), nullable=False)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    comment: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    # Relaciones
+    reviewer = relationship("User", foreign_keys=[reviewer_id])
+    reviewee = relationship("User", foreign_keys=[reviewee_id])
+    proposal = relationship("Proposal", back_populates="reviews")
