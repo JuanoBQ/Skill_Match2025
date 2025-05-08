@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Integer, ForeignKey, DateTime, Float, Text
+from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from typing import List, Optional
@@ -27,6 +28,10 @@ class User(db.Model):
         "Project", back_populates="employer", cascade="all, delete-orphan")
     proposals: Mapped[List["Proposal"]] = relationship(
         "Proposal", back_populates="freelancer", cascade="all, delete-orphan")
+    reviews_given:    Mapped[List["Review"]] = relationship(
+        "Review", foreign_keys="[Review.reviewer_id]", back_populates="reviewer")
+    reviews_received: Mapped[List["Review"]] = relationship(
+        "Review", foreign_keys="[Review.reviewee_id]", back_populates="reviewee")
 
 
     def __repr__(self):
@@ -242,6 +247,9 @@ class Payment(db.Model):
 
 class Review(db.Model):
     __tablename__ = "reviews"
+    __table_args__ = (
+        UniqueConstraint('reviewer_id', 'proposal_id', name='uix_reviewer_proposal'),
+        CheckConstraint('rating >= 1 AND rating <= 5', name='ck_rating_range'))
 
     id: Mapped[int] = mapped_column(primary_key=True)
     reviewer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
