@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Payment
+from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Review, Payment
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
@@ -630,6 +630,11 @@ def complete_payment(payment_id):
         return jsonify({"error": "Pago no encontrado"}), 404
 
     payment.status = "completed"
+    proposal = payment.proposal
+    proposal.status = "completed"
+    project = proposal.project
+    project.status = "completed"
+
     db.session.commit()
     return jsonify(payment.serialize()), 200
     
@@ -770,13 +775,11 @@ def search_freelancers_by_skill():
     if not skill_name:
         return jsonify({"msg": "Skill no proporcionada"}), 400
 
-    # Buscar la skill exacta
     skill = Skill.query.filter(Skill.name.ilike(f"%{skill_name}%")).first()
 
     if not skill:
-        return jsonify([]), 200  # Skill no encontrada
+        return jsonify([]), 200
 
-    # Buscar todos los perfiles que tienen esa skill
     freelancer_skills = FreelancerSkill.query.filter_by(skill_id=skill.id).all()
 
     profile_ids = [fs.profile_id for fs in freelancer_skills]
@@ -814,7 +817,6 @@ def search_freelancers_by_skill():
 def get_employer_completed_projects():
     user_id = int(get_jwt_identity())
 
-    # Hacemos join desde Project → Proposal → Payment
     completed_projects = (
         db.session.query(Project)
         .join(Proposal, Proposal.project_id == Project.id)
@@ -826,8 +828,72 @@ def get_employer_completed_projects():
         .all()
     )
 
-    # Serializamos con serialize_basic (o crea uno nuevo si quieres más datos)
     result = [p.serialize_basic() for p in completed_projects]
     return jsonify(result), 200
 
 
+def recalculate_profile_rating(user_id: int):
+    avg = (
+        db.session.query(func.avg(Review.rating))
+        .filter(Review.reviewee_id == user_id)
+        .scalar()
+        or 0)
+    
+    profile = Profile.query.filter_by(user_id=user_id).first()
+    if profile:
+        profile.rating = float(avg)
+
+
+# --- REVIEWS ---
+@routes.route('/reviews', methods=['POST'])
+@jwt_required()
+def create_review():
+    data = request.get_json()
+    reviewer_id = int(get_jwt_identity())
+
+    # 1) Valida que existe la propuesta
+    proposal = Proposal.query.get(data.get('proposal_id'))
+    if not proposal:
+        return jsonify({"msg": "Propuesta no encontrada"}), 404
+
+    # 2) Valida que el proyecto está completado
+    if proposal.project.status != 'completed':
+        return jsonify({"msg": "Solo puedes calificar proyectos completados"}), 400
+
+    # 3) Valida que el usuario participó en el trabajo
+    employer_id = proposal.project.employer_id
+    if reviewer_id not in (proposal.freelancer_id, employer_id):
+        return jsonify({"msg": "No autorizado para calificar esta propuesta"}), 403
+
+    # 4) Valida si ya este usuario dejo una calificacion de ese trabajo
+    exists = Review.query.filter_by(
+        proposal_id=proposal.id,
+        reviewer_id=reviewer_id
+    ).first()
+    if exists:
+        return jsonify({"msg": "Ya has calificado esta propuesta"}), 400
+
+    # 5) Crea el review
+    rev = Review(
+        reviewer_id=reviewer_id,
+        reviewee_id=data.get("reviewee_id"),
+        proposal_id=proposal.id,
+        rating=data.get("rating"),
+        comment=data.get("comment")
+    )
+    db.session.add(rev)
+    db.session.flush() #envía las operaciones al motor sin cerrar la transacción
+
+    recalculate_profile_rating(data.get("reviewee_id"))
+    db.session.commit()
+
+    return jsonify({
+        "msg": "Calificación creada",
+        "review": {
+            "id": rev.id,
+            "rating": rev.rating,
+            "comment": rev.comment,
+            "created_at": rev.created_at.isoformat()
+        },
+        "new_average": Profile.query.filter_by(user_id=data.get("reviewee_id")).first().rating
+    }), 201
