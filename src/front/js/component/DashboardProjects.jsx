@@ -92,9 +92,10 @@ const DashboardProjects = () => {
                                                 </div>
                                             </p>
                                             <p className="card-text text-muted mb-2"><i className="bi bi-file-earmark-check"></i> Status: {project.status}</p>
-                                            <button className="btn btn-primary btn-md mt-3 w-100" onClick={() => handleViewOffer(project)}>
+                                            {project.status==="open"? (<button className="btn btn-primary btn-md mt-3 w-100" onClick={() => handleViewOffer(project)}>
                                                 Ver Oferta
-                                            </button>
+                                            </button>): "Oferta Expirada"}
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -119,6 +120,7 @@ const DashboardProjects = () => {
                     <p><strong>Ubicación:</strong> {selectedProject?.location}</p>
                     <p><strong>Fecha límite:</strong> {new Date(selectedProject?.deadline).toLocaleDateString()}</p>
                     <p><strong>Publicado por:</strong> {selectedProject?.employer_info?.first_name} {selectedProject?.employer_info?.last_name} ({selectedProject?.employer_info?.email})</p>
+                    <p><strong>Calificacion:</strong> ⭐ {selectedProject?.employer_info?.rating}</p>
                     <p><strong>Habilidades requeridas:</strong>
                         {selectedProject?.skills?.map(skill => (
                             <span key={skill.id} className="badge bg-primary ms-2">{skill.name}</span>

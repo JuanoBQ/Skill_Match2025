@@ -24,7 +24,13 @@ import DashboardProjects from "./component/DashboardProjects.jsx";
 import PaymentPage from "./component/PaymentPage.jsx";
 import EmployerForm from "./component/EmployerForm.jsx";
 import SearchResults from "./component/SearchResults.jsx";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 import ProjectDetails from "./component/ProjectDetails.jsx";
+
+
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, { link: false });
+
 
 const Layout = () => {
     const basename = process.env.BASENAME || "";
@@ -55,21 +61,21 @@ const Layout = () => {
                         <Route element={<Dashboard />} path="/Dashboard" />               
                         <Route element={<EmployerForm />} path="/employerForm" />
                         <Route path="*" element={<h1>Not found!</h1>} />
-                        <Route element={<PaymentPage />} path="/payment/:proposalId" />
+                  
                         <Route element={<SearchResults />} path="/search" />
                         <Route element={<Profile />} path="/Profile/:id" />
                         <Route path="/project/:id" element={<ProjectDetails />} />
                         <Route element={< ContactUs/>} path="/Contact" />
                         <Route element={< Helpcenter/>} path="/Help" />
                         <Route element={< About/>} path="/About" />
-
+                        <Route element={<Elements stripe={stripePromise} options={{ link: false }}><PaymentPage /></Elements>} path="/payment/:proposalId" />
 
 
                         
 
 
-                        <Route element={<h1>Not found!</h1>} />
-                    </Routes>
+                            <Route element={<h1>Not found!</h1>} />
+                        </Routes>
                     </div>
                     <Footer />
                 </ScrollToTop>

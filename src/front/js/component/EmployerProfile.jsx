@@ -31,6 +31,7 @@ const EmployerProfile = () => {
     const [deadline, setDeadline] = useState("");
     const [location, setLocation] = useState("");
 
+    const [completedProjects, setCompletedProjects] = useState([]);
 
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
@@ -72,6 +73,11 @@ const EmployerProfile = () => {
             const propsRes = await actions.getEmployerProposals(userId);
             if (propsRes.success) {
                 setProposals(propsRes.proposals);
+            }
+
+            const completedRes = await actions.getCompletedProjects();
+            if (completedRes.success) {
+                setCompletedProjects(completedRes.projects);
             }
 
             // Skills
@@ -157,12 +163,12 @@ const EmployerProfile = () => {
 
     return (
         <div className="container mt-5" style={{ minHeight: "100vh" }}>
-         
+
             <div className="text-center mb-5">
                 <h2 className="fw-bold mb-4">Perfil del Empleador</h2>
 
                 <div className="card shadow-lg border-0 rounded-4 overflow-hidden">
-                   
+
                     <div className="bg-light py-4 px-3 text-center">
                         <img
                             src={profileImage}
@@ -174,7 +180,7 @@ const EmployerProfile = () => {
                         <p className="text-secondary mb-0">{profile.user?.email}</p>
                     </div>
 
-               
+
                     <div className="p-4 text-start">
                         <p className="mb-3">
                             <strong className="text-dark">Descripción:</strong>{" "}
@@ -203,7 +209,7 @@ const EmployerProfile = () => {
                         )}
                     </div>
 
-                   
+
                     <div className="px-4 pb-4 text-end">
                         <button className="btn btn-outline-primary rounded-pill px-4" onClick={handleEditProfile}>
                             Editar perfil
@@ -213,7 +219,7 @@ const EmployerProfile = () => {
             </div>
 
 
-          
+
             <div className="d-flex justify-content-center gap-3 mb-4">
                 <button className="btn btn-dark" onClick={() => setShowForm((f) => !f)}>
                     {showForm ? "Cancelar" : "Crear nueva oferta"}
@@ -226,12 +232,12 @@ const EmployerProfile = () => {
                 </button>
             </div>
 
-        
+
             <div className="row mb-5">
                 {[
                     { label: "Ofertas publicadas", value: stats.offers },
                     { label: "Propuestas recibidas", value: stats.proposals },
-                    { label: "Proyectos completados", value: stats.completed },
+                    { label: "Proyectos completados", value: completedProjects.length },
                     { label: "Valoración promedio", value: `${stats.rating.toFixed(1)}★` },
                 ].map((s, i) => (
                     <div key={i} className="col-md-3 mb-3">
@@ -245,7 +251,7 @@ const EmployerProfile = () => {
                 ))}
             </div>
 
-            
+
             {showForm && (
                 <div className="card shadow mb-4">
                     <div className="card-body">
@@ -314,7 +320,7 @@ const EmployerProfile = () => {
                                 />
                             </div>
 
-                            
+
                             <div className="mb-3">
                                 <label className="form-label">Fecha de entrega o expiración</label>
                                 <input
@@ -325,7 +331,7 @@ const EmployerProfile = () => {
                                 />
                             </div>
 
-                            
+
                             <div className="mb-3">
                                 <label className="form-label">Ubicación del proyecto</label>
                                 <Select
@@ -368,7 +374,7 @@ const EmployerProfile = () => {
             )}
 
 
-    
+
             <div className="mb-5">
                 <h4>Ofertas de Trabajo Activas</h4>
                 {offers.length > 0 ? (
@@ -417,7 +423,7 @@ const EmployerProfile = () => {
                 )}
             </div>
 
-           
+
             {showProposals && (
                 <div className="card shadow mb-5">
                     <div className="card-body">

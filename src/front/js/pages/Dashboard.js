@@ -42,7 +42,7 @@ export const Dashboard = () => {
         : "Nombre no disponible";
 
     return (
-        <div className="container-fluid ">
+        <div className="container-fluid animate__animated animate__fadeIn">
             <div className="row">
 
                 <div className="col-lg-8 ms-5 mb-4">

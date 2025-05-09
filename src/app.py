@@ -15,6 +15,7 @@ from api.commands import setup_commands
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
+import stripe
 
 # from models import Person
 
@@ -44,6 +45,10 @@ jwt = JWTManager(app)
 
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+if not stripe.api_key:
+    raise RuntimeError("No se encontró STRIPE_SECRET_KEY en el entorno")
 
 # add the admin
 setup_admin(app)

@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Payment, ProjectSkill 
+from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Review, Payment, ProjectSkill 
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
@@ -615,7 +615,7 @@ def create_payment():
         intent = stripe.PaymentIntent.create(
             amount=int(proposal.proposed_budget * 100),
             currency='usd',
-            automatic_payment_methods={"enabled": True},
+            payment_method_types=["card"],
         )
 
         # Guarda el intento en tu base de datos (opcional)
@@ -634,6 +634,23 @@ def create_payment():
 
     except Exception as e:
         return jsonify(error=str(e)), 500
+    
+
+@routes.route('/payments/<int:payment_id>/complete', methods=['POST'])
+@jwt_required()
+def complete_payment(payment_id):
+    payment = Payment.query.get(payment_id)
+    if not payment:
+        return jsonify({"error": "Pago no encontrado"}), 404
+
+    payment.status = "completed"
+    proposal = payment.proposal
+    proposal.status = "completed"
+    project = proposal.project
+    project.status = "completed"
+
+    db.session.commit()
+    return jsonify(payment.serialize()), 200
     
 
 @routes.route('/employer/profile', methods=['GET'])
@@ -807,21 +824,112 @@ def search_freelancers_by_skill():
             "skills": skills
         })
 
-    # ---------- PROJECTS ----------
-    project_skills = ProjectSkill.query.filter_by(skill_id=skill.id).all()
-    project_ids = list(set(ps.project_id for ps in project_skills))
+    return jsonify(results), 200
 
-    projects = Project.query.filter(Project.id.in_(project_ids)).options(
-        joinedload(Project.skills).joinedload(ProjectSkill.skill),
-        joinedload(Project.employer)
-    ).all()
 
-    project_results = [p.serialize() for p in projects]
+@routes.route('/employer/completed-projects', methods=['GET'])
+@jwt_required()
+def get_employer_completed_projects():
+    user_id = int(get_jwt_identity())
+
+    completed_projects = (
+        db.session.query(Project)
+        .join(Proposal, Proposal.project_id == Project.id)
+        .join(Payment, Payment.proposal_id == Proposal.id)
+        .filter(
+            Project.employer_id == user_id,
+            Payment.status == "completed"
+        )
+        .all()
+    )
+
+    result = [p.serialize_basic() for p in completed_projects]
+    return jsonify(result), 200
+
+
+def recalculate_profile_rating(user_id: int):
+    avg = (
+        db.session.query(func.avg(Review.rating))
+        .filter(Review.reviewee_id == user_id)
+        .scalar()
+        or 0)
+    
+    profile = Profile.query.filter_by(user_id=user_id).first()
+    if profile:
+        profile.rating = float(avg)
+
+
+# --- REVIEWS ---
+@routes.route('/reviews', methods=['POST'])
+@jwt_required()
+def create_review():
+    data = request.get_json()
+    reviewer_id = int(get_jwt_identity())
+
+    # 1) Valida que existe la propuesta
+    proposal = Proposal.query.get(data.get('proposal_id'))
+    if not proposal:
+        return jsonify({"msg": "Propuesta no encontrada"}), 404
+
+    # 2) Valida que el proyecto está completado
+    if proposal.project.status != 'completed':
+        return jsonify({"msg": "Solo puedes calificar proyectos completados"}), 400
+
+    # 3) Valida que el usuario participó en el trabajo
+    employer_id = proposal.project.employer_id
+    if reviewer_id not in (proposal.freelancer_id, employer_id):
+        return jsonify({"msg": "No autorizado para calificar esta propuesta"}), 403
+
+    # 4) Valida si ya este usuario dejo una calificacion de ese trabajo
+    exists = Review.query.filter_by(
+        proposal_id=proposal.id,
+        reviewer_id=reviewer_id
+    ).first()
+    if exists:
+        return jsonify({"msg": "Ya has calificado esta propuesta"}), 400
+
+    # 5) Crea el review
+    rev = Review(
+        reviewer_id=reviewer_id,
+        reviewee_id=data.get("reviewee_id"),
+        proposal_id=proposal.id,
+        rating=data.get("rating"),
+        comment=data.get("comment")
+    )
+    db.session.add(rev)
+    db.session.flush() #envía las operaciones al motor sin cerrar la transacción
+
+    recalculate_profile_rating(data.get("reviewee_id"))
+    db.session.commit()
 
     return jsonify({
-        "freelancers": freelancer_results,
-        "projects": project_results
-    }), 200
+        "msg": "Calificación creada",
+        "review": {
+            "id": rev.id,
+            "rating": rev.rating,
+            "comment": rev.comment,
+            "created_at": rev.created_at.isoformat()
+        },
+        "new_average": Profile.query.filter_by(user_id=data.get("reviewee_id")).first().rating
+    }), 201
 
 
-
+@routes.route('/freelancer/<int:fid>/completed-proposals', methods=['GET'])
+@jwt_required()
+def get_completed_proposals(fid):
+    # filtra donde Proposal.freelancer_id == fid y Project.status == 'completed'
+    props = Proposal.query.join(Proposal.project)\
+        .filter(Proposal.freelancer_id==fid, Project.status=='completed')\
+        .all()
+    result = []
+    for p in props:
+        result.append({
+          "id": p.id,
+          "project": {
+            "title": p.project.title,
+            "employer_id": p.project.employer_id,
+            "employer_name": p.project.employer.first_name
+          },
+          "reviewed": Review.query.filter_by(proposal_id=p.id, reviewer_id=fid).first() != None
+        })
+    return jsonify({"proposals": result, "success": True}), 200

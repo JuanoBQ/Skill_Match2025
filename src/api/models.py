@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Integer, ForeignKey, DateTime, Float, Text
+from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from typing import List, Optional
@@ -7,19 +8,15 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-# --- MODELOS BASE ---
-
 
 class User(db.Model):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(
-        String(120), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(200), nullable=False)
     first_name: Mapped[str] = mapped_column(String(80), nullable=True)
     last_name: Mapped[str] = mapped_column(String(80), nullable=True)
-    # 'freelancer', 'employer', 'admin'
     role: Mapped[str] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now())
@@ -31,6 +28,10 @@ class User(db.Model):
         "Project", back_populates="employer", cascade="all, delete-orphan")
     proposals: Mapped[List["Proposal"]] = relationship(
         "Proposal", back_populates="freelancer", cascade="all, delete-orphan")
+    reviews_given:    Mapped[List["Review"]] = relationship(
+        "Review", foreign_keys="[Review.reviewer_id]", back_populates="reviewer")
+    reviews_received: Mapped[List["Review"]] = relationship(
+        "Review", foreign_keys="[Review.reviewee_id]", back_populates="reviewee")
 
 
     def __repr__(self):
@@ -128,10 +129,8 @@ class FreelancerSkill(db.Model):
     profile_id: Mapped[int] = mapped_column(ForeignKey("profiles.id"))
     skill_id: Mapped[int] = mapped_column(ForeignKey("skills.id"))
 
-    profile: Mapped["Profile"] = relationship(
-        "Profile", back_populates="skills")
-    skill: Mapped["Skill"] = relationship(
-        "Skill", back_populates="freelancers")
+    profile: Mapped["Profile"] = relationship("Profile", back_populates="skills")
+    skill: Mapped["Skill"] = relationship("Skill", back_populates="freelancers")
 
     def serialize(self):
         return {
@@ -177,22 +176,26 @@ class Project(db.Model):
     budget: Mapped[Optional[float]] = mapped_column(Float)
     deadline: Mapped[Optional[datetime]] = mapped_column(DateTime)
     location: Mapped[Optional[str]] = mapped_column(String(100))
-    # open, in_progress, completed, cancelled
     status: Mapped[str] = mapped_column(String(20), default="open")
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
+    # Relaciones
     employer: Mapped["User"] = relationship("User", back_populates="projects")
     proposals: Mapped[List["Proposal"]] = relationship(
-        "Proposal", back_populates="project", cascade="all, delete-orphan")
+        "Proposal", back_populates="project", cascade="all, delete-orphan"
+    )
     skills: Mapped[List["ProjectSkill"]] = relationship(
-    "ProjectSkill", back_populates="project", cascade="all, delete-orphan"
-)
+        "ProjectSkill", back_populates="project", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<Project {self.title}>"
 
     def serialize(self):
+        # Obtener el rating desde el perfil del empleador
+        employer_profile = self.employer.profile if self.employer else None
+        employer_rating = employer_profile.rating if employer_profile and employer_profile.rating is not None else None
+
         return {
             "id": self.id,
             "employer_id": self.employer_id,
@@ -205,19 +208,21 @@ class Project(db.Model):
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "skills": [ps.skill.serialize() for ps in self.skills],
-            "employer_info": {  
-            "first_name": self.employer.first_name if self.employer else None,
-            "last_name": self.employer.last_name if self.employer else None,
-            "email": self.employer.email if self.employer else None
-        },
+            "employer_info": {
+                "first_name": self.employer.first_name if self.employer else None,
+                "last_name": self.employer.last_name if self.employer else None,
+                "email": self.employer.email if self.employer else None,
+                "rating": employer_rating
+            },
             "proposals": [p.serialize_basic() for p in self.proposals]
         }
-    
+
     def serialize_basic(self):
         return {
             "id": self.id,
             "title": self.title
-    }
+        }
+
 
 
 class Proposal(db.Model):
@@ -228,17 +233,14 @@ class Proposal(db.Model):
     freelancer_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     message: Mapped[str] = mapped_column(Text, nullable=False)
     proposed_budget: Mapped[Optional[float]] = mapped_column(Float)
-    status: Mapped[str] = mapped_column(
-        String(20), default="pending")  # pending, accepted, rejected
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now())
-
-    project: Mapped["Project"] = relationship(
-        "Project", back_populates="proposals")
-    freelancer: Mapped["User"] = relationship(
-        "User", back_populates="proposals")
-    payment: Mapped[Optional["Payment"]] = relationship(
-        "Payment", back_populates="proposal", uselist=False, cascade="all, delete-orphan")
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relaciones
+    project: Mapped["Project"] = relationship("Project", back_populates="proposals")
+    freelancer: Mapped["User"] = relationship("User", back_populates="proposals")
+    payment: Mapped[Optional["Payment"]] = relationship("Payment", back_populates="proposal", uselist=False, cascade="all, delete-orphan")
+    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="proposal", cascade="all, delete-orphan")
 
 
     def __repr__(self):
@@ -272,7 +274,7 @@ class Payment(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     proposal_id: Mapped[int] = mapped_column(ForeignKey("proposals.id"), nullable=False)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
-    status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)  # pending, completed, failed
+    status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     proposal: Mapped["Proposal"] = relationship("Proposal", back_populates="payment")
@@ -288,3 +290,23 @@ class Payment(db.Model):
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+    
+
+class Review(db.Model):
+    __tablename__ = "reviews"
+    __table_args__ = (
+        UniqueConstraint('reviewer_id', 'proposal_id', name='uix_reviewer_proposal'),
+        CheckConstraint('rating >= 1 AND rating <= 5', name='ck_rating_range'))
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reviewer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    reviewee_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    proposal_id: Mapped[int] = mapped_column(ForeignKey("proposals.id"), nullable=False)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    comment: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    # Relaciones
+    reviewer = relationship("User", foreign_keys=[reviewer_id])
+    reviewee = relationship("User", foreign_keys=[reviewee_id])
+    proposal = relationship("Proposal", back_populates="reviews")

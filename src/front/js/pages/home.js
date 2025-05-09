@@ -13,7 +13,7 @@ import Empresa5 from "./../../img/Empresas/Empresa 5.png"
 
 const Home = () => {
 	return (
-		<div className="upwork-homepage">
+		<div className="animate__animated animate__fadeIn">
 			{/* Hero Banner Section */}
 			<section className="hero-section">
 				<div className="container">
@@ -50,7 +50,7 @@ const Home = () => {
 				</div>
 			</section>
 
-			{/* Trusted By Section */}
+			{/* Empresas */}
 			<section className="trusted-by">
 				<div className="container">
 					<h5 className="text-center">Empresas que confían en nosotros</h5>
@@ -64,7 +64,7 @@ const Home = () => {
 				</div>
 			</section>
 
-			{/* Categories Section */}
+			{/* Categorias */}
 			<section className="categories-section">
 				<div className="container">
 					<h2>Explora las categorías principales</h2>
@@ -104,7 +104,7 @@ const Home = () => {
 				</div>
 			</section>
 
-			{/* How It Works */}
+			{/* El Como */}
 			<section className="how-it-works">
 				<div className="container">
 					<h2 className="text-center">Cómo funciona Skill Match</h2>
@@ -128,7 +128,7 @@ const Home = () => {
 				</div>
 			</section>
 
-			{/* Testimonials */}
+			{/* Testimonios */}
 			<section className="testimonials">
 				<div className="container">
 					<h2 className="text-center">Lo que dicen nuestros usuarios</h2>
@@ -179,7 +179,7 @@ const Home = () => {
 				</div>
 			</section>
 
-			{/* Stats Section */}
+			{/* Estadisticas */}
 			<section className="stats-section">
 				<div className="container">
 					<div className="stats-container">

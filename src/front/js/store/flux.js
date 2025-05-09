@@ -15,6 +15,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			searchResults: {
 				freelancers: [],
 				projects: [],
+				freelancers: [],
+				projects: [],
 				skills: [],
 				filters: {}
 			},
@@ -91,6 +93,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							userId: data.user_id,
 							isAuthenticated: false,
 						});
+
 
 
 						return { success: true };
@@ -244,6 +247,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			getCompletedProjects: async () => {
+				try {
+					const token = localStorage.getItem("token");
+					const res = await fetch(`${BASE_URL}/employer/completed-projects`, {
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`
+						}
+					});
+					const data = await res.json();
+					if (res.ok) {
+						return { success: true, projects: data };
+					} else {
+						return { success: false, error: data.msg || "Error desconocido" };
+					}
+				} catch (error) {
+					return { success: false, error: "Error de conexión" };
+				}
+			},
+
 			createOrUpdateProfile: async (userId, formData) => {
 				try {
 
@@ -367,6 +390,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, error: "Error al asignar skills" };
 				}
 			},
+			
 			clearFreelancerSkills: async (userId) => {
 				try {
 					const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
@@ -384,7 +408,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							});
 						}
 						return null;
-					}).filter(Boolean); // Filtra los null
+					}).filter(Boolean);
 
 					await Promise.all(deleteRequests);
 
@@ -406,7 +430,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						phone: formData.phone,
 					};
 
-					// Intento PATCH
 					let res = await fetch(`${BASE_URL}/employer/profile`, {
 						method: "PATCH",
 						headers: {
@@ -416,7 +439,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						body: JSON.stringify(payload),
 					});
 
-					// Si no existe aún (404), creamos con POST
 					if (res.status === 404) {
 						res = await fetch(`${BASE_URL}/employer/profile`, {
 							method: "POST",
@@ -463,7 +485,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Obtener proyectos activos del empleador
 			getEmployerProjects: async () => {
 				try {
 					const token = localStorage.getItem("token");
@@ -475,7 +496,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					});
 					const data = await res.json();
 					if (res.ok) {
-						// data.offers es el array de proyectos
 						return { success: true, projects: data.offers };
 					} else {
 						console.error("getEmployerProjects error:", data.msg);
@@ -526,6 +546,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 					setStore({ projects: data });
 				} catch (error) {
 					console.error(error)
+				}
+			},
+
+			getFreelancerCompletedProposals: async (fid) => {
+				const resp = await fetch(`${BASE_URL}/freelancer/${fid}/completed-proposals`, {
+					headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+				});
+				const data = await resp.json();
+				return { success: resp.ok, proposals: data.proposals, msg: data.msg };
+			},
+
+			createReview: async (payload) => {
+				try {
+					const resp = await fetch(`${BASE_URL}/reviews`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${localStorage.getItem("token")}`,
+						},
+						body: JSON.stringify(payload),
+					});
+					const data = await resp.json();
+					if (resp.ok) {
+						// devolvemos también el nuevo promedio para actualizar UI
+						return { success: true, data, msg: data.msg };
+					} else {
+						return { success: false, msg: data.msg || "Error al crear review" };
+					}
+				} catch (error) {
+					console.error("Error en createReview:", error);
+					return { success: false, msg: "Error de red al crear review" };
 				}
 			},
 
