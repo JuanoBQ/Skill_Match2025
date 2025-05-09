@@ -382,6 +382,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, error: "Error al asignar skills" };
 				}
 			},
+			
 			clearFreelancerSkills: async (userId) => {
 				try {
 					const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
@@ -399,7 +400,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							});
 						}
 						return null;
-					}).filter(Boolean); // Filtra los null
+					}).filter(Boolean);
 
 					await Promise.all(deleteRequests);
 
@@ -421,7 +422,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						phone: formData.phone,
 					};
 
-					// Intento PATCH
 					let res = await fetch(`${BASE_URL}/employer/profile`, {
 						method: "PATCH",
 						headers: {
@@ -431,7 +431,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						body: JSON.stringify(payload),
 					});
 
-					// Si no existe aún (404), creamos con POST
 					if (res.status === 404) {
 						res = await fetch(`${BASE_URL}/employer/profile`, {
 							method: "POST",
@@ -478,7 +477,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Obtener proyectos activos del empleador
 			getEmployerProjects: async () => {
 				try {
 					const token = localStorage.getItem("token");
@@ -490,7 +488,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					});
 					const data = await res.json();
 					if (res.ok) {
-						// data.offers es el array de proyectos
 						return { success: true, projects: data.offers };
 					} else {
 						console.error("getEmployerProjects error:", data.msg);
@@ -588,8 +585,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					if (res.ok) {
 						setStore({
 							searchResults: {
-								freelancers: data,  // ← Asegúrate de que esto es un array
-								projects: []        // Puedes dejarlo vacío si no estás usando aún
+								freelancers: data,
+								projects: []
 							}
 						});
 						return { success: true };

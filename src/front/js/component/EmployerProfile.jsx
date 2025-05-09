@@ -279,7 +279,7 @@ const EmployerProfile = () => {
                 </div>
             )}
 
-            {/* Ofertas activas */}
+            {/* Ofertas de trabajo activas */}
             <div className="mb-5">
                 <h4>Ofertas de Trabajo Activas</h4>
                 {offers.length > 0 ? (
