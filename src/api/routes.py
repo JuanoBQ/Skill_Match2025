@@ -897,3 +897,24 @@ def create_review():
         },
         "new_average": Profile.query.filter_by(user_id=data.get("reviewee_id")).first().rating
     }), 201
+
+
+@routes.route('/freelancer/<int:fid>/completed-proposals', methods=['GET'])
+@jwt_required()
+def get_completed_proposals(fid):
+    # filtra donde Proposal.freelancer_id == fid y Project.status == 'completed'
+    props = Proposal.query.join(Proposal.project)\
+        .filter(Proposal.freelancer_id==fid, Project.status=='completed')\
+        .all()
+    result = []
+    for p in props:
+        result.append({
+          "id": p.id,
+          "project": {
+            "title": p.project.title,
+            "employer_id": p.project.employer_id,
+            "employer_name": p.project.employer.first_name
+          },
+          "reviewed": Review.query.filter_by(proposal_id=p.id, reviewer_id=fid).first() != None
+        })
+    return jsonify({"proposals": result, "success": True}), 200

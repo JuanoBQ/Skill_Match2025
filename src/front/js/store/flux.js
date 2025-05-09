@@ -544,6 +544,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			getFreelancerCompletedProposals: async (fid) => {
+				const resp = await fetch(`${BASE_URL}/freelancer/${fid}/completed-proposals`, {
+					headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+				});
+				const data = await resp.json();
+				return { success: resp.ok, proposals: data.proposals, msg: data.msg };
+			},
+
+			createReview: async (payload) => {
+				try {
+					const resp = await fetch(`${BASE_URL}/reviews`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${localStorage.getItem("token")}`,
+						},
+						body: JSON.stringify(payload),
+					});
+					const data = await resp.json();
+					if (resp.ok) {
+						// devolvemos también el nuevo promedio para actualizar UI
+						return { success: true, data, msg: data.msg };
+					} else {
+						return { success: false, msg: data.msg || "Error al crear review" };
+					}
+				} catch (error) {
+					console.error("Error en createReview:", error);
+					return { success: false, msg: "Error de red al crear review" };
+				}
+			},
+
 
 			setSearchQuery: (query) => {
 				setStore({ searchQuery: query });
