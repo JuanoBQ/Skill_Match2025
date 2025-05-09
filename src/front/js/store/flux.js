@@ -1,4 +1,4 @@
-const BASE_URL = "https://congenial-dollop-q7q7w5q4gr773xvrx-3001.app.github.dev/api";
+const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -171,7 +171,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 							budget: formData.budget,
 							category: formData.category,
 							deadline: formData.deadline,
-							skills: formData.skills
+							skills: formData.skills,
+							location: formData.location
 						})
 					});
 
@@ -556,11 +557,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 
-			dashboardFilterBy: (category, rating, hourlyRate, skills) => {
+			dashboardFilterBy: (category, rating, location, hourlyRate, skills) => {
 				setStore({filters:
 					{
 						category: category,
 						rating: rating,
+						location: location,
 						hourlyRate: hourlyRate,
 						skills: skills
 					}

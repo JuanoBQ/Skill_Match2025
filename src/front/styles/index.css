@@ -17,10 +17,10 @@
     background-color: #f3f2f0;
 }
 
-.freelancer-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    background-color: #f3f2f0;
+.freelancer-card .card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .freelancer-card:hover {
@@ -28,19 +28,36 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.Project-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    background-color: #f3f2f0;
-}
-
 .Project-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.freelancer-profile {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    background-color: #f3f2f0;
+
+.btn-info {
+  background-color: #00cfff;
+  color: #000;
+  transition: all 0.3s ease;
 }
+
+
+.btn-outline-dark {
+  border-color: #343a40;
+  color: #343a40;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-dark:hover {
+  background-color: #343a40;
+  color: white;
+}
+
+.project-card {
+  background-color: #F9F9F9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+

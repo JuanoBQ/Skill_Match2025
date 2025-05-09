@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
+import undefinedImg from "./../../../front/img/User_Undefined.jpg";
 
 const EmployerProfile = () => {
     const navigate = useNavigate();
@@ -26,6 +27,10 @@ const EmployerProfile = () => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [budget, setBudget] = useState("");
+    const [category, setCategory] = useState("");
+    const [deadline, setDeadline] = useState("");
+    const [location, setLocation] = useState("");
+
 
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
@@ -44,7 +49,7 @@ const EmployerProfile = () => {
                 setProfileImage(
                     stored ||
                     profileRes.profile.profile_picture ||
-                    "https://via.placeholder.com/120"
+                    undefinedImg
                 );
             } else {
                 navigate("/employerForm");
@@ -92,12 +97,18 @@ const EmployerProfile = () => {
             description,
             budget: parseFloat(budget),
             skills: selectedSkills.map((s) => s.value),
-          });
+            category: category?.value,
+            deadline,
+            location: location?.value
+        });
         const res = await actions.createProject({
             title,
             description,
             budget: parseFloat(budget),
             skills: selectedSkills.map((s) => s.value),
+            category: category?.value,
+            deadline,
+            location: location?.value
         });
         if (res.success) {
             alert("Oferta creada exitosamente.");
@@ -106,6 +117,9 @@ const EmployerProfile = () => {
             setDescription("");
             setBudget("");
             setSelectedSkills([]);
+            setCategory("");
+            setDeadline("");
+            setLocation("")
 
             const statsRes = await actions.getEmployerStats();
             if (statsRes.success) setStats(statsRes.stats);
@@ -143,58 +157,63 @@ const EmployerProfile = () => {
 
     return (
         <div className="container mt-5" style={{ minHeight: "100vh" }}>
-            {/* Header */}
+         
             <div className="text-center mb-5">
-                <h2 className="fw-bold">Perfil del Empleador</h2>
-                <div className="card mb-4 p-4">
-                    <div className="d-flex align-items-center flex-column flex-md-row">
-                        {/* Foto */}
-                        <div className="position-relative me-md-4 mb-3 mb-md-0">
-                            <img
-                                src={profileImage}
-                                alt="Foto de perfil"
-                                className="rounded-circle"
-                                style={{ width: 120, height: 120, objectFit: "cover" }}
-                            />
-                        </div>
-                        {/* Datos */}
-                        <div className="text-center text-md-start flex-grow-1">
-                            <h4>{fullName}</h4>
-                            <p className="text-muted mb-1">{profile.user?.email}</p>
-                            <p className="mb-2">
-                                <strong>Descripción:</strong> {profile.bio || "Sin descripción."}
+                <h2 className="fw-bold mb-4">Perfil del Empleador</h2>
+
+                <div className="card shadow-lg border-0 rounded-4 overflow-hidden">
+                   
+                    <div className="bg-light py-4 px-3 text-center">
+                        <img
+                            src={profileImage}
+                            alt="Foto de perfil"
+                            className="rounded-circle shadow-sm border mb-3"
+                            style={{ width: 120, height: 120, objectFit: "cover" }}
+                        />
+                        <h4 className="fw-bold mb-1">{fullName}</h4>
+                        <p className="text-secondary mb-0">{profile.user?.email}</p>
+                    </div>
+
+               
+                    <div className="p-4 text-start">
+                        <p className="mb-3">
+                            <strong className="text-dark">Descripción:</strong>{" "}
+                            {profile.bio || <span className="text-muted">Sin descripción.</span>}
+                        </p>
+                        <p className="mb-3">
+                            <strong className="text-dark">Industria:</strong>{" "}
+                            {profile.industry || <span className="text-muted">No especificada</span>}
+                        </p>
+                        <p className="mb-3">
+                            <strong className="text-dark">Ubicación:</strong>{" "}
+                            {profile.location || <span className="text-muted">No especificada</span>}
+                        </p>
+                        {profile.website && (
+                            <p className="mb-3">
+                                <strong className="text-dark">Web:</strong>{" "}
+                                <a href={profile.website} target="_blank" rel="noreferrer" className="text-primary">
+                                    {profile.website}
+                                </a>
                             </p>
-                            <p className="mb-1">
-                                <strong>Industria:</strong> {profile.industry || "No especificada"}
+                        )}
+                        {profile.phone && (
+                            <p className="mb-3">
+                                <strong className="text-dark">Teléfono:</strong> {profile.phone}
                             </p>
-                            <p className="mb-1">
-                                <strong>Ubicación:</strong> {profile.location || "No especificada"}
-                            </p>
-                            {profile.website && (
-                                <p className="mb-1">
-                                    <strong>Web:</strong>{" "}
-                                    <a href={profile.website} target="_blank" rel="noreferrer">
-                                        {profile.website}
-                                    </a>
-                                </p>
-                            )}
-                            {profile.phone && (
-                                <p className="mb-1">
-                                    <strong>Teléfono:</strong> {profile.phone}
-                                </p>
-                            )}
-                        </div>
-                        {/* Editar */}
-                        <div className="text-center text-md-end">
-                            <button className="btn btn-outline-primary" onClick={handleEditProfile}>
-                                Editar perfil
-                            </button>
-                        </div>
+                        )}
+                    </div>
+
+                   
+                    <div className="px-4 pb-4 text-end">
+                        <button className="btn btn-outline-primary rounded-pill px-4" onClick={handleEditProfile}>
+                            Editar perfil
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* Acciones */}
+
+          
             <div className="d-flex justify-content-center gap-3 mb-4">
                 <button className="btn btn-dark" onClick={() => setShowForm((f) => !f)}>
                     {showForm ? "Cancelar" : "Crear nueva oferta"}
@@ -207,7 +226,7 @@ const EmployerProfile = () => {
                 </button>
             </div>
 
-            {/* Estadísticas */}
+        
             <div className="row mb-5">
                 {[
                     { label: "Ofertas publicadas", value: stats.offers },
@@ -226,7 +245,7 @@ const EmployerProfile = () => {
                 ))}
             </div>
 
-            {/* Formulario de nueva oferta */}
+            
             {showForm && (
                 <div className="card shadow mb-4">
                     <div className="card-body">
@@ -242,6 +261,7 @@ const EmployerProfile = () => {
                                     required
                                 />
                             </div>
+
                             <div className="mb-3">
                                 <textarea
                                     className="form-control"
@@ -251,6 +271,7 @@ const EmployerProfile = () => {
                                     required
                                 />
                             </div>
+
                             <div className="mb-3">
                                 <input
                                     type="number"
@@ -261,6 +282,72 @@ const EmployerProfile = () => {
                                     required
                                 />
                             </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Categoría</label>
+                                <Select
+                                    options={[
+                                        { value: 'Web Developer', label: 'Web Developer' },
+                                        { value: 'Graphic Designer', label: 'Graphic Designer' },
+                                        { value: 'Ui Ux designer', label: 'UI/UX Designer' },
+                                        { value: 'Mobile Developer', label: 'Mobile App Developer' },
+                                        { value: 'Data Scientist', label: 'Data Scientist' },
+                                        { value: 'Software Engineer', label: 'Software Engineer' },
+                                        { value: 'Backend Developer', label: 'Backend Developer' },
+                                        { value: 'Frontend Developer', label: 'Frontend Developer' },
+                                        { value: 'Fullstack Developer', label: 'Fullstack Developer' },
+                                        { value: 'Devops Engineer', label: 'DevOps Engineer' },
+                                        { value: 'Content Writer', label: 'Content Writer' },
+                                        { value: 'Copywriter', label: 'Copywriter' },
+                                        { value: 'Seo Specialist', label: 'SEO Specialist' },
+                                        { value: 'Digital Marketer', label: 'Digital Marketer' },
+                                        { value: 'video Editor', label: 'Video Editor' },
+                                        { value: 'Photographer', label: 'Photographer' },
+                                        { value: 'Illustrator', label: 'Illustrator' },
+                                        { value: 'Translator', label: 'Translator' },
+                                        { value: 'Virtual assistant', label: 'Virtual Assistant' },
+                                        { value: 'Project manager', label: 'Project Manager' }
+                                    ]}
+                                    value={category}
+                                    onChange={setCategory}
+                                    placeholder="Selecciona una categoría"
+                                />
+                            </div>
+
+                            
+                            <div className="mb-3">
+                                <label className="form-label">Fecha de entrega o expiración</label>
+                                <input
+                                    type="date"
+                                    className="form-control"
+                                    value={deadline}
+                                    onChange={(e) => setDeadline(e.target.value)}
+                                />
+                            </div>
+
+                            
+                            <div className="mb-3">
+                                <label className="form-label">Ubicación del proyecto</label>
+                                <Select
+                                    options={[
+                                        { value: 'Argentina', label: 'Argentina' },
+                                        { value: 'Bolivia', label: 'Bolivia' },
+                                        { value: 'Brasil', label: 'Brasil' },
+                                        { value: 'Chile', label: 'Chile' },
+                                        { value: 'Colombia', label: 'Colombia' },
+                                        { value: 'Ecuador', label: 'Ecuador' },
+                                        { value: 'Paraguay', label: 'Paraguay' },
+                                        { value: 'Peru', label: 'Perú' },
+                                        { value: 'Uruguay', label: 'Uruguay' },
+                                        { value: 'Venezuela', label: 'Venezuela' },
+                                        { value: 'Remoto', label: 'Remoto' }
+                                    ]}
+                                    value={location}
+                                    onChange={setLocation}
+                                    placeholder="Selecciona la ubicación"
+                                />
+                            </div>
+
                             <div className="mb-3">
                                 <label className="form-label">Habilidades requeridas</label>
                                 <Select
@@ -271,6 +358,7 @@ const EmployerProfile = () => {
                                     placeholder="Selecciona las habilidades"
                                 />
                             </div>
+
                             <button type="submit" className="btn btn-success w-100">
                                 Publicar proyecto
                             </button>
@@ -279,7 +367,8 @@ const EmployerProfile = () => {
                 </div>
             )}
 
-            {/* Ofertas activas */}
+
+    
             <div className="mb-5">
                 <h4>Ofertas de Trabajo Activas</h4>
                 {offers.length > 0 ? (
@@ -328,7 +417,7 @@ const EmployerProfile = () => {
                 )}
             </div>
 
-            {/* Solicitudes recibidas */}
+           
             {showProposals && (
                 <div className="card shadow mb-5">
                     <div className="card-body">

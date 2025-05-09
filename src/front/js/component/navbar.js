@@ -97,7 +97,7 @@ export const Navbar = () => {
             {store.isAuthenticated ? (
               <>
                 <button onClick={goToProfile} className="btn btn-info px-4 py-2 me-2">
-                  Mi Perfil
+                  <i class="fa-solid fa-user" style={{color:' #ffffff'}}></i>  Mi Perfil
                 </button>
                 <button onClick={handleLogout} className="btn btn-danger px-4 py-2">
                   Logout

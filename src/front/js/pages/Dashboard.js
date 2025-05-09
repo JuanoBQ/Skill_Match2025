@@ -5,6 +5,8 @@ import { UsefullCard } from "../component/usefullCard.jsx";
 import { DashAccordion } from "../component/dashAccordion.jsx";
 import DashboardFilter from "../component/DashboardFilter.jsx"
 import undefined from "./../../../front/img/User_Undefined.jpg"
+import styles from './../../styles/index.css';
+import banner from "../../../../public/Banner.png"
 
 export const Dashboard = () => {
     const { store, actions } = useContext(Context);
@@ -37,48 +39,65 @@ export const Dashboard = () => {
         : "Nombre no disponible";
 
     return (
-        <div className="container-fluid">
+        <div className="container-fluid ">
             <div className="row">
-                <div className="col-8 ms-5">
+
+                <div className="col-lg-8 ms-5 mb-4">
                     <div className="d-flex">
-                        <div className="container mb-2 background rounded-3 mx-5 mt-5">
-                            <div className="ps-5 container-fluid py-5 text-start" style={{height: "18rem"}}>
-                                <h1 className="display-6">Listo para comenzar!</h1>
-                                <p className="fs-5">Conecta con gente de todas partes del mundo!</p>
+                        <div className="container-fluid mb-4 mx-3 mt-5">
+                            <div
+                                className="d-flex justify-content-center align-items-center"
+                                style={{
+                                    background: `url(${banner}) center center / cover no-repeat`,
+                                    borderRadius: "12px",
+                                    boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
+                                    height: "20rem",
+                                    minHeight: "18rem",
+                                    padding: "3rem 2rem",
+                                    width: "100%",
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
+                                }}
+                            >
                             </div>
                         </div>
+
                     </div>
                     <Tabs />
                 </div>
 
-                <aside className="col-3 mt-5 ms-5">
+
+                <aside className="col-lg-3 mt-5 ms-2">
                     {store.isAuthenticated && (
-                        <div className="card mx-0 shadow-sm border border-0 background" style={{ maxWidth: "22rem" }}>
-                            <div className="card-body d-flex pb-2 border-bottom align-items-center">
+                        <div className="card shadow-md rounded-3 mb-4" style={{ maxWidth: "22rem" }}>
+                            <div className="card-body d-flex pb-3 align-items-center">
                                 <img
                                     src={profile?.profile_picture || "/User_Undefined.jpg"}
                                     alt="Foto de perfil"
                                     className="rounded-circle"
-                                    style={{ width: "60px", height: "60px", objectFit: "cover" }}
+                                    style={{ width: "70px", height: "70px", objectFit: "cover" }}
                                 />
-                                <h4 className="ms-3 mb-0">{loading ? "Cargando..." : fullName}</h4>
+                                <div className="ms-3">
+                                    <h4 className="mb-0 fw-bold">{loading ? "Cargando..." : fullName}</h4>
+                                </div>
                             </div>
                             <div className="card-body ms-3">
-                                <h5>Trabajos terminados: 6</h5>
+                                <h5 className="text-dark">Contactos: </h5>
                             </div>
                         </div>
                     )}
 
+
                     {store.isAuthenticated && (
                         <>
                             <DashAccordion />
-                            
                         </>
                     )}
-                    <DashboardFilter/>  
+                    <DashboardFilter />
                     <UsefullCard />
                 </aside>
             </div>
         </div>
+
     );
 };

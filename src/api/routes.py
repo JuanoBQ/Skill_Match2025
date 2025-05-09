@@ -166,6 +166,7 @@ def get_freelancer_profile():
         "hourly_rate": profile.hourly_rate,
         "rating": profile.rating,
         "user": {
+            "id": user.id if user else None,
             "first_name": user.first_name if user else None,
             "last_name": user.last_name if user else None,
             "email": user.email if user else None
@@ -462,9 +463,10 @@ def create_project():
         employer_id=current_user_id,
         title=data.get('title'),
         description=data.get('description'),
-        # category=data.get('category'),
+        category=data.get('category'),
         budget=data.get('budget'),
         deadline=deadline,
+        location=data.get('location'),
         status="open"
     )
 

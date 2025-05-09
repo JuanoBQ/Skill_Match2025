@@ -174,6 +174,7 @@ class Project(db.Model):
     category: Mapped[Optional[str]] = mapped_column(String(100))
     budget: Mapped[Optional[float]] = mapped_column(Float)
     deadline: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    location: Mapped[Optional[str]] = mapped_column(String(100))
     # open, in_progress, completed, cancelled
     status: Mapped[str] = mapped_column(String(20), default="open")
     created_at: Mapped[datetime] = mapped_column(
@@ -198,6 +199,7 @@ class Project(db.Model):
             "category": self.category,
             "budget": self.budget,
             "deadline": self.deadline.isoformat() if self.deadline else None,
+            "location": self.location,
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "skills": [ps.skill.serialize() for ps in self.skills],

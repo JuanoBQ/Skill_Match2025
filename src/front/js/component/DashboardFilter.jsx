@@ -7,15 +7,22 @@ const DashboardFilter = () => {
   const [rating, setRating] = useState('');
   const [hourlyRate, setHourlyRate] = useState('');
   const [skills, setSkills] = useState('');
+  const [location, setLocation] = useState('');
 
   const { store, actions } = useContext(Context)
 
   useEffect(() => {
     actions.getSkills()
-    actions.dashboardFilterBy(category, rating, hourlyRate, skills)
-  }, [category, rating, hourlyRate, skills])
+    actions.dashboardFilterBy(category, rating, location, hourlyRate, skills)
+  }, [category, rating, location, hourlyRate, skills])
 
-
+  const handleReset = () => {
+    setCategory("")
+    setRating("")
+    setHourlyRate("")
+    setSkills("")
+    setLocation("")
+  }
 
   return (
     <div className="card m-0 mt-4 shadow-sm border border-0 background" style={{ maxWidth: "22rem" }}>
@@ -77,6 +84,29 @@ const DashboardFilter = () => {
                 </select>
               </div>
 
+
+              <div className="mb-3">
+                <label htmlFor="location" className="form-label">Ubicacion</label>
+                <select
+                  id="location"
+                  className="form-select"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                >
+                  <option value="">Selecciona un país</option>
+                  <option value="Argentina">Argentina</option>
+                  <option value="Bolivia">Bolivia</option>
+                  <option value="Brasil">Brasil</option>
+                  <option value="Chile">Chile</option>
+                  <option value="Colombia">Colombia</option>
+                  <option value="Ecuador">Ecuador</option>
+                  <option value="Paraguay">Paraguay</option>
+                  <option value="Peru">Perú</option>
+                  <option value="Uruguay">Uruguay</option>
+                  <option value="Venezuela">Venezuela</option>
+                </select>
+              </div>
+
               <div className="mb-3">
                 <label htmlFor="hourlyRate" className="form-label">Costo por Hora</label>
                 <input
@@ -102,13 +132,21 @@ const DashboardFilter = () => {
                   {store.skills ? store.skills.map((skill) => { return <option key={skill.id} value={skill.name} >{skill.name}</option> }) : ("No options")}
                 </select>
               </div>
+
+              <button
+                className="btn btn-outline-primary px-4 py-2"
+                onClick={() => handleReset()}
+
+              >
+                Limpiar
+              </button>
             </div>
           </div>
         </div>
 
 
       </div>
-    </div>
+    </div >
   );
 };
 

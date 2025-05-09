@@ -34,13 +34,14 @@ const DashboardFreelancer = () => {
 
     const readMore = (bio) => {
         if (!bio) return "No Bio";
-        return bio.length > 150 ? bio.slice(0, 150) + "..." : bio;
+        return bio.length > 500 ? bio.slice(0, 500) + "..." : bio;
     };
 
     const filteredProfiles = freelancerProfiles.filter(profile =>
         (!store.filters.skills || profile.skills?.some(skill => skill.name === store.filters.skills)) &&
         (!store.filters.category || profile.career === store.filters.category) &&
         (!store.filters.rating || profile.rating >= parseInt(store.filters.rating)) &&
+        (!store.filters.location || profile.location === store.filters.location) &&
         (!store.filters.hourlyRate || profile.hourly_rate <= parseFloat(store.filters.hourlyRate))
     );
 
@@ -50,53 +51,80 @@ const DashboardFreelancer = () => {
                 <div>
                     {filteredProfiles.map((profile) => (
                         <div key={profile.user.id}>
-                            <div className="card mb-3 freelancer-card" style={{ width: '100%' }}>
-                                <div className="ms-3 row no-gutters">
-                                    <div className="d-flex col-md-3 justify-content-center align-items-center">
+                            <div className="card mb-4 freelancer-card shadow-lg" style={{ borderRadius: '20px', overflow: 'hidden' }}>
+                                <div className="row no-gutters">
+                                    
+                                    <div className="col-md-2 d-flex justify-content-center align-items-center p-3">
                                         <img
                                             src={profile.profile_picture || undefinedImg}
                                             alt="Foto de perfil"
+                                            className="rounded-circle img-fluid border border-3 border-primary"
                                             style={{
-                                                width: "150px",
-                                                height: "150px",
-                                                borderRadius: "50%",
-                                                objectFit: "cover"
+                                                width: '100px',
+                                                height: '100px',
+                                                objectFit: 'cover',
+                                                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)'
                                             }}
                                         />
                                     </div>
 
-                                    <div className="col-md-9">
-                                        <div className="card-body">
-                                            <h4 className="card-title">{profile.user.first_name} {profile.user.last_name}</h4>
-                                            <h6 className="text-dark">{profile.career}</h6>
-                                            <p className="card-text">{readMore(profile.bio)}</p>
-                                        </div>
-                                        <ul className="list-group list-group-flush me-5">
-                                            <li className="list-group-item">
-                                                <strong>Ubicación:</strong> {profile.location || "No especificada"}
-                                            </li>
-                                            <li className="list-group-item">
-                                                <strong>Skills:</strong>{" "}
-                                                {profile.skills?.length > 0 ? (
-                                                    profile.skills.map((skill, index) => (
-                                                        <span key={index} className="badge bg-secondary me-1">{skill.name}</span>
-                                                    ))
-                                                ) : (
-                                                    "No Skills"
-                                                )}
-                                            </li>
-                                            <li className="list-group-item">
-                                                <strong>Rating:</strong> {profile.rating ? `⭐ ${profile.rating}` : "No Rating"}
-                                            </li>
-                                        </ul>
-                                        <div className="card-body">
-                                            <button className="btn btn-info me-3" onClick={() => goToProfile(profile.user.id)}>Ver perfil</button>
-                                            <a href="#" className="card-link me-3">Mensaje</a>
-                                            <a href="#" className="card-link">Conectar</a>
+                                    
+                                    <div className="col-md-10">
+                                        <div className="card-body p-4">
+                                            
+                                            <h4 className="text-dark fs-5 fw-bold mb-2">{profile.user.first_name} {profile.user.last_name}</h4>
+                                            <h5 className="text-muted mb-3">{profile.career}</h5>
+
+                                           
+                                            <p className="card-text text-muted mb-3" style={{ height: '70px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                {readMore(profile.bio)}
+                                            </p>
+
+                                           
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <button
+                                                    className="btn btn-outline-primary px-4 py-2"
+                                                    onClick={() => goToProfile(profile.user.id)}
+                                                    style={{ fontWeight: '500' }}
+                                                >
+                                                    Ver perfil
+                                                </button>
+                                                <div className="text-muted d-flex gap-3">
+                                                    <a href="#" className="card-link text-decoration-none">Mensaje</a>
+                                                    <a href="#" className="card-link text-decoration-none">Conectar</a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                
+                                <div className="card-body p-4 bg-light">
+                                    
+                                    <div className="d-flex justify-content-between align-items-center mb-3" style={{ fontSize: '0.9rem' }}>
+                                        <strong>Ubicación:</strong>
+                                        <span className="text-muted" style={{ fontWeight: '400' }}>{profile.location || "No especificada"}</span>
+                                    </div>
+
+                                    <div className="gap-2 mb-3" style={{ fontSize: '0.9rem' }}>
+                                        <strong>Skills:</strong>
+                                        {profile.skills?.length > 0 ? (
+                                            profile.skills.map((skill, index) => (
+                                                <span key={index} className="badge bg-dark ms-2 rounded-pill">{skill.name}</span>
+                                            ))
+                                        ) : (
+                                            <span className="text-muted">No Skills</span>
+                                        )}
+                                    </div>
+
+                                   
+                                    <div className="d-flex justify-content-between align-items-center mb-3" style={{ fontSize: '0.9rem' }}>
+                                        <strong>Rating:</strong>
+                                        <span className="text-muted" style={{ fontWeight: '400' }}>{profile.rating ? `⭐ ${profile.rating}` : "No Rating"}</span>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     ))}
                 </div>

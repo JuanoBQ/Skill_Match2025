@@ -9,7 +9,7 @@ const ProjectDetails = () => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const res = await fetch(`https://congenial-dollop-q7q7w5q4gr773xvrx-3001.app.github.dev/api/projects/${id}`);
+        const res = await fetch(`https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api/projects/${id}`);
         const data = await res.json();
 
         if (res.ok) {
@@ -80,7 +80,6 @@ const ProjectDetails = () => {
 
         <div className="d-flex flex-wrap gap-3 mt-4">
           <button className="btn btn-outline-primary px-4">Enviar mensaje</button>
-          <button className="btn btn-success px-4">Conectar</button>
           <button className="btn btn-secondary ms-auto" onClick={() => navigate(-1)}>Volver</button>
         </div>
       </div>
