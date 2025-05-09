@@ -66,6 +66,7 @@ class Profile(db.Model):
     language: Mapped[Optional[str]] = mapped_column(Text)
     location: Mapped[Optional[str]] = mapped_column(Text)
     education: Mapped[Optional[str]] = mapped_column(Text)
+    contacts: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
 
     # Relaciones
     user: Mapped["User"] = relationship("User", back_populates="profile")
@@ -90,7 +91,8 @@ class Profile(db.Model):
             "language": self.language,
             "location": self.location,
             "education": self.education,
-            "skills": [fs.skill.serialize() for fs in self.skills if fs.skill is not None]
+            "skills": [fs.skill.serialize() for fs in self.skills if fs.skill is not None],
+            "contacts" : self.contacts
         }
 
 

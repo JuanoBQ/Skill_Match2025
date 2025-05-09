@@ -175,7 +175,8 @@ def get_freelancer_profile():
         "language": profile.language,
         "location": profile.location,
         "education": profile.education,
-        "skills": []
+        "skills": [],
+        "contacts": []
     }
 
     for fs in profile.skills:

@@ -12,6 +12,7 @@ export const Dashboard = () => {
     const { store, actions } = useContext(Context);
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+  
 
     useEffect(() => {
 
@@ -32,7 +33,9 @@ export const Dashboard = () => {
         };
 
         loadProfile();
+        
     }, [actions, store.isAuthenticated]);
+
 
     const fullName = profile?.user
         ? `${profile.user.first_name} ${profile.user.last_name}`
@@ -51,7 +54,7 @@ export const Dashboard = () => {
                                     background: `url(${banner}) center center / cover no-repeat`,
                                     borderRadius: "12px",
                                     boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
-                                    height: "20rem",
+                                    height: "23rem",
                                     minHeight: "18rem",
                                     padding: "3rem 2rem",
                                     width: "100%",
@@ -61,7 +64,6 @@ export const Dashboard = () => {
                             >
                             </div>
                         </div>
-
                     </div>
                     <Tabs />
                 </div>
@@ -82,7 +84,7 @@ export const Dashboard = () => {
                                 </div>
                             </div>
                             <div className="card-body ms-3">
-                                <h5 className="text-dark">Contactos: </h5>
+                                <h5 className="text-dark">Contactos: {profile && profile.contacts.length > 0 ? profile.contacts : "0"} </h5>
                             </div>
                         </div>
                     )}
