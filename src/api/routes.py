@@ -824,7 +824,21 @@ def search_freelancers_by_skill():
             "skills": skills
         })
 
-    return jsonify(results), 200
+    # ---------- PROJECTS ----------
+    project_skills = ProjectSkill.query.filter_by(skill_id=skill.id).all()
+    project_ids = list(set(ps.project_id for ps in project_skills))
+
+    projects = Project.query.filter(Project.id.in_(project_ids)).options(
+        joinedload(Project.skills).joinedload(ProjectSkill.skill),
+        joinedload(Project.employer)
+    ).all()
+
+    project_results = [p.serialize() for p in projects]
+
+    return jsonify({
+        "freelancers": freelancer_results,
+        "projects": project_results
+    }), 200
 
 
 @routes.route('/employer/completed-projects', methods=['GET'])
