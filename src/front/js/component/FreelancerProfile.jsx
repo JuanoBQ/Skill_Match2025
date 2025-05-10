@@ -156,14 +156,14 @@ const FreelancerProfile = () => {
                   <strong>{p.project.title}</strong><br />
                   Empleador: {p.project.employer_name}
                 </div>
-                {p.reviewed 
+                {p.reviewed
                   ? <span className="badge bg-success">Calificado</span>
                   : <button
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => handleOpenReview(p)}
-                    >
-                      Calificar
-                    </button>
+                    className="btn btn-outline-primary btn-sm"
+                    onClick={() => handleOpenReview(p)}
+                  >
+                    Calificar
+                  </button>
                 }
               </li>
             ))}
@@ -177,7 +177,7 @@ const FreelancerProfile = () => {
           <div className="modal-content p-4" style={{ maxWidth: 400, width: "100%" }}>
             <h5 className="mb-3">Calificar a {profile.user.first_name}</h5>
             <div className="mb-3">
-              {[1,2,3,4,5].map(n => (
+              {[1, 2, 3, 4, 5].map(n => (
                 <span
                   key={n}
                   style={{
@@ -198,7 +198,7 @@ const FreelancerProfile = () => {
             />
             <div className="d-flex justify-content-end">
               <button className="btn btn-secondary me-2" onClick={() => setModalOpen(false)}>Cancelar</button>
-              <button className="btn btn-primary" onClick={submitReview} disabled={rating===0}>Enviar</button>
+              <button className="btn btn-primary" onClick={submitReview} disabled={rating === 0}>Enviar</button>
             </div>
           </div>
         </div>
