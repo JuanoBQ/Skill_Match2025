@@ -477,9 +477,9 @@ const EmployerProfile = () => {
                 </div>
                 <div className="col-auto d-flex flex-column gap-3 align-items-end">
                     {[
-                        { label: "Ofertas publicadas", value: stats.offers },
+                        { label: "Trabajos publicados", value: stats.offers },
                         { label: "Propuestas recibidas", value: stats.proposals },
-                        { label: "Proyectos completados", value: completedProjects.length },
+                        { label: "Trabajos completados", value: completedProjects.length },
                         { label: "Valoración promedio", value: `${stats.rating.toFixed(1)}★` },
                     ].map((s, i) => (
                         <div
@@ -501,7 +501,8 @@ const EmployerProfile = () => {
                 </div>
             </div>
 
-            {/* ======== CALIFICAR FREELANCER (usar proposals, no completedProjects) ======== */}
+
+
             <div className="mt-4">
                 <details>
                     <summary className="fw-bold">
@@ -537,26 +538,22 @@ const EmployerProfile = () => {
                 </details>
             </div>
 
-            {/* ======== MODAL DE CALIFICACIÓN DE FREELANCER ======== */}
-            {modalOpen && currentProposal && (
+
+            {modalOpen && (
                 <div className="modal-backdrop d-flex justify-content-center align-items-center">
                     <div className="modal-content p-4" style={{ maxWidth: 400, width: "100%" }}>
-                        <h5 className="mb-3">
-                            Calificar a {currentProposal.freelancer.first_name}
-                        </h5>
+                        <h5 className="mb-3">Calificar a {currentProposal.freelancer.first_name}</h5>
                         <div className="mb-3">
-                            {[1, 2, 3, 4, 5].map((n) => (
+                            {[1, 2, 3, 4, 5].map(n => (
                                 <span
                                     key={n}
                                     style={{
                                         cursor: "pointer",
                                         fontSize: "1.5rem",
-                                        color: n <= rating ? "#ffc107" : "#e4e5e9",
+                                        color: n <= rating ? "#ffc107" : "#e4e5e9"
                                     }}
                                     onClick={() => setRating(n)}
-                                >
-                                    ★
-                                </span>
+                                >★</span>
                             ))}
                         </div>
                         <textarea
@@ -567,19 +564,8 @@ const EmployerProfile = () => {
                             onChange={(e) => setComment(e.target.value)}
                         />
                         <div className="d-flex justify-content-end">
-                            <button
-                                className="btn btn-secondary me-2"
-                                onClick={() => setModalOpen(false)}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                className="btn btn-primary"
-                                onClick={submitReview}
-                                disabled={rating === 0}
-                            >
-                                Enviar
-                            </button>
+                            <button className="btn btn-secondary me-2" onClick={() => setModalOpen(false)}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={submitReview} disabled={rating === 0}>Enviar</button>
                         </div>
                     </div>
                 </div>
