@@ -1,4 +1,4 @@
-const BASE_URL = "https://symmetrical-halibut-jj5jxp57p5qwcj6g4-3001.app.github.dev/api";
+const BASE_URL = "https://special-guacamole-v6pw5wqpv4ppcx7gg-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
