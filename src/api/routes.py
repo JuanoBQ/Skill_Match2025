@@ -784,19 +784,19 @@ def get_employer_projects():
 
 @routes.route("/search/freelancers", methods=["GET"])
 def search_freelancers_by_skill():
-    skill_name = request.args.get("skill")
-
-    if not skill_name:
+    skill_names = request.args.get("skill", "").split(",")
+    if not skill_names:
         return jsonify({"msg": "Skill no proporcionada"}), 400
 
-    skill = Skill.query.filter(Skill.name.ilike(f"%{skill_name}%")).first()
-
-    if not skill:
+    skills = Skill.query.filter(Skill.name.in_(skill_names)).all()
+    if not skills:
         return jsonify({"freelancers": [], "projects": []}), 200
 
+    skill_ids = [s.id for s in skills]
+
     # ---------- FREELANCERS ----------
-    freelancer_skills = FreelancerSkill.query.filter_by(skill_id=skill.id).all()
-    profile_ids = [fs.profile_id for fs in freelancer_skills]
+    freelancer_skills = FreelancerSkill.query.filter(FreelancerSkill.skill_id.in_(skill_ids)).all()
+    profile_ids = list(set(fs.profile_id for fs in freelancer_skills))
 
     profiles = Profile.query.filter(Profile.id.in_(profile_ids)).options(
         joinedload(Profile.skills).joinedload(FreelancerSkill.skill),
@@ -825,7 +825,7 @@ def search_freelancers_by_skill():
         })
 
     # ---------- PROJECTS ----------
-    project_skills = ProjectSkill.query.filter_by(skill_id=skill.id).all()
+    project_skills = ProjectSkill.query.filter(ProjectSkill.skill_id.in_(skill_ids)).all()
     project_ids = list(set(ps.project_id for ps in project_skills))
 
     projects = Project.query.filter(Project.id.in_(project_ids)).options(
@@ -839,6 +839,7 @@ def search_freelancers_by_skill():
         "freelancers": freelancer_results,
         "projects": project_results
     }), 200
+
 
 
 @routes.route('/employer/completed-projects', methods=['GET'])
