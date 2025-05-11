@@ -11,8 +11,8 @@ const DashboardFreelancer = () => {
     useEffect(() => {
         const loadData = async () => {
             await actions.getUsers();
+            const freelancers = store.users?.filter(user => user.role === "freelancer") || [];
 
-            const freelancers = store.user?.filter(user => user.role === "freelancer") || [];
 
             const profiles = [];
             for (const user of freelancers) {
@@ -81,7 +81,7 @@ const DashboardFreelancer = () => {
                                             </p>
 
                                            
-                                            <div className="d-flex justify-content-between align-items-center">
+                                           <div className="d-flex justify-content-between align-items-center">
                                                 <button
                                                     className="btn btn-outline-primary px-4 py-2"
                                                     onClick={() => goToProfile(profile.user.id)}
@@ -89,11 +89,12 @@ const DashboardFreelancer = () => {
                                                 >
                                                     Ver perfil
                                                 </button>
-                                                <div className="text-muted d-flex gap-3">
-                                                    <a href="#" className="card-link text-decoration-none">Mensaje</a>
-                                                    <a href="#" className="card-link text-decoration-none">Conectar</a>
+                                                <div className="d-flex gap-2">
+                                                    <button className="btn btn-outline-secondary btn-sm me-2">Mensaje</button>
+                                                    <button className="btn btn-outline-success btn-sm">Conectar</button>
                                                 </div>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>

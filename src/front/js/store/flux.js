@@ -1,4 +1,4 @@
-const BASE_URL = "https://refactored-space-goggles-7v65qpqwp44fxpvr-3001.app.github.dev/api";
+const BASE_URL = "https://symmetrical-halibut-jj5jxp57p5qwcj6g4-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -10,6 +10,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			userId: localStorage.getItem("user_id") || null,
 			isAuthenticated: !!localStorage.getItem("token"),
 			user: [],
+			users:[],
 			projects: [],
 			searchQuery: "",
 			searchResults: {
@@ -507,6 +508,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			// deleteProject: async (projectId) => {
+			// 	try {
+			// 		const token = localStorage.getItem("token");
+			// 		const res = await fetch(`${BASE_URL}/projects/${projectId}`, {
+			// 			method: "DELETE",
+			// 			headers: {
+			// 				"Authorization": `Bearer ${token}`
+			// 			}
+			// 		});
+			// 		if (res.status === 204) {
+			// 			return { success: true };
+			// 		} else {
+			// 			const data = await res.json();
+			// 			return { success: false, error: data.msg };
+			// 		}
+			// 	} catch (error) {
+			// 		console.error("deleteProject network error:", error);
+			// 		return { success: false, error: error.message };
+			// 	}
+			// },
 			deleteProject: async (projectId) => {
 				try {
 					const token = localStorage.getItem("token");
@@ -516,17 +537,28 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Authorization": `Bearer ${token}`
 						}
 					});
+
 					if (res.status === 204) {
+						const updatedProjects = getStore().projects.filter(p => p.id !== projectId);
+						setStore({ projects: updatedProjects });
+
 						return { success: true };
 					} else {
-						const data = await res.json();
-						return { success: false, error: data.msg };
+						const contentType = res.headers.get("content-type");
+						if (contentType && contentType.includes("application/json")) {
+							const data = await res.json();
+							return { success: false, error: data.msg || "Error desconocido" };
+						} else {
+							const text = await res.text();
+							return { success: false, error: text };
+						}
 					}
 				} catch (error) {
 					console.error("deleteProject network error:", error);
 					return { success: false, error: error.message };
 				}
 			},
+
 
 			// getUsers: async () => {    // Codigo que ya estaba (para hacer funcionar el dashboard)
 			// 	try {
@@ -542,7 +574,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const res = await fetch(`${BASE_URL}/admin/users`);
 					const data = await res.json();
-					setStore({ users: data }); // Use 'users' instead of 'user' (es la unica diferencia entre ambos codigos ni idea de porque el resultado cambia)
+					setStore({ users: data });
+					return data; // Use 'users' instead of 'user' (es la unica diferencia entre ambos codigos ni idea de porque el resultado cambia)
 				} catch (error) {
 					console.error(error);
 				}
@@ -628,7 +661,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 						skills: skills
 					}
 				})
+			},
+		deleteUser: async (userId) => {
+				try {
+					const token = localStorage.getItem("token");
+					const res = await fetch(`${BASE_URL}/admin/users/${userId}`, {
+						method: "DELETE",
+						headers: {
+							"Authorization": `Bearer ${token}`
+						}
+					});
+
+					if (res.status === 204) {
+						const updatedUsers = getStore().users.filter(user => user.id !== userId);
+						setStore({ users: updatedUsers });
+						return { success: true };
+					} else {
+						const contentType = res.headers.get("content-type");
+						if (contentType && contentType.includes("application/json")) {
+							const data = await res.json();
+							return { success: false, error: data.msg || "Error desconocido" };
+						} else {
+							const text = await res.text();
+							return { success: false, error: text };
+						}
+					}
+				} catch (error) {
+					console.error("Error deleting user:", error);
+					return { success: false, error: error.message };
+				}
 			}
+
 
 
 

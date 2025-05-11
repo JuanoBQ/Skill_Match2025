@@ -9,6 +9,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import func
 import stripe
 from dotenv import load_dotenv
+from datetime import datetime  
 
 load_dotenv()
 
@@ -386,6 +387,7 @@ def remove_freelancer_skill(skill_id):
 @routes.route('/projects', methods=['GET'])
 def get_all_projects():
     projects = Project.query.filter(Project.status != 'cancelled').all()
+    
 
     if not projects:
         employer = User.query.filter_by(role='employer').first()
@@ -423,13 +425,14 @@ def get_all_projects():
         ]
 
         for p_data in example_projects:
+            deadline = datetime.strptime(p_data["deadline"], "%Y-%m-%d") 
             project = Project(
                 employer_id=employer.id,
                 title=p_data["title"],
                 description=p_data["description"],
                 category=p_data["category"],
                 budget=p_data["budget"],
-                deadline=p_data["deadline"],
+                 deadline=deadline,
                 status=p_data["status"]
             )
             db.session.add(project)
@@ -499,8 +502,7 @@ def delete_project(project_id):
 
     if not project:
         return jsonify({"msg": "Proyecto no encontrado"}), 404
-    if project.employer_id != current_user:
-        return jsonify({"msg": "No tienes permiso para eliminar este proyecto"}), 403
+
 
     project.status = 'cancelled'
     db.session.commit()
@@ -948,3 +950,14 @@ def get_completed_proposals(fid):
           "reviewed": Review.query.filter_by(proposal_id=p.id, reviewer_id=fid).first() != None
         })
     return jsonify({"proposals": result, "success": True}), 200
+@routes.route('/admin/users/<int:user_id>', methods=['DELETE'])
+@jwt_required()  
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    db.session.delete(user)
+    db.session.commit()
+    return '', 204
+
