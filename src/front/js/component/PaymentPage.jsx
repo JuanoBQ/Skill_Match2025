@@ -115,7 +115,6 @@ const PaymentPage = () => {
             <h2 className="text-center mb-5">Resumen de Pago</h2>
 
             <div className="row gx-4">
-                {/* ——— Columna izquierda: Resumen del proyecto ——— */}
                 <div className="col-md-6 mb-4">
                     <div className="card h-100 shadow-sm">
                         <div className="card-body">

@@ -475,6 +475,7 @@ const EmployerProfile = () => {
                         </div>
                     )}
                 </div>
+                
                 <div className="col-auto d-flex flex-column gap-3 align-items-end">
                     {[
                         { label: "Trabajos publicados", value: stats.offers },

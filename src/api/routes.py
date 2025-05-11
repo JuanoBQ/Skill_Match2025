@@ -948,3 +948,4 @@ def get_completed_proposals(fid):
           "reviewed": Review.query.filter_by(proposal_id=p.id, reviewer_id=fid).first() != None
         })
     return jsonify({"proposals": result, "success": True}), 200
+

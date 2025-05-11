@@ -485,6 +485,28 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			getFreelancerStats: async () => {
+				try {
+					const token = localStorage.getItem("token");
+					const res = await fetch(`${BASE_URL}/freelancer/stats`, {
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`
+						}
+					});
+					const data = await res.json();
+					if (res.ok) {
+						return { success: true, stats: data };
+					} else {
+						console.error("getFreelancerStats error:", data.msg);
+						return { success: false, error: data.msg };
+					}
+				} catch (error) {
+					console.error("getFreelancerStats network error:", error);
+					return { success: false, error: error.message };
+				}
+			},
+
 			getEmployerProjects: async () => {
 				try {
 					const token = localStorage.getItem("token");
