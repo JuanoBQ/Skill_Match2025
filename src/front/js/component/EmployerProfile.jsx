@@ -144,22 +144,6 @@ const EmployerProfile = () => {
 
     const handleHire = (id) => navigate(`/payment/${id}`);
 
-    const handlePictureChange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const imageUrl = reader.result;
-            const userId = localStorage.getItem("user_id");
-            const res = await actions.uploadEmployerPicture(userId, imageUrl);
-            if (res.success) {
-                setProfileImage(imageUrl);
-                alert("Foto actualizada");
-            }
-        };
-        reader.readAsDataURL(file);
-    };
-
     const handleOpenReview = (proposal) => {
         setCurrentProposal(proposal);
         setRating(0);
@@ -481,7 +465,7 @@ const EmployerProfile = () => {
                         { label: "Trabajos publicados", value: stats.offers },
                         { label: "Propuestas recibidas", value: stats.proposals },
                         { label: "Trabajos completados", value: completedProjects.length },
-                        { label: "Valoración promedio", value: `${stats.rating.toFixed(1)}★` },
+                        { label: "Valoración", value: `${stats.rating.toFixed(1)}★` },
                     ].map((s, i) => (
                         <div
                             key={i}
