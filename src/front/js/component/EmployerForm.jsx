@@ -103,7 +103,7 @@ const EmployerForm = () => {
   }
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 animate__animated animate__fadeIn">
       <h2 className="mb-4 text-center fw-bold">Editar Perfil de Empresa</h2>
       <div className="card shadow-lg border-0 rounded-4 mb-4" style={{ maxWidth: "50rem", margin: "auto" }}>
         <div className="card-body p-4">

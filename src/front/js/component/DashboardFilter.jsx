@@ -25,7 +25,7 @@ const DashboardFilter = () => {
   }
 
   return (
-    <div className="card m-0 mt-4 shadow-sm border border-0 background" style={{ maxWidth: "22rem" }}>
+    <div className="card m-0 mt-4 shadow-sm border border-0 background animate__animated animate__fadeIn" style={{ maxWidth: "22rem" }}>
       <div className="row">
 
         <div>

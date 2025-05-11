@@ -197,7 +197,7 @@ const EmployerProfile = () => {
     const fullName = `${profile.user?.first_name} ${profile.user?.last_name}`;
 
     return (
-        <div className="container mt-5" style={{ minHeight: "100vh" }}>
+        <div className="container mt-5 animate__animated animate__fadeIn" style={{ minHeight: "100vh" }}>
             <div className="row mb-5">
                 <div className="col">
 

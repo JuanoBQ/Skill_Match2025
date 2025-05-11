@@ -48,7 +48,7 @@ const FreelancerProfile = () => {
           undefinedImg
         );
       } else {
-        navigate("/profileForm");
+        navigate("/freelancerForm");
         return;
       }
 
@@ -116,13 +116,15 @@ const FreelancerProfile = () => {
     : "Nombre no disponible";
 
   return (
-    <div className="container mt-5" style={{ minHeight: "100vh" }}>
+    <div className="container mt-5 animate__animated animate__fadeIn" style={{ minHeight: "100vh" }}>
       <div className="row mb-5">
         <div className="col">
 
           <div className="card shadow-lg border-0 rounded-4 overflow-hidden">
             <div className="row g-0">
-              <div className="col-md-4 bg-light text-center text-md-start py-4 px-3">
+
+              {/* COLUMNA IZQUIERDA: foto, datos, botón y ahora idiomas/tarifa/etc */}
+              <div className="col-md-4 bg-light text-md-start text-center py-4 px-3">
                 <img
                   src={profileImage}
                   alt="Foto de perfil"
@@ -132,52 +134,61 @@ const FreelancerProfile = () => {
 
                 <h4 className="fw-bold mb-1">{fullName}</h4>
                 <p className="text-secondary mb-3">{profile.user?.email}</p>
-                <h4 className="text-dark mt-0 mb-1" style={{ fontSize: "1.1rem" }}>{profile.career}</h4>
-                <h4 className="text-dark mt-0" style={{ fontSize: "1rem" }}>{profile.location}</h4>
+                <h4 className="text-dark mt-0 mb-1" style={{ fontSize: "1.1rem" }}>
+                  {profile.career}
+                </h4>
+                <h4 className="text-dark mt-0 mb-3" style={{ fontSize: "1rem" }}>
+                  {profile.location}
+                </h4>
 
-                <div className="me-5">
-                  <button className="btn btn-outline-primary rounded-pill px-4" onClick={() => navigate('/profileForm')}>
-                    Editar Perfil
-                  </button>
+                <button
+                  className="btn btn-outline-primary rounded-pill px-4 mb-4"
+                  onClick={() => navigate("/freelancerForm")}
+                >
+                  Editar Perfil
+                </button>
+
+                {/* <--- Aquí integramos la sección “basic” dentro del mismo col-md-4 */}
+                <div className="ps-3">
+                  <p className="mb-2 text-dark">
+                    <strong>Idiomas:</strong><br /> {profile.language}
+                  </p>
+                  <p className="mb-2 text-dark">
+                    <strong>Tarifa por hora:</strong><br /> ${profile.hourly_rate || "No definida"}
+                  </p>
+                  <p className="mb-2 text-dark">
+                    <strong>Calificación:</strong><br /> ⭐ {profile.rating || "Sin calificación"}
+                  </p>
+                  <div className="mb-2">
+                    <strong>Habilidades:</strong><br />
+                    {profile.skills.length
+                      ? profile.skills.map((s) => (
+                        <span key={s.id} className="badge bg-secondary me-1">
+                          {s.name}
+                        </span>
+                      ))
+                      : <span className="badge bg-secondary">No hay habilidades</span>
+                    }
+                  </div>
+                  <p className="mb-2 text-dark">
+                    <strong>Educación:</strong><br />{profile.education}
+                  </p>
                 </div>
               </div>
 
-
+              {/* COLUMNA DERECHA: Bio */}
               <div className="col-md-8">
-                <div className="p-4" style={{ whiteSpace: 'pre-line' }}>
-
+                <div className="p-4" style={{ whiteSpace: "pre-line" }}>
                   <h5 className="fw-bold">Bio</h5>
-                  <p className="text-justify"> {profile.bio || <span className="text-muted">Sin descripción.</span>}</p>
+                  <p className="text-justify">
+                    {profile.bio || <span className="text-muted">Sin descripción.</span>}
+                  </p>
                 </div>
               </div>
-              <div className="basic col-3 mb-5">
-
-                <p className="mb-2 text-dark">
-                  <strong>Idiomas:</strong><br></br> {profile.language}
-                </p>
-
-                <p className="mb-2 text-dark">
-                  <strong>Tarifa por hora:</strong><br></br> ${profile.hourly_rate || "No definida"}
-                </p>
-
-                <p className="mb-2 text-dark">
-                  <strong>Calificación:</strong><br></br> ⭐ {profile.rating || "Sin calificación"}
-                </p>
-
-                <div className="mb-2">
-                  <strong>Habilidades:</strong><br />
-                  {profile.skills.length ? profile.skills.map(s => (
-                    <span key={s.id} className="badge bg-secondary me-1">{s.name}</span>
-                  )) : <span className="badge bg-secondary">No hay habilidades</span>}
-                </div>
-                <p className="mb-2"><strong>Educación:</strong><br />{profile.education}</p>
-              </div>
-            </div>
-            <div className="container d-flex flex-row ms-5 mt-5">
-
 
             </div>
           </div>
+
 
           {/* ======== PROYECTOS COMPLETADOS ======== */}
           <div className="mt-4">
