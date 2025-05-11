@@ -1,4 +1,4 @@
-const BASE_URL = "https://symmetrical-halibut-jj5jxp57p5qwcj6g4-3001.app.github.dev/api";
+const BASE_URL = "https://refactored-space-goggles-7v65qpqwp44fxpvr-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -528,13 +528,23 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			getUsers: async () => {
+			// getUsers: async () => {    // Codigo que ya estaba (para hacer funcionar el dashboard)
+			// 	try {
+			// 		const res = await fetch(`${BASE_URL}/admin/users`)
+			// 		const data = await res.json();
+			// 		setStore({ user: data });
+			// 	} catch (error) {
+			// 		console.error(error)
+			// 	}
+			// },
+
+			getUsers: async () => {    // Codigo nuevo (para hacer funcionar el map de admin)
 				try {
-					const res = await fetch(`${BASE_URL}/admin/users`)
+					const res = await fetch(`${BASE_URL}/admin/users`);
 					const data = await res.json();
-					setStore({ user: data });
+					setStore({ users: data }); // Use 'users' instead of 'user' (es la unica diferencia entre ambos codigos ni idea de porque el resultado cambia)
 				} catch (error) {
-					console.error(error)
+					console.error(error);
 				}
 			},
 
