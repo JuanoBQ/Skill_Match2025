@@ -967,3 +967,12 @@ def get_completed_proposals(fid):
         })
     return jsonify({"proposals": result, "success": True}), 200
 
+
+@routes.route("/freelancer/<int:user_id>/proposals", methods=["GET"])
+def get_freelancer_proposals(user_id):
+ 
+    proposals = Proposal.query.filter_by(freelancer_id=user_id).all()
+ 
+    result = [p.serialize() for p in proposals]
+    return jsonify({ "proposals": result }), 200
+

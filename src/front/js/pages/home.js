@@ -23,14 +23,7 @@ const Home = () => {
 							<p className="hero-subtitle">
 								Contrata a los mejores freelancers para cualquier trabajo, en línea.
 							</p>
-							<div className="search-container">
-								<input
-									type="text"
-									placeholder="¿Qué servicio estás buscando?"
-									className="search-input"
-								/>
-								<button className="search-btn">Buscar</button>
-							</div>
+							
 							<div className="popular-searches">
 								<span>Popular:</span>
 								<Link to="#">Desarrollo Web</Link>

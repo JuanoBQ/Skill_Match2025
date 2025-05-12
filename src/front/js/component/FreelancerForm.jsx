@@ -108,7 +108,7 @@ const FreelancerForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!bio || !hourlyRate || !profileImage) {
+        if (!bio || !hourlyRate ) {
             return alert("Por favor completa todos los campos obligatorios.");
         }
 

@@ -413,7 +413,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, error: "Error al asignar skills" };
 				}
 			},
-			
+
 			clearFreelancerSkills: async (userId) => {
 				try {
 					const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
@@ -530,6 +530,27 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			getFreelancerSentProposals: async (userId) => {
+				try {
+					const token = localStorage.getItem("token");
+					const resp = await fetch(
+						`${BASE_URL}/freelancer/${userId}/proposals`,
+						{
+							method: "GET",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Bearer ${token}`
+							}
+						}
+					);
+					const json = await resp.json();
+					return { success: resp.ok, proposals: json.proposals || [] };
+				} catch (error) {
+					console.error("Error trayendo solicitudes enviadas:", error);
+					return { success: false, proposals: [] };
+				}
+			},
+
 			getEmployerProjects: async () => {
 				try {
 					const token = localStorage.getItem("token");
@@ -632,21 +653,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			searchBySkill: async (skillName) => {
 				try {
-				  const res = await fetch(`${BASE_URL}/search/freelancers?skill=${encodeURIComponent(skillName)}`);
-				  const data = await res.json();
-			  
-				  if (res.ok) {
-					setStore({
-						searchResults: {
-						  freelancers: data.freelancers || [],
-						  projects: data.projects || [],
-						}
-					  });
-					  
-					return { success: true };
-				  } else {
-					return { success: false, error: data.msg };
-				  }
+					const res = await fetch(`${BASE_URL}/search/freelancers?skill=${encodeURIComponent(skillName)}`);
+					const data = await res.json();
+
+					if (res.ok) {
+						setStore({
+							searchResults: {
+								freelancers: data.freelancers || [],
+								projects: data.projects || [],
+							}
+						});
+
+						return { success: true };
+					} else {
+						return { success: false, error: data.msg };
+					}
 				} catch (error) {
 					return { success: false, error: "Error al buscar skill" };
 				}
@@ -654,7 +675,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 			dashboardFilterBy: (category, rating, location, hourlyRate, skills) => {
-				setStore({filters:
+				setStore({
+					filters:
 					{
 						category: category,
 						rating: rating,

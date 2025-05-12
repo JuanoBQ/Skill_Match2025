@@ -12,11 +12,13 @@ const Register = () => {
     lastName: '',
     email: '',
     password: '',
+    confirmPassword: '',
     company: '',
     gender: '',
     age: '',
     role: '',
     error: ''
+    
   });
 
   const handleChange = (e) => {
@@ -24,16 +26,16 @@ const Register = () => {
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
-      error: '' // limpia el error al escribir
+      error: ''
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { firstName, lastName, email, password, company, gender, age, role } = formData;
+    const { firstName, lastName, email, password, confirmPassword, role } = formData;
 
     // Validaciones
-    if (!firstName || !lastName || !email || !password  || !role) {
+    if (!firstName || !lastName || !email || !password || !role) {
       setFormData((prevData) => ({ ...prevData, error: 'Por favor, completa todos los campos.' }));
       return;
     }
@@ -48,8 +50,13 @@ const Register = () => {
       return;
     }
 
+    if (password !== confirmPassword) {
+      setFormData(prev => ({ ...prev, error: 'Las contraseñas no coinciden.' }));
+      return;
+    }
+
     // Llamar al action register
-    const response = await actions.register(email, password, role,firstName, lastName);
+    const response = await actions.register(email, password, role, firstName, lastName);
 
     if (response.success) {
       navigate('/login');
@@ -119,47 +126,20 @@ const Register = () => {
                   />
                 </div>
 
-                {/* <div className="mb-3">
-                  <label htmlFor="company" className="form-label">Empresa (Opcional)</label>
+                <div className="mb-3">
+                  <label htmlFor="confirmPassword" className="form-label">
+                    Confirmar Contraseña
+                  </label>
                   <input
-                    type="text"
-                    id="company"
+                    type="password"
+                    id="confirmPassword"
                     className="form-control"
-                    placeholder="Ingrese el nombre de su empresa"
-                    name="company"
-                    value={formData.company}
+                    placeholder="Confirma tu contraseña"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
                     onChange={handleChange}
                   />
-                </div> */}
-
-                {/* <div className="mb-3">
-                  <label htmlFor="gender" className="form-label">Género</label>
-                  <select
-                    id="gender"
-                    className="form-select"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                  >
-                    <option value="">Seleccione su género</option>
-                    <option value="male">Masculino</option>
-                    <option value="female">Femenino</option>
-                    <option value="other">Otro</option>
-                  </select>
-                </div> */}
-
-                {/* <div className="mb-3">
-                  <label htmlFor="age" className="form-label">Edad</label>
-                  <input
-                    type="number"
-                    id="age"
-                    className="form-control"
-                    placeholder="Ingrese su edad"
-                    name="age"
-                    value={formData.age}
-                    onChange={handleChange}
-                  />
-                </div> */}
+                </div>
 
                 <div className="mb-3">
                   <label htmlFor="role" className="form-label">Rol</label>
@@ -189,4 +169,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Register;

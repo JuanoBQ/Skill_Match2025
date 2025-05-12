@@ -18,8 +18,8 @@ const FreelancerProfile = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [profileImage, setProfileImage] = useState("");
-
   const [completedProjects, setCompletedProjects] = useState([]);
+  const [sentProposals, setSentProposals] = useState([]);
   const [stats, setStats] = useState({
     offers: 0,
     proposals: 0,
@@ -58,6 +58,12 @@ const FreelancerProfile = () => {
       const respProps = await actions.getFreelancerCompletedProposals(userId);
       if (respProps.success) {
         setCompletedProposals(respProps.proposals);
+      }
+
+      const respSent = await actions.getFreelancerSentProposals(userId);
+      console.log("🚀 solicitudes enviadas del API:", respSent);
+      if (respSent.success) {
+        setSentProposals(respSent.proposals);
       }
 
       const completedRes = await actions.getCompletedProjects();
@@ -123,7 +129,6 @@ const FreelancerProfile = () => {
           <div className="card shadow-lg border-0 rounded-4 overflow-hidden">
             <div className="row g-0">
 
-              {/* COLUMNA IZQUIERDA: foto, datos, botón y ahora idiomas/tarifa/etc */}
               <div className="col-md-4 bg-light text-md-start text-center py-4 px-3">
                 <img
                   src={profileImage}
@@ -148,7 +153,6 @@ const FreelancerProfile = () => {
                   Editar Perfil
                 </button>
 
-                {/* <--- Aquí integramos la sección “basic” dentro del mismo col-md-4 */}
                 <div className="ps-3">
                   <p className="mb-2 text-dark">
                     <strong>Idiomas:</strong><br /> {profile.language}
@@ -176,7 +180,6 @@ const FreelancerProfile = () => {
                 </div>
               </div>
 
-              {/* COLUMNA DERECHA: Bio */}
               <div className="col-md-8">
                 <div className="p-4" style={{ whiteSpace: "pre-line" }}>
                   <h5 className="fw-bold">Bio</h5>
@@ -189,8 +192,6 @@ const FreelancerProfile = () => {
             </div>
           </div>
 
-
-          {/* ======== PROYECTOS COMPLETADOS ======== */}
           <div className="mt-4">
             <details>
               <summary className="fw-bold">Proyectos completados ({completedProposals.length})</summary>
@@ -216,7 +217,6 @@ const FreelancerProfile = () => {
             </details>
           </div>
 
-          {/* ======== MODAL DE CALIFICACIÓN ======== */}
           {modalOpen && (
             <div className="modal-backdrop d-flex justify-content-center align-items-center">
               <div className="modal-content p-4" style={{ maxWidth: 400, width: "100%" }}>
@@ -251,6 +251,7 @@ const FreelancerProfile = () => {
         </div>
         <div className="col-auto d-flex flex-column gap-3 align-items-end">
           {[
+            { label: "Solicitudes Enviadas", value: sentProposals.length },
             { label: "Trabajos completados", value: completedProjects.length },
             { label: "Valoración promedio", value: `${stats.rating.toFixed(1)}★` },
           ].map((s, i) => (
