@@ -8,8 +8,9 @@ export const Navbar = () => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
 
-  const [selectedSkill, setSelectedSkill] = useState(null);
+  const [selectedSkills, setSelectedSkills] = useState([]);
   const [availableSkills, setAvailableSkills] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     actions.getSkills().then(res => {
@@ -32,36 +33,33 @@ export const Navbar = () => {
 
   const goToProfile = () => {
     const currentRole = store.role;
-    console.log("Rol actual en el store:", currentRole);
-
     if (currentRole === "freelancer") {
-      console.log("Redirigiendo a /freelancerProfile");
       navigate('/freelancerProfile');
     } else if (currentRole === "employer") {
-      console.log("Redirigiendo a /employerProfile");
       navigate('/employerProfile');
-    } else {
-      console.log("Rol no encontrado. No se puede redirigir.");
     }
-  };
-
-  const goToFreelancers = () => {
-    navigate('/Dashboard');
-  };
-
-  const goToProjects = () => {
-    navigate('/DashboardProjects');
   };
 
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
-    if (selectedSkill) {
-      const query = selectedSkill.value;
+    if (selectedSkills.length > 0) {
+      const query = selectedSkills.map(s => s.value).join(",");
       actions.setSearchQuery(query);
-      await actions.searchBySkill(query);
-      navigate(`/search?query=${encodeURIComponent(query)}`);
-      setSelectedSkill(null);
+      setIsSearching(true);
+      const res = await actions.searchBySkill(query);
+      setIsSearching(false);
+
+      if (res.success) {
+        navigate(`/search?query=${encodeURIComponent(query)}`);
+      } else {
+        alert("Ocurrió un error al buscar.");
+      }
     }
+  };
+
+  const clearSearch = () => {
+    setSelectedSkills([]);
+    actions.setSearchQuery("");
   };
 
   return (
@@ -69,7 +67,7 @@ export const Navbar = () => {
       <nav className="navbar">
         <div className="container-fluid navStyles">
           <Link to={"/"} className="navbar-brand">
-            <img src={logo} alt="Bootstrap" width="42" height="42" />
+            <img src={logo} alt="Logo SkillMatch" width="42" height="42" />
           </Link>
 
           <div className="navbar-nav navOptions col d-flex flex-row">
@@ -78,26 +76,43 @@ export const Navbar = () => {
             <Link to={"/Contact"} className="nav-link active ms-2 me-3 text-black">Contact</Link>
           </div>
 
-          <form className="d-flex me-4" role="search" onSubmit={handleSearchSubmit}>
+          <form className="d-flex me-4" onSubmit={handleSearchSubmit}>
             <div style={{ width: "250px" }}>
               <Select
+                isMulti
                 options={availableSkills}
-                value={selectedSkill}
-                onChange={setSelectedSkill}
+                value={selectedSkills}
+                onChange={setSelectedSkills}
                 placeholder="Buscar skills..."
-                isClearable
               />
             </div>
-            <button className="btn btn-outline-dark ms-2" type="submit" aria-label="Search">
-              <i className="fa-solid fa-magnifying-glass"></i>
+            <button
+              className="btn btn-outline-dark ms-2"
+              type="submit"
+              disabled={isSearching}
+            >
+              {isSearching ? (
+                <span className="spinner-border spinner-border-sm" role="status" />
+              ) : (
+                <i className="fa-solid fa-magnifying-glass"></i>
+              )}
             </button>
+            {selectedSkills.length > 0 && (
+              <button
+                className="btn btn-outline-secondary ms-2"
+                type="button"
+                onClick={clearSearch}
+              >
+                Limpiar
+              </button>
+            )}
           </form>
 
           <div>
             {store.isAuthenticated ? (
               <>
                 <button onClick={goToProfile} className="btn btn-info px-4 py-2 me-2">
-                  <i class="fa-solid fa-user" style={{color:' #ffffff'}}></i>  Mi Perfil
+                  <i className="fa-solid fa-user" style={{ color: "#ffffff" }}></i> Mi Perfil
                 </button>
                 <button onClick={handleLogout} className="btn btn-danger px-4 py-2">
                   Logout
@@ -106,10 +121,10 @@ export const Navbar = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <button type="button" className="btn btn-dark px-4 py-2 me-2">Log in</button>
+                  <button className="btn btn-dark px-4 py-2 me-2">Log in</button>
                 </Link>
                 <Link to="/register">
-                  <button type="button" className="btn btn-dark px-4 py-2">Sign up</button>
+                  <button className="btn btn-dark px-4 py-2">Sign up</button>
                 </Link>
               </>
             )}

@@ -12,7 +12,7 @@ export const Dashboard = () => {
     const { store, actions } = useContext(Context);
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
-  
+
 
     useEffect(() => {
 
@@ -33,7 +33,7 @@ export const Dashboard = () => {
         };
 
         loadProfile();
-        
+
     }, [actions, store.isAuthenticated]);
 
 
@@ -48,21 +48,28 @@ export const Dashboard = () => {
                 <div className="col-lg-8 ms-5 mb-4">
                     <div className="d-flex">
                         <div className="container-fluid mb-4 mx-3 mt-5">
-                            <div
-                                className="d-flex justify-content-center align-items-center"
-                                style={{
-                                    background: `url(${banner}) center center / cover no-repeat`,
-                                    borderRadius: "12px",
-                                    boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
-                                    height: "23rem",
-                                    minHeight: "18rem",
-                                    padding: "3rem 2rem",
-                                    width: "100%",
-                                    backgroundSize: "cover",
-                                    backgroundPosition: "center",
-                                }}
-                            >
+                            <div style={{
+                                width: "100%",
+                                height: "23rem",
+                                minHeight: "18rem",
+                                borderRadius: "12px",
+                                overflow: "hidden",
+                                boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}>
+                                <img
+                                    src={banner}
+                                    alt="Banner"
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover"
+                                    }}
+                                />
                             </div>
+
                         </div>
                     </div>
                     <Tabs />

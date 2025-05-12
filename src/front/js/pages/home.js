@@ -99,7 +99,7 @@ const Home = () => {
 						</div>
 					</div>
 					<div className="text-center mt-4">
-						<Link to="/categories" className="view-all-btn">Ver todas las categorías</Link>
+						<Link to="/dashboard" className="view-all-btn">Explorar</Link>
 					</div>
 				</div>
 			</section>

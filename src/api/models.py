@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from typing import List, Optional
 from datetime import datetime
+import json
 
 db = SQLAlchemy()
 
@@ -55,7 +56,8 @@ class Profile(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), unique=True, nullable=False)
+        ForeignKey("users.id"), unique=True, nullable=False
+    )
     bio: Mapped[Optional[str]] = mapped_column(Text)
     profile_picture: Mapped[Optional[str]] = mapped_column(String(255))
     hourly_rate: Mapped[Optional[float]] = mapped_column(Float)
@@ -67,12 +69,13 @@ class Profile(db.Model):
     language: Mapped[Optional[str]] = mapped_column(Text)
     location: Mapped[Optional[str]] = mapped_column(Text)
     education: Mapped[Optional[str]] = mapped_column(Text)
-    contacts: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    contacts: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Relaciones
     user: Mapped["User"] = relationship("User", back_populates="profile")
     skills: Mapped[List["FreelancerSkill"]] = relationship(
-        "FreelancerSkill", back_populates="profile", cascade="all, delete-orphan")
+        "FreelancerSkill", back_populates="profile", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<Profile UserID={self.user_id}>"
@@ -93,7 +96,7 @@ class Profile(db.Model):
             "location": self.location,
             "education": self.education,
             "skills": [fs.skill.serialize() for fs in self.skills if fs.skill is not None],
-            "contacts" : self.contacts
+            "contacts": json.loads(self.contacts) if self.contacts else []
         }
 
 

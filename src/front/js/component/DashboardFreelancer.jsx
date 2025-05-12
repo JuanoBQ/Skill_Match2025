@@ -7,6 +7,7 @@ const DashboardFreelancer = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
     const [freelancerProfiles, setFreelancerProfiles] = useState([]);
+    const [selfId,setSelfId]=useState();
 
     useEffect(() => {
         const loadData = async () => {
@@ -24,7 +25,7 @@ const DashboardFreelancer = () => {
 
             setFreelancerProfiles(profiles);
         };
-
+        setSelfId(store.userId)
         loadData();
     }, []);
 
@@ -53,7 +54,7 @@ const DashboardFreelancer = () => {
                         <div key={profile.user.id}>
                             <div className="card mb-4 freelancer-card shadow-lg" style={{ borderRadius: '20px', overflow: 'hidden' }}>
                                 <div className="row no-gutters">
-                                    
+
                                     <div className="col-md-2 d-flex justify-content-center align-items-center p-3">
                                         <img
                                             src={profile.profile_picture || undefinedImg}
@@ -68,19 +69,19 @@ const DashboardFreelancer = () => {
                                         />
                                     </div>
 
-                                    
+
                                     <div className="col-md-10">
                                         <div className="card-body p-4">
-                                            
+
                                             <h4 className="text-dark fs-5 fw-bold mb-2">{profile.user.first_name} {profile.user.last_name}</h4>
                                             <h5 className="text-muted mb-3">{profile.career}</h5>
 
-                                           
+
                                             <p className="card-text text-muted mb-3" style={{ height: '70px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                 {readMore(profile.bio)}
                                             </p>
 
-                                           
+
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <button
                                                     className="btn btn-outline-primary px-4 py-2"
@@ -90,17 +91,32 @@ const DashboardFreelancer = () => {
                                                     Ver perfil
                                                 </button>
                                                 <div className="text-muted d-flex gap-3">
-                                                    <a href="#" className="card-link text-decoration-none">Mensaje</a>
-                                                    <a href="#" className="card-link text-decoration-none">Conectar</a>
+                                                    <a href="#" className="card-link text-decoration-none" >Mensaje</a>
+                                                    <a
+                                                        href="#"
+                                                        className="card-link text-decoration-none"
+                                                        onClick={(e) => {
+                                                            e.preventDefault(); 
+                                                            actions.addNewContact(
+                                                                profile.user.id,
+                                                                profile.user.first_name,
+                                                                profile.user.last_name,
+                                                                profile.career,
+                                                                selfId
+                                                            );
+                                                        }}
+                                                    >
+                                                        Conectar
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                
+
                                 <div className="card-body p-4 bg-light">
-                                    
+
                                     <div className="d-flex justify-content-between align-items-center mb-3" style={{ fontSize: '0.9rem' }}>
                                         <strong>Ubicación:</strong>
                                         <span className="text-muted" style={{ fontWeight: '400' }}>{profile.location || "No especificada"}</span>
@@ -117,7 +133,7 @@ const DashboardFreelancer = () => {
                                         )}
                                     </div>
 
-                                   
+
                                     <div className="d-flex justify-content-between align-items-center mb-3" style={{ fontSize: '0.9rem' }}>
                                         <strong>Rating:</strong>
                                         <span className="text-muted" style={{ fontWeight: '400' }}>{profile.rating ? `⭐ ${profile.rating}` : "No Rating"}</span>

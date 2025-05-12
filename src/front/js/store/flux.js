@@ -390,7 +390,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, error: "Error al asignar skills" };
 				}
 			},
-			
+
 			clearFreelancerSkills: async (userId) => {
 				try {
 					const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
@@ -587,21 +587,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			searchBySkill: async (skillName) => {
 				try {
-				  const res = await fetch(`${BASE_URL}/search/freelancers?skill=${encodeURIComponent(skillName)}`);
-				  const data = await res.json();
-			  
-				  if (res.ok) {
-					setStore({
-						searchResults: {
-						  freelancers: data.freelancers || [],
-						  projects: data.projects || [],
-						}
-					  });
-					  
-					return { success: true };
-				  } else {
-					return { success: false, error: data.msg };
-				  }
+					const res = await fetch(`${BASE_URL}/search/freelancers?skill=${encodeURIComponent(skillName)}`);
+					const data = await res.json();
+
+					if (res.ok) {
+						setStore({
+							searchResults: {
+								freelancers: data.freelancers || [],
+								projects: data.projects || [],
+							}
+						});
+
+						return { success: true };
+					} else {
+						return { success: false, error: data.msg };
+					}
 				} catch (error) {
 					return { success: false, error: "Error al buscar skill" };
 				}
@@ -609,7 +609,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 			dashboardFilterBy: (category, rating, location, hourlyRate, skills) => {
-				setStore({filters:
+				setStore({
+					filters:
 					{
 						category: category,
 						rating: rating,
@@ -618,7 +619,82 @@ const getState = ({ getStore, getActions, setStore }) => {
 						skills: skills
 					}
 				})
+			},
+
+
+			addNewContact: async (contactId, firstName, lastName, career) => {
+				try {
+					const token = localStorage.getItem("token");
+
+					if (!token) {
+						return { success: false, error: "Usuario no autenticado." };
+					}
+
+					const getRes = await fetch(`${BASE_URL}/freelancer/contacts`, {
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
+						},
+					});
+
+					if (!getRes.ok) {
+						const errorResponse = await getRes.json();
+
+						// Manejar token expirado
+						if (
+							errorResponse.msg === "token expirado" ||
+							errorResponse.msg === "jwt expired" ||
+							getRes.status === 401
+						) {
+							localStorage.removeItem("token");
+							alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+							window.location.href = "/login"; // Cambia esto según tu ruta de login
+							return { success: false, error: "Sesión expirada." };
+						}
+
+						return { success: false, error: errorResponse.msg || "Error al obtener el perfil." };
+					}
+
+					const currentProfile = await getRes.json();
+					const existingContacts = currentProfile.contacts || [];
+
+					const alreadyAdded = existingContacts.some(c => c.id === contactId);
+					if (alreadyAdded) {
+						return { success: false, error: "El contacto ya existe." };
+					}
+
+					const updatedContacts = [
+						...existingContacts,
+						{ id: contactId, first_name: firstName, last_name: lastName, career },
+					];
+
+					const res = await fetch(`${BASE_URL}/freelancer/contacts`, {
+						method: "PATCH",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
+						},
+						body: JSON.stringify({ contacts: updatedContacts }),
+					});
+
+					if (res.ok) {
+						const data = await res.json();
+						console.log("Contactos actualizados:", data);
+						return { success: true, profile: data };
+					} else {
+						const errorData = await res.json();
+						return { success: false, error: errorData.msg || "Error al actualizar contactos." };
+					}
+				} catch (error) {
+					console.error("Error al actualizar los contactos:", error);
+					return { success: false, error: "Error de red o del servidor." };
+				}
 			}
+
+
+
+
+
 
 
 

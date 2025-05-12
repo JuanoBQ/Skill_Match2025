@@ -7,7 +7,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from flask_cors import cross_origin
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import func
-import stripe
+import stripe, json
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -230,6 +230,7 @@ def create_profile():
 
     db.session.commit()
     return jsonify(profile.serialize()), 201
+
 
 
 @routes.route('/freelancer/profile', methods=['PATCH'])
@@ -784,19 +785,19 @@ def get_employer_projects():
 
 @routes.route("/search/freelancers", methods=["GET"])
 def search_freelancers_by_skill():
-    skill_name = request.args.get("skill")
-
-    if not skill_name:
+    skill_names = request.args.get("skill", "").split(",")
+    if not skill_names:
         return jsonify({"msg": "Skill no proporcionada"}), 400
 
-    skill = Skill.query.filter(Skill.name.ilike(f"%{skill_name}%")).first()
-
-    if not skill:
+    skills = Skill.query.filter(Skill.name.in_(skill_names)).all()
+    if not skills:
         return jsonify({"freelancers": [], "projects": []}), 200
 
+    skill_ids = [s.id for s in skills]
+
     # ---------- FREELANCERS ----------
-    freelancer_skills = FreelancerSkill.query.filter_by(skill_id=skill.id).all()
-    profile_ids = [fs.profile_id for fs in freelancer_skills]
+    freelancer_skills = FreelancerSkill.query.filter(FreelancerSkill.skill_id.in_(skill_ids)).all()
+    profile_ids = list(set(fs.profile_id for fs in freelancer_skills))
 
     profiles = Profile.query.filter(Profile.id.in_(profile_ids)).options(
         joinedload(Profile.skills).joinedload(FreelancerSkill.skill),
@@ -825,7 +826,7 @@ def search_freelancers_by_skill():
         })
 
     # ---------- PROJECTS ----------
-    project_skills = ProjectSkill.query.filter_by(skill_id=skill.id).all()
+    project_skills = ProjectSkill.query.filter(ProjectSkill.skill_id.in_(skill_ids)).all()
     project_ids = list(set(ps.project_id for ps in project_skills))
 
     projects = Project.query.filter(Project.id.in_(project_ids)).options(
@@ -839,6 +840,7 @@ def search_freelancers_by_skill():
         "freelancers": freelancer_results,
         "projects": project_results
     }), 200
+
 
 
 @routes.route('/employer/completed-projects', methods=['GET'])
@@ -947,3 +949,80 @@ def get_completed_proposals(fid):
           "reviewed": Review.query.filter_by(proposal_id=p.id, reviewer_id=fid).first() != None
         })
     return jsonify({"proposals": result, "success": True}), 200
+
+
+
+@routes.route('/freelancer/contacts', methods=['GET'])
+@jwt_required()
+def get_freelancer_contacts():
+    user_id = int(get_jwt_identity())
+
+    profile = Profile.query.filter_by(user_id=user_id).first()
+    if not profile:
+        return jsonify({"msg": "Perfil no encontrado"}), 404
+
+    import json
+    contacts = json.loads(profile.contacts or "[]")
+
+    return jsonify({"contacts": contacts}), 200
+
+
+
+
+@routes.route('/freelancer/contacts', methods=['PATCH'])
+@jwt_required()
+def update_freelancer_contacts():
+    try:
+        # Obtener el id del usuario del token JWT
+        user_id = int(get_jwt_identity())
+        
+        # Obtener los datos enviados en la solicitud
+        data = request.get_json()
+        new_contacts = data.get("contacts")
+
+        # Validar que 'contacts' sea una lista
+        if not isinstance(new_contacts, list):
+            return jsonify({"msg": "El campo 'contacts' debe ser una lista"}), 400
+
+        # Buscar el perfil del usuario
+        profile = Profile.query.filter_by(user_id=user_id).first()
+        if not profile:
+            return jsonify({"msg": "Perfil no encontrado"}), 404
+
+        # Actualizar la lista de contactos
+        profile.contacts = json.dumps(new_contacts)
+        db.session.commit()
+
+        return jsonify({"msg": "Contactos actualizados correctamente"}), 200
+    except Exception as e:
+        return jsonify({"msg": "Error al procesar la solicitud", "error": str(e)}), 500
+
+
+
+@routes.route('/freelancer/contacts/<int:contact_id>', methods=['DELETE'])
+@jwt_required()
+def delete_freelancer_contact(contact_id):
+    try:
+        # Obtener el id del usuario desde el token JWT
+        user_id = int(get_jwt_identity())
+
+        # Buscar el perfil del usuario
+        profile = Profile.query.filter_by(user_id=user_id).first()
+        if not profile:
+            return jsonify({"msg": "Perfil no encontrado"}), 404
+
+        # Cargar los contactos existentes
+        contacts = json.loads(profile.contacts or "[]")
+        updated_contacts = [c for c in contacts if c.get("id") != contact_id]
+
+        # Verificar si el contacto a eliminar existe
+        if len(contacts) == len(updated_contacts):
+            return jsonify({"msg": "Contacto no encontrado"}), 404
+
+        # Actualizar los contactos en el perfil
+        profile.contacts = json.dumps(updated_contacts)
+        db.session.commit()
+
+        return jsonify({"msg": "Contacto eliminado exitosamente"}), 200
+    except Exception as e:
+        return jsonify({"msg": "Error al procesar la solicitud", "error": str(e)}), 500
