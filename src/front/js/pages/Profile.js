@@ -111,10 +111,10 @@ export const Profile = () => {
             </div>
 
             {/* Botones de Acción */}
-            <div className="d-flex justify-content-center mb-4">
+            {/* <div className="d-flex justify-content-center mb-4">
                 <button className="btn btn-primary me-3" style={{ width: "150px" }}>Mensaje</button>
                 <button className="btn btn-success" style={{ width: "150px" }}>Conectar</button>
-            </div>
+            </div> */}
 
             {/* Botón Volver */}
             <div className="text-center">

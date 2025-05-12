@@ -7,13 +7,11 @@ const DashboardFreelancer = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
     const [freelancerProfiles, setFreelancerProfiles] = useState([]);
-    const [selfId,setSelfId]=useState();
 
     useEffect(() => {
         const loadData = async () => {
             await actions.getUsers();
             const freelancers = store.users?.filter(user => user.role === "freelancer") || [];
-
 
             const profiles = [];
             for (const user of freelancers) {
@@ -25,7 +23,7 @@ const DashboardFreelancer = () => {
 
             setFreelancerProfiles(profiles);
         };
-        setSelfId(store.userId)
+
         loadData();
     }, []);
 
@@ -46,6 +44,20 @@ const DashboardFreelancer = () => {
         (!store.filters.hourlyRate || profile.hourly_rate <= parseFloat(store.filters.hourlyRate))
     );
 
+    const handleAddContact = async (contactId) => {
+        try {
+            const result = await actions.addNewContact(contactId);
+            if (result.success) {
+                alert("¡Conexión exitosa!");
+            } else {
+                alert(`Error: ${result.error || "Error desconocido"}`);
+            }
+        } catch (error) {
+            console.error("Error al agregar el contacto:", error);
+            alert("Hubo un error al intentar agregar el contacto. Intenta de nuevo más tarde.");
+        }
+    };
+
     return (
         <div className='container-fluid d-flex justify-content-center mt-5'>
             {filteredProfiles.length > 0 ? (
@@ -54,7 +66,6 @@ const DashboardFreelancer = () => {
                         <div key={profile.user.id}>
                             <div className="card mb-4 freelancer-card shadow-lg" style={{ borderRadius: '20px', overflow: 'hidden' }}>
                                 <div className="row no-gutters">
-
                                     <div className="col-md-2 d-flex justify-content-center align-items-center p-3">
                                         <img
                                             src={profile.profile_picture || undefinedImg}
@@ -69,18 +80,14 @@ const DashboardFreelancer = () => {
                                         />
                                     </div>
 
-
                                     <div className="col-md-10">
                                         <div className="card-body p-4">
-
                                             <h4 className="text-dark fs-5 fw-bold mb-2">{profile.user.first_name} {profile.user.last_name}</h4>
                                             <h5 className="text-muted mb-3">{profile.career}</h5>
-
 
                                             <p className="card-text text-muted mb-3" style={{ height: '70px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                 {readMore(profile.bio)}
                                             </p>
-
 
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <button
@@ -91,33 +98,24 @@ const DashboardFreelancer = () => {
                                                     Ver perfil
                                                 </button>
                                                 <div className="text-muted d-flex gap-3">
-                                                    <a href="#" className="card-link text-decoration-none" >Mensaje</a>
+                                                    <a href="#" className="card-link text-decoration-none">Mensaje</a>
                                                     <a
                                                         href="#"
                                                         className="card-link text-decoration-none"
                                                         onClick={(e) => {
-                                                            e.preventDefault(); 
-                                                            actions.addNewContact(
-                                                                profile.user.id,
-                                                                profile.user.first_name,
-                                                                profile.user.last_name,
-                                                                profile.career,
-                                                                selfId
-                                                            );
+                                                            e.preventDefault();
+                                                            handleAddContact(profile.user.id);
                                                         }}
                                                     >
                                                         Conectar
                                                     </a>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
 
-
                                 <div className="card-body p-4 bg-light">
-
                                     <div className="d-flex justify-content-between align-items-center mb-3" style={{ fontSize: '0.9rem' }}>
                                         <strong>Ubicación:</strong>
                                         <span className="text-muted" style={{ fontWeight: '400' }}>{profile.location || "No especificada"}</span>
@@ -134,14 +132,12 @@ const DashboardFreelancer = () => {
                                         )}
                                     </div>
 
-
                                     <div className="d-flex justify-content-between align-items-center mb-3" style={{ fontSize: '0.9rem' }}>
                                         <strong>Rating:</strong>
                                         <span className="text-muted" style={{ fontWeight: '400' }}>{profile.rating ? `⭐ ${profile.rating}` : "No Rating"}</span>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     ))}
                 </div>

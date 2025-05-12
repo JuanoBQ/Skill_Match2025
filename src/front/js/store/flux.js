@@ -12,6 +12,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			user: [],
 			users: [],
 			projects: [],
+			contacts: [],
 			searchQuery: "",
 			searchResults: {
 				freelancers: [],
@@ -759,74 +760,75 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			addNewContact: async (contactId, firstName, lastName, career) => {
+			getContacts: async () => {
+				try {
+					const userId = localStorage.getItem("user_id");
+					if (!userId) {
+						throw new Error("User ID is missing.");
+					}
+					const res = await fetch(`${BASE_URL}/contacts?user_id=${userId}`);
+					if (!res.ok) {
+						throw new Error("Failed to fetch contacts.");
+					}
+					const data = await res.json();
+					const store = getStore();
+					setStore({
+						...store,
+						contacts: data.contacts,
+					});
+				} catch (error) {
+					console.error("Error al obtener los contactos:", error);
+				}
+			},
+
+			addNewContact: async (contactId) => {
 				try {
 					const token = localStorage.getItem("token");
+					const userId = localStorage.getItem("user_id");
 
 					if (!token) {
 						return { success: false, error: "Usuario no autenticado." };
 					}
 
-					const getRes = await fetch(`${BASE_URL}/freelancer/contacts`, {
+
+					if (contactId === userId) {
+						return { success: false, error: "No puedes agregar a tu propio perfil como contacto." };
+					}
+
+
+					const store = getStore();
+					const existingContact = store.contacts.find(contact => contact.id === contactId);
+
+					if (existingContact) {
+						return { success: false, error: "Este contacto ya está en tu lista." };
+					}
+
+
+					const res = await fetch(`${BASE_URL}/contacts`, {
+						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
 							"Authorization": `Bearer ${token}`,
 						},
+						body: JSON.stringify({ contact_id: contactId }),
 					});
 
-					if (!getRes.ok) {
-						const errorResponse = await getRes.json();
-
-						// Manejar token expirado
-						if (
-							errorResponse.msg === "token expirado" ||
-							errorResponse.msg === "jwt expired" ||
-							getRes.status === 401
-						) {
-							localStorage.removeItem("token");
-							alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
-							window.location.href = "/login"; // Cambia esto según tu ruta de login
-							return { success: false, error: "Sesión expirada." };
-						}
-
-						return { success: false, error: errorResponse.msg || "Error al obtener el perfil." };
-					}
-
-					const currentProfile = await getRes.json();
-					const existingContacts = currentProfile.contacts || [];
-
-					const alreadyAdded = existingContacts.some(c => c.id === contactId);
-					if (alreadyAdded) {
-						return { success: false, error: "El contacto ya existe." };
-					}
-
-					const updatedContacts = [
-						...existingContacts,
-						{ id: contactId, first_name: firstName, last_name: lastName, career },
-					];
-
-					const res = await fetch(`${BASE_URL}/freelancer/contacts`, {
-						method: "PATCH",
-						headers: {
-							"Content-Type": "application/json",
-							"Authorization": `Bearer ${token}`,
-						},
-						body: JSON.stringify({ contacts: updatedContacts }),
-					});
+					const data = await res.json();
+					console.log("Contacto agregado:", data);
 
 					if (res.ok) {
-						const data = await res.json();
-						console.log("Contactos actualizados:", data);
-						return { success: true, profile: data };
+						return { success: true, message: data.message || "Contacto agregado correctamente." };
 					} else {
-						const errorData = await res.json();
-						return { success: false, error: errorData.msg || "Error al actualizar contactos." };
+						return { success: false, error: data.error || "Error al agregar el contacto." };
 					}
 				} catch (error) {
-					console.error("Error al actualizar los contactos:", error);
+					console.error("Error al agregar el contacto:", error);
 					return { success: false, error: "Error de red o del servidor." };
 				}
-			}
+			},
+
+
+
 
 
 

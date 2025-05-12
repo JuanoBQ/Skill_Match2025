@@ -1,11 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Integer, ForeignKey, DateTime, Float, Text
+from sqlalchemy import JSON
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from typing import List, Optional
 from datetime import datetime
-import json
+from sqlalchemy.ext.mutable import MutableList
 
 db = SQLAlchemy()
 
@@ -48,7 +49,6 @@ class User(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 
-
 # --- PERFIL DEL FREELANCER ---
 
 class Profile(db.Model):
@@ -69,7 +69,6 @@ class Profile(db.Model):
     language: Mapped[Optional[str]] = mapped_column(Text)
     location: Mapped[Optional[str]] = mapped_column(Text)
     education: Mapped[Optional[str]] = mapped_column(Text)
-    contacts: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Relaciones
     user: Mapped["User"] = relationship("User", back_populates="profile")
@@ -96,8 +95,8 @@ class Profile(db.Model):
             "location": self.location,
             "education": self.education,
             "skills": [fs.skill.serialize() for fs in self.skills if fs.skill is not None],
-            "contacts": json.loads(self.contacts) if self.contacts else []
         }
+
 
 
 # --- SKILLS Y RELACIÓN MANY-TO-MANY ---
@@ -313,3 +312,18 @@ class Review(db.Model):
     reviewer = relationship("User", foreign_keys=[reviewer_id])
     reviewee = relationship("User", foreign_keys=[reviewee_id])
     proposal = relationship("Proposal", back_populates="reviews")
+
+
+class Contact(db.Model):
+    __tablename__ = "contacts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    contact_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    user: Mapped["User"] = relationship("User", foreign_keys=[user_id], backref="my_contacts")
+    contact: Mapped["User"] = relationship("User", foreign_keys=[contact_id], backref="contacted_by")
+
+    def __repr__(self):
+        return f"<Contact(user_id={self.user_id}, contact_id={self.contact_id})>"

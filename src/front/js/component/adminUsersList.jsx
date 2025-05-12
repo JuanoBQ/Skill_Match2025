@@ -18,7 +18,7 @@ const MyUsersList = () => {
             }
         };
         loadData();
-    }, [actions]);
+    }, []);
 
     const handleDeleteUser = async (userId) => {
         const confirmed = window.confirm("¿Estás seguro de eliminar este usuario?");

@@ -34,7 +34,7 @@ export const Dashboard = () => {
 
         loadProfile();
 
-    }, [actions, store.isAuthenticated]);
+    }, [actions, store.isAuthenticated, store.contacts]);
 
 
     const fullName = profile?.user
@@ -91,7 +91,7 @@ export const Dashboard = () => {
                                 </div>
                             </div>
                             <div className="card-body ms-3">
-                                <h5 className="text-dark">Contactos: {profile && profile.contacts.length > 0 ? profile.contacts : "0"} </h5>
+                                <h5 className="text-dark">Contactos: {store.contacts? store.contacts.length : "0"} </h5>
                             </div>
                         </div>
                     )}

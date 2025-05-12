@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Review, Payment, ProjectSkill
+from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Review, Payment, ProjectSkill, Contact
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
@@ -398,32 +398,7 @@ def get_all_projects():
             db.session.add(employer)
             db.session.commit()
 
-        example_projects = [
-            {
-                "title": "Desarrollo de sitio web corporativo",
-                "description": "Necesitamos un sitio web moderno y responsivo para nuestra empresa.",
-                "category": "web-development",
-                "budget": 1500.00,
-                "deadline": "2025-12-31",
-                "status": "open"
-            },
-            {
-                "title": "Aplicación móvil para delivery",
-                "description": "Buscamos desarrolladores para crear una app de entrega de comida.",
-                "category": "mobile-app",
-                "budget": 3000.00,
-                "deadline": "2025-10-15",
-                "status": "open"
-            },
-            {
-                "title": "Rediseño de identidad de marca",
-                "description": "Necesitamos actualizar nuestra imagen corporativa.",
-                "category": "design",
-                "budget": 800.00,
-                "deadline": "2025-08-01",
-                "status": "open"
-            }
-        ]
+        example_projects = []
 
         for p_data in example_projects:
             deadline = datetime.strptime(p_data["deadline"], "%Y-%m-%d") 
@@ -972,80 +947,6 @@ def get_completed_proposals(fid):
 
 
 
-@routes.route('/freelancer/contacts', methods=['GET'])
-@jwt_required()
-def get_freelancer_contacts():
-    user_id = int(get_jwt_identity())
-
-    profile = Profile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({"msg": "Perfil no encontrado"}), 404
-
-    import json
-    contacts = json.loads(profile.contacts or "[]")
-
-    return jsonify({"contacts": contacts}), 200
-
-
-
-
-@routes.route('/freelancer/contacts', methods=['PATCH'])
-@jwt_required()
-def update_freelancer_contacts():
-    try:
-        # Obtener el id del usuario del token JWT
-        user_id = int(get_jwt_identity())
-        
-        # Obtener los datos enviados en la solicitud
-        data = request.get_json()
-        new_contacts = data.get("contacts")
-
-        # Validar que 'contacts' sea una lista
-        if not isinstance(new_contacts, list):
-            return jsonify({"msg": "El campo 'contacts' debe ser una lista"}), 400
-
-        # Buscar el perfil del usuario
-        profile = Profile.query.filter_by(user_id=user_id).first()
-        if not profile:
-            return jsonify({"msg": "Perfil no encontrado"}), 404
-
-        # Actualizar la lista de contactos
-        profile.contacts = json.dumps(new_contacts)
-        db.session.commit()
-
-        return jsonify({"msg": "Contactos actualizados correctamente"}), 200
-    except Exception as e:
-        return jsonify({"msg": "Error al procesar la solicitud", "error": str(e)}), 500
-
-
-
-@routes.route('/freelancer/contacts/<int:contact_id>', methods=['DELETE'])
-@jwt_required()
-def delete_freelancer_contact(contact_id):
-    try:
-        # Obtener el id del usuario desde el token JWT
-        user_id = int(get_jwt_identity())
-
-        # Buscar el perfil del usuario
-        profile = Profile.query.filter_by(user_id=user_id).first()
-        if not profile:
-            return jsonify({"msg": "Perfil no encontrado"}), 404
-
-        # Cargar los contactos existentes
-        contacts = json.loads(profile.contacts or "[]")
-        updated_contacts = [c for c in contacts if c.get("id") != contact_id]
-
-        # Verificar si el contacto a eliminar existe
-        if len(contacts) == len(updated_contacts):
-            return jsonify({"msg": "Contacto no encontrado"}), 404
-
-        # Actualizar los contactos en el perfil
-        profile.contacts = json.dumps(updated_contacts)
-        db.session.commit()
-
-        return jsonify({"msg": "Contacto eliminado exitosamente"}), 200
-    except Exception as e:
-        return jsonify({"msg": "Error al procesar la solicitud", "error": str(e)}), 500
 @routes.route('/admin/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()  
 def delete_user(user_id):
@@ -1058,8 +959,6 @@ def delete_user(user_id):
     return '', 204
 
 
-
-
 @routes.route("/freelancer/<int:user_id>/proposals", methods=["GET"])
 def get_freelancer_proposals(user_id):
  
@@ -1068,3 +967,61 @@ def get_freelancer_proposals(user_id):
     result = [p.serialize() for p in proposals]
     return jsonify({ "proposals": result }), 200
 
+
+
+@routes.route("/contacts", methods=["GET"])
+def get_contacts():
+    requested_user_id = request.args.get("user_id", type=int)
+
+    # Si no se pasa un `user_id` en la query, se usa el ID del usuario actual
+    if requested_user_id is None:
+        return jsonify({"message": "user_id query parameter is required"}), 400
+
+    # Obtener los contactos del usuario solicitado
+    contacts = Contact.query.filter_by(user_id=requested_user_id).all()
+
+    contact_list = []
+    for contact in contacts:
+        contact_user = contact.contact  # Este es el User del contacto
+        contact_profile = contact_user.profile  # Acceder al Profile del contacto
+
+        contact_list.append({
+            "id": contact_user.id,
+            "first_name": contact_user.first_name,
+            "last_name": contact_user.last_name,
+            "email": contact_user.email,
+            "career": contact_profile.career if contact_profile else None,
+            "profile_picture": contact_profile.profile_picture
+        })
+
+    return jsonify({"contacts": contact_list}), 200
+
+
+
+@routes.route("/contacts", methods=["POST"])
+@jwt_required()
+def add_contact():
+    user_id = get_jwt_identity()  # Obtén el user_id del JWT
+    contact_id = request.json.get("contact_id")  # Obtén el ID del contacto a agregar
+
+    if not contact_id:
+        return jsonify({"error": "No se proporcionó un ID de contacto"}), 400
+
+    # Evitar que un usuario se agregue a sí mismo como contacto
+    if user_id == contact_id:
+        return jsonify({"error": "No puedes agregar a ti mismo como contacto"}), 400
+
+    # Verificar si el contacto ya existe
+    existing_contact = Contact.query.filter(
+        (Contact.user_id == user_id) & (Contact.contact_id == contact_id)
+    ).first()
+
+    if existing_contact:
+        return jsonify({"message": "El contacto ya está en tu lista de contactos"}), 200
+
+    # Crear el nuevo contacto
+    new_contact = Contact(user_id=user_id, contact_id=contact_id)
+    db.session.add(new_contact)
+    db.session.commit()
+
+    return jsonify({"message": "Contacto agregado correctamente"}), 201
