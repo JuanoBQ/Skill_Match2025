@@ -10,7 +10,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			userId: localStorage.getItem("user_id") || null,
 			isAuthenticated: !!localStorage.getItem("token"),
 			user: [],
-			users:[],
+			users: [],
 			projects: [],
 			searchQuery: "",
 			searchResults: {
@@ -443,7 +443,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			createOrUpdateEmployerProfile: async (formData) => {
+			createOrUpdateEmployerProfile: async (userId, formData) => {
 				try {
 					const token = localStorage.getItem("token");
 					const payload = {
@@ -454,7 +454,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						website: formData.website,
 						phone: formData.phone,
 					};
-
 					let res = await fetch(`${BASE_URL}/employer/profile`, {
 						method: "PATCH",
 						headers: {
@@ -476,16 +475,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 
 					const data = await res.json();
-					if (res.ok) {
-						return { success: true, profile: data };
-					} else {
-						return { success: false, error: data.msg };
-					}
+					return res.ok
+						? { success: true, profile: data }
+						: { success: false, error: data.msg };
 
 				} catch (err) {
 					console.error("Error al crear o actualizar perfil:", err);
 					return { success: false, error: "Error de red" };
 				}
+
 			},
 
 			getEmployerStats: async () => {
@@ -730,8 +728,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 				})
 			},
-			
-		deleteUser: async (userId) => {
+
+			deleteUser: async (userId) => {
 				try {
 					const token = localStorage.getItem("token");
 					const res = await fetch(`${BASE_URL}/admin/users/${userId}`, {
@@ -760,7 +758,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, error: error.message };
 				}
 			},
-		
+
 			addNewContact: async (contactId, firstName, lastName, career) => {
 				try {
 					const token = localStorage.getItem("token");

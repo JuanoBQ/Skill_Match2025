@@ -1,7 +1,7 @@
 import os
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Review, Payment, ProjectSkill 
+from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Review, Payment, ProjectSkill
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin

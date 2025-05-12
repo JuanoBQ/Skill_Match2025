@@ -23,6 +23,14 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
+
+CORS(app,
+     resources={r"/api/*": {"origins": "*"}},
+     supports_credentials=True,
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
+)
+
 app.url_map.strict_slashes = False
 
 # database configuration
@@ -34,11 +42,6 @@ app.config['JWT_SECRET_KEY'] = 'super-secret-key-for-testing'
 app.config['JWT_TOKEN_LOCATION'] = ['headers']
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hora
 bcrypt = Bcrypt(app)
-
-# Flask-CORS
-
-CORS(app)
-
 
 # Setup JWT
 jwt = JWTManager(app)

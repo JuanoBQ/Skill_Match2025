@@ -97,7 +97,7 @@ const EmployerProfile = () => {
         };
 
         loadAll();
-    }, [actions, navigate]);
+    }, []);
 
     const handleEditProfile = () => navigate("/employerForm");
 
