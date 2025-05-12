@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 
-const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
+const BASE_URL = "https://refactored-space-goggles-7v65qpqwp44fxpvr-3001.app.github.dev/api";
 
 const PaymentPage = () => {
     const { proposalId } = useParams();

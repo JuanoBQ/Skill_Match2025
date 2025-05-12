@@ -12,8 +12,8 @@ const DashboardFreelancer = () => {
     useEffect(() => {
         const loadData = async () => {
             await actions.getUsers();
+            const freelancers = store.users?.filter(user => user.role === "freelancer") || [];
 
-            const freelancers = store.user?.filter(user => user.role === "freelancer") || [];
 
             const profiles = [];
             for (const user of freelancers) {
@@ -110,6 +110,7 @@ const DashboardFreelancer = () => {
                                                     </a>
                                                 </div>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>

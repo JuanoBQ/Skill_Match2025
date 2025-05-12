@@ -14,6 +14,7 @@ import { About } from "./pages/About.js";
 import injectContext from "./store/appContext";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+import { Admin } from "./pages/admis.js";
 import Login from "./component/Login.jsx";
 import Register from "./component/Register.jsx";
 import EmployerProfile from "./component/EmployerProfile.jsx";
@@ -60,6 +61,7 @@ const Layout = () => {
                         <Route element={<DashboardProjects />} path="/DashboardProjects" />
                         <Route element={<Dashboard />} path="/Dashboard" />               
                         <Route element={<EmployerForm />} path="/employerForm" />
+                        <Route element={<Admin />} path="/admin" />
                         <Route path="*" element={<h1>Not found!</h1>} />
                   
                         <Route element={<SearchResults />} path="/search" />
