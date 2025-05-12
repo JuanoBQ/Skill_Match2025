@@ -216,36 +216,72 @@ const FreelancerProfile = () => {
           </div>
 
           {modalOpen && (
-            <div className="modal-backdrop d-flex justify-content-center align-items-center">
-              <div className="modal-content p-4" style={{ maxWidth: 400, width: "100%" }}>
-                <h5 className="mb-3">Calificar a {profile.user.first_name}</h5>
-                <div className="mb-3">
-                  {[1, 2, 3, 4, 5].map(n => (
-                    <span
-                      key={n}
-                      style={{
-                        cursor: "pointer",
-                        fontSize: "1.5rem",
-                        color: n <= rating ? "#ffc107" : "#e4e5e9"
-                      }}
-                      onClick={() => setRating(n)}
-                    >★</span>
-                  ))}
-                </div>
-                <textarea
-                  className="form-control mb-3"
-                  rows={3}
-                  placeholder="Comentario (opcional)"
-                  value={comment}
-                  onChange={e => setComment(e.target.value)}
-                />
-                <div className="d-flex justify-content-end">
-                  <button className="btn btn-secondary me-2" onClick={() => setModalOpen(false)}>Cancelar</button>
-                  <button className="btn btn-primary" onClick={submitReview} disabled={rating === 0}>Enviar</button>
+            <>
+              <div
+                className="modal d-block"
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                style={{ backgroundColor: "transparent" }}
+              >
+                <div
+                  className="modal-dialog modal-dialog-centered"
+                  role="document"
+                >
+                  <div className="modal-content rounded-4 shadow-lg">
+                    <div className="modal-header border-0">
+                      <h5 className="modal-title">Calificar a {profile.user.first_name}</h5>
+                      <button
+                        type="button"
+                        className="btn-close"
+                        aria-label="Cerrar"
+                        onClick={() => setModalOpen(false)}
+                      />
+                    </div>
+                    <div className="modal-body">
+                      <div className="d-flex justify-content-center mb-3">
+                        {[1, 2, 3, 4, 5].map(n => (
+                          <span
+                            key={n}
+                            style={{ cursor: "pointer", color: n <= rating ? "#ffc107" : "#e4e5e9" }}
+                            className={`bi bi-star${n <= rating ? "-fill" : ""} fs-3 mx-1`}
+                            onClick={() => setRating(n)}
+                          >★</span>
+                        ))}
+                      </div>
+                      <textarea
+                        className="form-control mb-3"
+                        rows={3}
+                        placeholder="Comentario (opcional)"
+                        value={comment}
+                        onChange={e => setComment(e.target.value)}
+                      />
+                    </div>
+                    <div className="modal-footer border-0">
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => setModalOpen(false)}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={submitReview}
+                        disabled={rating === 0}
+                      >
+                        Enviar
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              <div className="modal-backdrop fade show"></div>
+            </>
           )}
+
         </div>
         <div className="col-auto d-flex flex-column gap-3 align-items-end">
           {[
