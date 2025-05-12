@@ -31,7 +31,7 @@ def register():
     first_name=data.get('first_name')
     last_name=data.get('last_name')
 
-    if not email or not password or role not in ['freelancer', 'employer']:
+    if not email or not password or role not in ['freelancer', 'employer','admin']:
         return jsonify({"msg": "Rellena todos los campos"}), 400
     if not first_name or not last_name:
         return jsonify({"msg": "Nombres y apellidos son obligatorios"}), 400
