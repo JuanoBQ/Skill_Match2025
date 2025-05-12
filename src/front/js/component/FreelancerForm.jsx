@@ -65,7 +65,7 @@ const FreelancerForm = () => {
                 const profile = profileRes.profile;
                 setBio(profile.bio || "");
                 setHourlyRate(profile.hourly_rate || "");
-                setProfileImage(profile.profile_picture || "");
+                setProfileImage(res.profile.profile_picture || "");
                 setEducation(profile.education || "");
                 setLanguage(profile.language
                     ? profile.language.split(", ").map(lang => ({ value: lang, label: lang }))
@@ -108,7 +108,7 @@ const FreelancerForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!bio || !hourlyRate ) {
+        if (!bio || !hourlyRate) {
             return alert("Por favor completa todos los campos obligatorios.");
         }
 
@@ -164,30 +164,16 @@ const FreelancerForm = () => {
             <div className="card shadow-lg border-0 rounded-4 mb-4" style={{ maxWidth: "50rem", margin: "auto" }}>
                 <div className="card-body p-4">
                     <form onSubmit={handleSubmit}>
-                        <div className="d-flex justify-content-center mb-3">
-                            <div className="position-relative p-2">
-                                <img
-                                    src={profileImage}
-                                    alt="Foto de perfil"
-                                    className="rounded-circle"
-                                    style={{ width: 120, height: 120, objectFit: "cover" }}
-                                />
-                                <label
-                                    htmlFor="upload-photo"
-                                    className="position-absolute bottom-0 end-0 bg-light rounded-circle p-1 border"
-                                    style={{ cursor: "pointer", width: 30, height: 30 }}
-                                    title="Cambiar foto"
-                                >
-                                    <i className="fas fa-camera"></i>
-                                </label>
-                                <input
-                                    id="upload-photo"
-                                    type="file"
-                                    accept="image/*"
-                                    style={{ display: "none" }}
-                                    onChange={handlePictureChange}
-                                />
-                            </div>
+                        
+                        <div className="mb-3">
+                            <label className="form-label">URL de tu foto de perfil</label>
+                            <input
+                                type="url"
+                                className="form-control"
+                                placeholder="https://mi-cdn.com/mi-foto.jpg"
+                                value={profileImage}
+                                onChange={e => setProfileImage(e.target.value)}
+                            />
                         </div>
 
                         <label htmlFor="bio" className="form-label">

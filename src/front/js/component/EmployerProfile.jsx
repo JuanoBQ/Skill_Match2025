@@ -54,7 +54,6 @@ const EmployerProfile = () => {
                 setProfile(profileRes.profile);
                 const stored = localStorage.getItem("profile_picture");
                 setProfileImage(
-                    stored ||
                     profileRes.profile.profile_picture ||
                     undefinedImg
                 );
@@ -459,7 +458,7 @@ const EmployerProfile = () => {
                         </div>
                     )}
                 </div>
-                
+
                 <div className="col-auto d-flex flex-column gap-3 align-items-end">
                     {[
                         { label: "Trabajos publicados", value: stats.offers },
@@ -507,16 +506,15 @@ const EmployerProfile = () => {
                                         Freelancer: {p.freelancer.first_name} {p.freelancer.last_name}
                                     </div>
 
-                                    {p.reviewed ? (
-                                        <span className="badge bg-success">Calificado</span>
-                                    ) : (
-                                        <button
+                                    {p.reviewed
+                                        ? <span className="badge bg-success">Calificado</span>
+                                        : <button
                                             className="btn btn-outline-primary btn-sm"
                                             onClick={() => handleOpenReview(p)}
                                         >
                                             Calificar
                                         </button>
-                                    )}
+                                    }
                                 </li>
                             ))}
                     </ul>

@@ -10,7 +10,7 @@ import {
 } from "@stripe/react-stripe-js";
 import logo from "./../../../../public/stripe-logo.png";
 
-const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
+const BASE_URL = "https://automatic-space-chainsaw-jjr9g9qr5wg4fjqgg-3001.app.github.dev/api";
 
 const PaymentPage = () => {
     const { proposalId } = useParams();

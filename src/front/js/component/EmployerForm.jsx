@@ -39,7 +39,7 @@ const EmployerForm = () => {
       if (res.success && res.profile) {
         const profile = res.profile;
         setBio(profile.bio || "");
-        setProfileImage(profile.profile_picture || "");
+        setProfileImage(res.profile.profile_picture || "");
         setIndustry(profile.industry || "");
         setWebsite(profile.website || "");
         setPhone(profile.phone || "");
@@ -50,22 +50,6 @@ const EmployerForm = () => {
 
     loadEmployerProfile();
   }, [store.userId, actions]);
-
-  const handlePictureChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const imageUrl = reader.result;
-      const userId = localStorage.getItem("user_id");
-      const res = await actions.uploadEmployerPicture(userId, imageUrl);
-      if (res.success) {
-        setProfileImage(imageUrl);
-        alert("Foto actualizada");
-      }
-    };
-    reader.readAsDataURL(file);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,7 +65,7 @@ const EmployerForm = () => {
 
     const payload = {
       bio,
-      profile_image: profileImage,
+      profile_picture: profileImage,
       industry,
       location: location?.value || "",
       website,
@@ -109,38 +93,15 @@ const EmployerForm = () => {
         <div className="card-body p-4">
           <form onSubmit={handleSubmit}>
 
-            {/* Imagen de perfil */}
-            <div className="mb-4 text-center">
-              <div className="position-relative d-inline-block">
-                <img
-                  src={profileImage}
-                  alt="Foto de perfil"
-                  className="rounded-circle"
-                  style={{ width: 120, height: 120, objectFit: "cover" }}
-                />
-                <label
-                  htmlFor="upload-photo"
-                  className="position-absolute bottom-0 end-0 bg-light rounded-circle p-1 border"
-                  style={{
-                    cursor: "pointer",
-                    width: 30,
-                    height: 30,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                  title="Cambiar foto"
-                >
-                  <i className="fas fa-camera"></i>
-                </label>
-                <input
-                  id="upload-photo"
-                  type="file"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={handlePictureChange}
-                />
-              </div>
+            <div className="mb-3">
+              <label className="form-label">URL de tu foto de perfil</label>
+              <input
+                type="url"
+                className="form-control"
+                placeholder="https://mi-cdn.com/mi-foto.jpg"
+                value={profileImage}
+                onChange={e => setProfileImage(e.target.value)}
+              />
             </div>
 
             <div className="mb-3">

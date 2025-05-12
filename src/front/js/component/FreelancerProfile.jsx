@@ -43,7 +43,6 @@ const FreelancerProfile = () => {
         setProfile(profileRes.profile);
         const stored = localStorage.getItem("profile_picture");
         setProfileImage(
-          stored ||
           profileRes.profile.profile_picture ||
           undefinedImg
         );
@@ -82,7 +81,6 @@ const FreelancerProfile = () => {
     loadAll();
   }, [actions, navigate]);
 
-  // Abrir modal para calificar
   const handleOpenReview = (proposal) => {
     setCurrentProposal(proposal);
     setRating(0);
