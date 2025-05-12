@@ -19,7 +19,7 @@ import Login from "./component/Login.jsx";
 import Register from "./component/Register.jsx";
 import EmployerProfile from "./component/EmployerProfile.jsx";
 import FreelancerProfile from "./component/FreelancerProfile.jsx";
-import ProfileForm from "./component/ProfileForm.jsx";
+import FreelancerForm from "./component/FreelancerForm.jsx";
 import DashboardFreelancer from "./component/DashboardFreelancer.jsx";
 import DashboardProjects from "./component/DashboardProjects.jsx";
 import PaymentPage from "./component/PaymentPage.jsx";
@@ -52,11 +52,10 @@ const Layout = () => {
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<Login />} path="/login" />
-                        <Route element={<Login />} path="/login" />
                         <Route element={<Register />} path="/register" />
                         <Route element={<EmployerProfile />} path="/employerProfile" />
                         <Route element={<FreelancerProfile />} path="/freelancerProfile" />
-                        <Route element={<ProfileForm />} path="/profileform" />
+                        <Route element={<FreelancerForm />} path="/FreelancerForm" />
                         <Route element={<DashboardFreelancer />} path="/DashboardFreelancer" />
                         <Route element={<DashboardProjects />} path="/DashboardProjects" />
                         <Route element={<Dashboard />} path="/Dashboard" />               

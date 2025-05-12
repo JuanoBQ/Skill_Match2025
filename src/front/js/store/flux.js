@@ -350,6 +350,29 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			uploadFreelancerPicture: async (userId, pictureUrl) => {
+				try {
+					const res = await fetch(`${BASE_URL}/freelancer/profile/picture`, {
+						method: "PATCH",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({ user_id: userId, profile_picture: pictureUrl })
+					});
+
+					if (res.ok) {
+						const data = await res.json();
+						localStorage.setItem("profile_picture", pictureUrl);
+						return { success: true, picture: pictureUrl };
+					} else {
+						return { success: false, error: "No se pudo actualizar la imagen" };
+					}
+				} catch (err) {
+					console.error(err);
+					return { success: false, error: "Error de conexión" };
+				}
+			},
+
 			getSkills: async () => {
 				try {
 					const res = await fetch(`${BASE_URL}/skills`);
@@ -391,6 +414,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: false, error: "Error al asignar skills" };
 				}
 			},
+
 
 			clearFreelancerSkills: async (userId) => {
 				try {
@@ -483,6 +507,49 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("getEmployerStats network error:", error);
 					return { success: false, error: error.message };
+				}
+			},
+
+			getFreelancerStats: async () => {
+				try {
+					const token = localStorage.getItem("token");
+					const res = await fetch(`${BASE_URL}/freelancer/stats`, {
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`
+						}
+					});
+					const data = await res.json();
+					if (res.ok) {
+						return { success: true, stats: data };
+					} else {
+						console.error("getFreelancerStats error:", data.msg);
+						return { success: false, error: data.msg };
+					}
+				} catch (error) {
+					console.error("getFreelancerStats network error:", error);
+					return { success: false, error: error.message };
+				}
+			},
+
+			getFreelancerSentProposals: async (userId) => {
+				try {
+					const token = localStorage.getItem("token");
+					const resp = await fetch(
+						`${BASE_URL}/freelancer/${userId}/proposals`,
+						{
+							method: "GET",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Bearer ${token}`
+							}
+						}
+					);
+					const json = await resp.json();
+					return { success: resp.ok, proposals: json.proposals || [] };
+				} catch (error) {
+					console.error("Error trayendo solicitudes enviadas:", error);
+					return { success: false, proposals: [] };
 				}
 			},
 
@@ -663,6 +730,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 				})
 			},
+			
 		deleteUser: async (userId) => {
 				try {
 					const token = localStorage.getItem("token");

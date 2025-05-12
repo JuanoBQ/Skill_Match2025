@@ -749,6 +749,24 @@ def update_employer_picture():
 
     return jsonify({ "success": True, "picture": picture_url }), 200
 
+@routes.route('/freelancer/profile/picture', methods=['PATCH'])
+def update_freelancer_picture():
+    data = request.json
+    user_id = data.get("user_id")
+    picture_url = data.get("profile_picture")
+
+    if not user_id or not picture_url:
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    profile = Profile.query.filter_by(user_id=user_id).first()
+    if not profile:
+        return jsonify({"msg": "Perfil no encontrado"}), 404
+
+    profile.profile_picture = picture_url
+    db.session.commit()
+
+    return jsonify({ "success": True, "picture": picture_url }), 200
+
 
 @routes.route('/employer/stats', methods=['GET'])
 @jwt_required()
@@ -1038,4 +1056,15 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
     return '', 204
+
+
+
+
+@routes.route("/freelancer/<int:user_id>/proposals", methods=["GET"])
+def get_freelancer_proposals(user_id):
+ 
+    proposals = Proposal.query.filter_by(freelancer_id=user_id).all()
+ 
+    result = [p.serialize() for p in proposals]
+    return jsonify({ "proposals": result }), 200
 
