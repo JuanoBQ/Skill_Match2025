@@ -464,7 +464,7 @@ const EmployerProfile = () => {
                         { label: "Trabajos publicados", value: stats.offers },
                         { label: "Propuestas recibidas", value: stats.proposals },
                         { label: "Trabajos completados", value: completedProjects.length },
-                        { label: "Valoración", value: `${stats.rating.toFixed(1)}★` },
+                        { label: "Valoración", value: `${stats.rating.toFixed(1)}⭐` },
                     ].map((s, i) => (
                         <div
                             key={i}

@@ -158,9 +158,6 @@ const FreelancerProfile = () => {
                   <p className="mb-2 text-dark">
                     <strong>Tarifa por hora:</strong><br /> ${profile.hourly_rate || "No definida"}
                   </p>
-                  <p className="mb-2 text-dark">
-                    <strong>Calificación:</strong><br /> ⭐ {profile.rating || "Sin calificación"}
-                  </p>
                   <div className="mb-2">
                     <strong>Habilidades:</strong><br />
                     {profile.skills.length
@@ -287,7 +284,7 @@ const FreelancerProfile = () => {
           {[
             { label: "Solicitudes Enviadas", value: sentProposals.length },
             { label: "Trabajos completados", value: completedProjects.length },
-            { label: "Valoración promedio", value: `${stats.rating.toFixed(1)}★` },
+            { label: "Valoración", value: `${stats.rating.toFixed(1)}⭐` },
           ].map((s, i) => (
             <div
               key={i}
