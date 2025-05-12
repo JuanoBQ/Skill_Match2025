@@ -5,21 +5,27 @@ import MyUsersList from "../component/adminUsersList.jsx";
 
 export const Admin = () => {
     const { store, actions } = useContext(Context);
-    
-    useEffect(() => {
-            actions.getProjects();
-    }, []);
 
+    // useEffect para cargar los proyectos solo cuando no están disponibles en el store
+    useEffect(() => {
+        // Solo realiza la llamada a la API si no hay proyectos cargados
+        if (store.projects.length === 0) {
+            actions.getProjects();  // Llama a la API para obtener proyectos solo si el store está vacío
+        }
+    }, [store.projects.length, actions]); // Esto asegura que se llame solo cuando el array de proyectos esté vacío
+
+    // Función para manejar la eliminación de un proyecto
     const handleDelete = async (projectId) => {
-        console.log("Deleting project with ID:", projectId);  // Check the ID value
-        const response = await actions.deleteProject(projectId);
+        console.log("Deleting project with ID:", projectId);  // Verifica el ID
+        const response = await actions.deleteProject(projectId); // Elimina el proyecto desde el store
         if (response.success) {
-            actions.getProjects();  // Refresh the list after successful deletion
+            actions.getProjects();  // Refresca la lista después de la eliminación
         } else {
             alert(`Error: ${response.error}`);
         }
     };
-        
+
+    // Filtrado de los proyectos según los filtros aplicados
     const list = store.projects.filter(project => 
         (!store.filters || !store.filters.title || project.title === store.filters.title) &&
         (!store.filters || !store.filters.category || project.category === store.filters.category)

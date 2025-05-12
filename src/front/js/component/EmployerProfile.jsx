@@ -40,17 +40,17 @@ const EmployerProfile = () => {
     const [comment, setComment] = useState("");
 
     useEffect(() => {
-        const userId = localStorage.getItem("user_id");
-        if (!userId) {
-            console.error("No hay user_id en localStorage.");
-            setLoading(false);
-            return;
-        }
+    const userId = localStorage.getItem("user_id");
+    if (!userId) {
+        console.error("No hay user_id en localStorage.");
+        setLoading(false);
+        return;
+    }
 
-        const loadAll = async () => {
-            // Perfil
+    const loadAll = async () => {
+        try {
             const profileRes = await actions.getEmployerProfile(userId);
-            if (profileRes.success) {
+            if (profileRes.success && profileRes.profile) {
                 setProfile(profileRes.profile);
                 const stored = localStorage.getItem("profile_picture");
                 setProfileImage(
@@ -59,34 +59,22 @@ const EmployerProfile = () => {
                     undefinedImg
                 );
             } else {
-                navigate("/employerForm");
-                return;
+                console.warn("Perfil de empleador no configurado.");
+                setProfile(null);
             }
 
-            // Estadísticas
             const statsRes = await actions.getEmployerStats();
-            if (statsRes.success) {
-                setStats(statsRes.stats);
-            }
+            if (statsRes.success) setStats(statsRes.stats);
 
-            // Ofertas de trabajo activas
             const projRes = await actions.getEmployerProjects();
-            if (projRes.success) {
-                setOffers(projRes.projects);
-            }
+            if (projRes.success) setOffers(projRes.projects);
 
-            // Solicitudes
             const propsRes = await actions.getEmployerProposals(userId);
-            if (propsRes.success) {
-                setProposals(propsRes.proposals);
-            }
+            if (propsRes.success) setProposals(propsRes.proposals);
 
             const completedRes = await actions.getCompletedProjects();
-            if (completedRes.success) {
-                setCompletedProjects(completedRes.projects);
-            }
+            if (completedRes.success) setCompletedProjects(completedRes.projects);
 
-            // Skills
             const skillsRes = await actions.getSkills();
             if (skillsRes.success) {
                 setAvailableSkills(
@@ -94,11 +82,16 @@ const EmployerProfile = () => {
                 );
             }
 
+        } catch (error) {
+            console.error("Error inesperado al cargar datos:", error);
+        } finally {
             setLoading(false);
-        };
+        }
+    };
 
-        loadAll();
-    }, [actions, navigate]);
+    loadAll();
+}, []); 
+
 
     const handleEditProfile = () => navigate("/employerForm");
 
@@ -175,8 +168,20 @@ const EmployerProfile = () => {
 
     if (loading)
         return <div className="text-center mt-5">Cargando perfil...</div>;
-    if (!profile)
-        return <div className="text-center mt-5">Perfil no encontrado.</div>;
+    if (!profile) {
+        return (
+            <div className="text-center mt-5">
+                <p>Tu perfil de empleador no está configurado aún.</p>
+                <button
+                    className="btn btn-primary"
+                    onClick={() => navigate("/employerForm")}
+                >
+                    Crear perfil
+                </button>
+            </div>
+        );
+    }
+
 
     const fullName = `${profile.user?.first_name} ${profile.user?.last_name}`;
 
@@ -459,7 +464,7 @@ const EmployerProfile = () => {
                         </div>
                     )}
                 </div>
-                
+
                 <div className="col-auto d-flex flex-column gap-3 align-items-end">
                     {[
                         { label: "Trabajos publicados", value: stats.offers },
