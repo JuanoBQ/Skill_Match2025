@@ -1,4 +1,4 @@
-const BASE_URL = "https://automatic-space-chainsaw-jjr9g9qr5wg4fjqgg-3001.app.github.dev/api";
+const BASE_URL = "https://ubiquitous-xylophone-pj7969p7rxxg397rw-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
