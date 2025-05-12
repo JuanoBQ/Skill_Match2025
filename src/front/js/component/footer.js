@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-
+import { Context } from "../store/appContext";  
 export const Footer = () => {
+    const { store } = useContext(Context);
+
     return (
         <footer className="footer-section bg-dark text-light py-4 mt-5">
             <div className="container">
                 <div className="row align-items-center">
+
                     {/* Logo y nombre */}
                     <div className="col-md-4 text-center text-md-start mb-3 mb-md-0">
                         <h4 className="mb-0 text-white">SkillMatch</h4>
@@ -24,9 +27,11 @@ export const Footer = () => {
                             <li className="nav-item">
                                 <Link className="nav-link text-light" to="/dashboardFreelancer">Freelancers</Link>
                             </li>
-                            <li className="nav-item">
-                                <Link className="nav-link text-light" to="/admin">Admin</Link>
-                            </li>
+                            {store.role === "admin" && (
+                                <li className="nav-item">
+                                    <Link className="nav-link text-light" to="/admin">Admin</Link>
+                                </li>
+                            )}
                         </ul>
                     </div>
 

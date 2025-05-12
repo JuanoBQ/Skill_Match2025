@@ -9,7 +9,7 @@ const ProjectDetails = () => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const res = await fetch(`https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api/projects/${id}`);
+        const res = await fetch(`https://reimagined-space-meme-4j7jxp7v94pqhpwq-3001.app.github.dev/api/projects/${id}`);
         const data = await res.json();
 
         if (res.ok) {

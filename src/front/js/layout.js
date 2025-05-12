@@ -1,7 +1,9 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
+import { useContext } from "react";
+import { Context } from "./store/appContext";
+
 
 import Home from "./pages/home";
 import { Demo } from "./pages/demo";
@@ -28,12 +30,17 @@ import SearchResults from "./component/SearchResults.jsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import ProjectDetails from "./component/ProjectDetails.jsx";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+
 
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, { link: false });
 
 
 const Layout = () => {
+    const { store } = useContext(Context);
+
+
     const basename = process.env.BASENAME || "";
 
     if (!process.env.BACKEND_URL || process.env.BACKEND_URL === "") {
@@ -60,7 +67,11 @@ const Layout = () => {
                         <Route element={<DashboardProjects />} path="/DashboardProjects" />
                         <Route element={<Dashboard />} path="/Dashboard" />               
                         <Route element={<EmployerForm />} path="/employerForm" />
-                        <Route element={<Admin />} path="/admin" />
+                        <Route
+                            path="/admin"
+                            element={store.role === "admin" ? <Admin /> : <Navigate to="/" replace />}
+                        />
+
                         <Route path="*" element={<h1>Not found!</h1>} />
                   
                         <Route element={<SearchResults />} path="/search" />
