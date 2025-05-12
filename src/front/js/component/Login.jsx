@@ -3,7 +3,7 @@ import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const { actions } = useContext(Context); // ⬅️ No necesitas store aquí
+  const { actions } = useContext(Context);
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -21,7 +21,8 @@ const Login = () => {
     const response = await actions.login(email, password);
 
     if (response.success) {
-      navigate('/'); // 
+      sessionStorage.setItem("showLoginAlert", "true");
+      navigate('/');
     } else {
       setError(response.error);
     }

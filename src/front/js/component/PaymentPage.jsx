@@ -24,6 +24,11 @@ const PaymentPage = () => {
     const [clientSecret, setClientSecret] = useState(null);
     const [paymentId, setPaymentId] = useState(null);
     const [payLoading, setPayLoading] = useState(false);
+    const [alertInfo, setAlertInfo] = useState({
+        show: false,        // si se muestra o no
+        type: "",           // 'success' | 'danger' | 'warning' ...
+        message: ""         // texto a mostrar
+    });
 
     useEffect(() => {
         const fetchProposal = async () => {
@@ -79,36 +84,47 @@ const PaymentPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!stripe || !elements || !clientSecret) return;
+
         setPayLoading(true);
-
-        const cardNumberElement = elements.getElement(CardNumberElement);
-        if (!cardNumberElement) {
-            alert("El campo de tarjeta no se ha montado correctamente.");
-            setPayLoading(false);
-            return;
-        }
-
-        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: cardNumberElement
-            }
-        });
-
-        if (error) {
-            alert("Error al procesar la tarjeta: " + error.message);
-        } else if (paymentIntent && paymentIntent.status === "succeeded") {
-            await fetch(`${BASE_URL}/payments/${paymentId}/complete`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem("token")
+        try {
+            const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: elements.getElement(CardNumberElement)
                 }
             });
-            alert("¡Pago exitoso y status actualizado!");
-            navigate("/employerProfile");
-        }
 
-        setPayLoading(false);
+            if (error) {
+                setAlertInfo({
+                    show: true,
+                    type: "danger",
+                    message: "Error al procesar la tarjeta: " + error.message
+                });
+            } else if (paymentIntent?.status === "succeeded") {
+                await fetch(`${BASE_URL}/payments/${paymentId}/complete`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem("token")
+                    }
+                });
+                setAlertInfo({
+                    show: true,
+                    type: "success",
+                    message: "¡Pago exitoso y status actualizado!"
+                });
+                // opcional: redirige con un pequeño delay para que lean la alerta
+                setTimeout(() => navigate("/employerProfile"), 5000);
+            }
+        } catch (err) {
+            console.error(err);
+            setAlertInfo({
+                show: true,
+                type: "danger",
+                message: "Ocurrió un error inesperado."
+            });
+        } finally {
+            setPayLoading(false);
+        }
     };
 
     if (loading) {
@@ -120,6 +136,21 @@ const PaymentPage = () => {
 
     return (
         <div className="container mt-5">
+            {alertInfo.show && (
+                <div
+                    className={`alert alert-${alertInfo.type} alert-dismissible fade show mx-auto`}
+                    style={{ maxWidth: "600px" }}
+                    role="alert"
+                >
+                    {alertInfo.message}
+                    <button
+                        type="button"
+                        className="btn-close"
+                        aria-label="Close"
+                        onClick={() => setAlertInfo({ ...alertInfo, show: false })}
+                    />
+                </div>
+            )}
             <h2 className="text-center mb-5">Resumen de Pago</h2>
 
             <div className="row gx-4">

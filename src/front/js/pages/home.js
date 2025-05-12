@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../../styles/home.css";
 import 'animate.css';
@@ -12,9 +12,29 @@ import Empresa4 from "./../../img/Empresas/Empresa 4.png"
 import Empresa5 from "./../../img/Empresas/Empresa 5.png"
 
 const Home = () => {
+	const [showAlert, setShowAlert] = useState(false);
+	useEffect(() => {
+		if (sessionStorage.getItem("showLoginAlert") === "true") {
+			setShowAlert(true);
+			sessionStorage.removeItem("showLoginAlert");
+		}
+	}, []);
 	return (
 		<div className="animate__animated animate__fadeIn">
-			{/* Hero Banner Section */}
+			{showAlert && (
+				<div
+					className="alert alert-success alert-dismissible fade show mx-3 mt-3"
+					role="alert"
+				>
+					<strong>¡Bienvenido a SkillMatch!</strong> Has iniciado sesión con éxito.
+					<button
+						type="button"
+						className="btn-close"
+						aria-label="Close"
+						onClick={() => setShowAlert(false)}
+					></button>
+				</div>
+			)}
 			<section className="hero-section">
 				<div className="container">
 					<div className="row">
@@ -23,7 +43,7 @@ const Home = () => {
 							<p className="hero-subtitle">
 								Contrata a los mejores freelancers para cualquier trabajo, en línea.
 							</p>
-							
+
 							<div className="popular-searches">
 								<span>Popular:</span>
 								<Link to="#">Desarrollo Web</Link>
