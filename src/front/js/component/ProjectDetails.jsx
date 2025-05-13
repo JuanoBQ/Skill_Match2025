@@ -9,7 +9,7 @@ const ProjectDetails = () => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const res = await fetch(`https://glowing-umbrella-69vwpw4vg6pwcrwqp-3001.app.github.dev/api/projects/${id}`);
+        const res = await fetch(`https://expert-space-potato-jj5jxp57pj5rcqw5q-3001.app.github.dev/api/projects/${id}`);
         const data = await res.json();
 
         if (res.ok) {

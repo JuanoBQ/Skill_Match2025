@@ -5,7 +5,6 @@ const MyUsersList = () => {
     const { store, actions } = useContext(Context);
     const [loading, setLoading] = useState(true);
 
-    // Cargar usuarios y proyectos al montar el componente
     useEffect(() => {
         const loadData = async () => {
             try {
@@ -14,7 +13,7 @@ const MyUsersList = () => {
             } catch (error) {
                 console.error("Error al cargar datos:", error);
             } finally {
-                setLoading(false); // ✅ solo cuando todo terminó
+                setLoading(false);
             }
         };
         loadData();
@@ -28,9 +27,21 @@ const MyUsersList = () => {
         if (!result.success) {
             alert("Error eliminando usuario: " + result.error);
         } else {
-            // ✅ Actualiza los datos luego de eliminar
             await actions.getUsers();
             await actions.getProjects();
+        }
+    };
+
+    const getRoleBadgeClass = (role) => {
+        switch (role) {
+            case "freelancer":
+                return "badge bg-primary";
+            case "employer":
+                return "badge bg-success";
+            case "admin":
+                return "badge bg-secondary";
+            default:
+                return "badge bg-light text-dark";
         }
     };
 
@@ -49,32 +60,24 @@ const MyUsersList = () => {
             {userList.length > 0 ? (
                 <div>
                     {userList.map((user) => (
-                        <div key={user.id}>
-                            <div className="d-flex">
-                                <div className="card text-bg-secondary mb-4 col-10">
-                                    <div className="card-body">
-                                        <h5 className="card-title mb-0">{user.first_name} {user.last_name}</h5>
-                                        <p className="card-text">{user.email}</p>
+                        <div key={user.id} className="d-flex align-items-center mb-3">
+                            <div className="card col-10 px-3 py-2" style={{ backgroundColor: "#f8f9fa", borderRadius: "10px" }}>
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 className="mb-0">{user.first_name} {user.last_name}</h6>
+                                        <small className="text-muted">{user.email}</small><br />
+                                        <span className={`${getRoleBadgeClass(user.role)} mt-1`}>{user.role}</span>
                                     </div>
                                 </div>
-                                <div className="d-flex flex-column ms-3">
-                                    <button 
-                                        type="button" 
-                                        className="btn btn-outline-danger pt-2" 
-                                        style={{ height: "2.3rem", marginBottom: "0.5rem" }}
-                                    >
-                                        <i className="fa-solid fa-flag fa-lg"></i>
-                                    </button>
-                                    <button 
-                                        type="button" 
-                                        className="btn btn-outline-danger" 
-                                        style={{ height: "2.3rem" }}
-                                        onClick={() => handleDeleteUser(user.id)}
-                                    >
-                                        <i className="fa-solid fa-trash fa-lg"></i>
-                                    </button>
-                                </div>
                             </div>
+                            <button
+                                type="button"
+                                className="btn btn-outline-danger ms-2"
+                                style={{ height: "2.5rem" }}
+                                onClick={() => handleDeleteUser(user.id)}
+                            >
+                                <i className="fa-solid fa-trash"></i>
+                            </button>
                         </div>
                     ))}
                 </div>

@@ -1,4 +1,4 @@
-const BASE_URL = "https://glowing-umbrella-69vwpw4vg6pwcrwqp-3001.app.github.dev/api";
+const BASE_URL = "https://expert-space-potato-jj5jxp57pj5rcqw5q-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
