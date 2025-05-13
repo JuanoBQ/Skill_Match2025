@@ -37,7 +37,7 @@ const FreelancerProfile = () => {
 
     const loadAll = async () => {
 
-      
+
       const profileRes = await actions.getFreelancerProfile(userId);
       if (profileRes.success) {
         setProfile(profileRes.profile);
@@ -53,7 +53,7 @@ const FreelancerProfile = () => {
 
       setProfile(profileRes.profile);
 
-      
+
       const respProps = await actions.getFreelancerCompletedProposals(userId);
       if (respProps.success) {
         setCompletedProposals(respProps.proposals);
@@ -88,7 +88,7 @@ const FreelancerProfile = () => {
     setModalOpen(true);
   };
 
-  
+
   const submitReview = async () => {
     const payload = {
       proposal_id: currentProposal.id,
@@ -98,13 +98,13 @@ const FreelancerProfile = () => {
     };
     const resp = await actions.createReview(payload);
     if (resp.success) {
-     
+
       setCompletedProposals((prev) =>
         prev.map((p) =>
           p.id === currentProposal.id ? { ...p, reviewed: true } : p
         )
       );
-      
+
       setProfile((p) => ({ ...p, rating: resp.data.new_average }));
       setModalOpen(false);
     } else {
@@ -186,6 +186,33 @@ const FreelancerProfile = () => {
 
             </div>
           </div>
+
+          {profile.reviews && profile.reviews.length > 0 && (
+            <div className="mt-5">
+              <h5 className="fw-bold">Reseñas de clientes</h5>
+              <ul className="list-group">
+                {profile.reviews.map(r => (
+                  <li key={r.id} className="list-group-item">
+                    <div className="d-flex align-items-center">
+                      <img src={r.reviewer.profile_picture}
+                        alt={`${r.reviewer.first_name}`}
+                        className="rounded-circle me-3"
+                        style={{ width: 40, height: 40, objectFit: 'cover' }} />
+                      <div>
+                        <strong>{r.reviewer.first_name} {r.reviewer.last_name}</strong>
+                        <span className="ms-2 text-warning">
+                          {'★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)}
+                        </span>
+                      </div>
+                    </div>
+                    {r.comment && <p className="mt-2 mb-0">{r.comment}</p>}
+                    <small className="text-muted">{new Date(r.created_at).toLocaleDateString()}</small>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
 
           <div className="mt-4">
             <details>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
+import { Modal, Button } from "react-bootstrap";
 
 const ProjectDetails = () => {
   const { store, actions } = useContext(Context);
@@ -9,6 +10,7 @@ const ProjectDetails = () => {
   const [project, setProject] = useState(null);
   const [proposalMessage, setProposalMessage] = useState("");
   const [proposedBudget, setProposedBudget] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -44,10 +46,9 @@ const ProjectDetails = () => {
     });
 
     if (res.success) {
-      alert("Aplicaste exitosamente a la oferta.");
       setProposalMessage("");
       setProposedBudget("");
-      window.location.reload();
+      setShowSuccessModal(true);
     } else {
       alert("Error al aplicar: " + res.error);
     }
@@ -153,6 +154,31 @@ const ProjectDetails = () => {
         )}
 
       </div>
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Body className="text-center py-5">
+          <i
+            className="bi bi-check-circle-fill text-success"
+            style={{ fontSize: '4rem' }}
+          ></i>
+          <h4 className="mt-3">¡Solicitud Enviada!</h4>
+          <p className="text-muted">
+            Has aplicado con éxito a esta oferta.
+          </p>
+          <Button
+            variant="success"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate(-1);
+            }}
+          >
+            Aceptar
+          </Button>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

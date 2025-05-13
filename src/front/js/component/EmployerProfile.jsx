@@ -40,53 +40,53 @@ const EmployerProfile = () => {
     const [comment, setComment] = useState("");
 
     useEffect(() => {
-    const userId = localStorage.getItem("user_id");
-    if (!userId) {
-        console.error("No hay user_id en localStorage.");
-        setLoading(false);
-        return;
-    }
-
-    const loadAll = async () => {
-        try {
-            const profileRes = await actions.getEmployerProfile(userId);
-            if (profileRes.success && profileRes.profile) {
-                setProfile(profileRes.profile);
-                const stored = localStorage.getItem("profile_picture");
-                setProfileImage(
-                    profileRes.profile.profile_picture ||
-                    undefinedImg
-                );
-            } else {
-                console.warn("Perfil de empleador no configurado.");
-                setProfile(null);
-            }
-
-            const statsRes = await actions.getEmployerStats();
-            if (statsRes.success) setStats(statsRes.stats);
-
-            const projRes = await actions.getEmployerProjects();
-            if (projRes.success) setOffers(projRes.projects);
-
-            const propsRes = await actions.getEmployerProposals(userId);
-            if (propsRes.success) setProposals(propsRes.proposals);
-
-            const completedRes = await actions.getCompletedProjects();
-            if (completedRes.success) setCompletedProjects(completedRes.projects);
-
-            const skillsRes = await actions.getSkills();
-            if (skillsRes.success) {
-                setAvailableSkills(
-                    skillsRes.skills.map((s) => ({ value: s.id, label: s.name }))
-                );
-            }
-
-        } catch (error) {
-            console.error("Error inesperado al cargar datos:", error);
-        } finally {
+        const userId = localStorage.getItem("user_id");
+        if (!userId) {
+            console.error("No hay user_id en localStorage.");
             setLoading(false);
+            return;
         }
-    };
+
+        const loadAll = async () => {
+            try {
+                const profileRes = await actions.getEmployerProfile(userId);
+                if (profileRes.success && profileRes.profile) {
+                    setProfile(profileRes.profile);
+                    const stored = localStorage.getItem("profile_picture");
+                    setProfileImage(
+                        profileRes.profile.profile_picture ||
+                        undefinedImg
+                    );
+                } else {
+                    console.warn("Perfil de empleador no configurado.");
+                    setProfile(null);
+                }
+
+                const statsRes = await actions.getEmployerStats();
+                if (statsRes.success) setStats(statsRes.stats);
+
+                const projRes = await actions.getEmployerProjects();
+                if (projRes.success) setOffers(projRes.projects);
+
+                const propsRes = await actions.getEmployerProposals(userId);
+                if (propsRes.success) setProposals(propsRes.proposals);
+
+                const completedRes = await actions.getCompletedProjects();
+                if (completedRes.success) setCompletedProjects(completedRes.projects);
+
+                const skillsRes = await actions.getSkills();
+                if (skillsRes.success) {
+                    setAvailableSkills(
+                        skillsRes.skills.map((s) => ({ value: s.id, label: s.name }))
+                    );
+                }
+
+            } catch (error) {
+                console.error("Error inesperado al cargar datos:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
         loadAll();
     }, []);
@@ -142,7 +142,7 @@ const EmployerProfile = () => {
         setModalOpen(true);
     };
 
-    
+
     const submitReview = async () => {
         const payload = {
             proposal_id: currentProposal.id,
@@ -152,7 +152,7 @@ const EmployerProfile = () => {
         };
         const resp = await actions.createReview(payload);
         if (resp.success) {
-            
+
             setProposals((prev) =>
                 prev.map((p) =>
                     p.id === currentProposal.id ? { ...p, reviewed: true } : p
@@ -240,6 +240,32 @@ const EmployerProfile = () => {
                             </div>
                         </div>
                     </div>
+
+                    {profile.reviews && profile.reviews.length > 0 && (
+                        <div className="mt-5">
+                            <h5 className="fw-bold">Reseñas de clientes</h5>
+                            <ul className="list-group">
+                                {profile.reviews.map(r => (
+                                    <li key={r.id} className="list-group-item">
+                                        <div className="d-flex align-items-center">
+                                            <img src={r.reviewer.profile_picture}
+                                                alt={`${r.reviewer.first_name}`}
+                                                className="rounded-circle me-3"
+                                                style={{ width: 40, height: 40, objectFit: 'cover' }} />
+                                            <div>
+                                                <strong>{r.reviewer.first_name} {r.reviewer.last_name}</strong>
+                                                <span className="ms-2 text-warning">
+                                                    {'★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {r.comment && <p className="mt-2 mb-0">{r.comment}</p>}
+                                        <small className="text-muted">{new Date(r.created_at).toLocaleDateString()}</small>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
 
                     <div className="d-flex justify-content-center gap-3 mt-5 mb-4">

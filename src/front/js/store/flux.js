@@ -1,4 +1,4 @@
-const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
+const BASE_URL = "https://automatic-space-trout-r47wxwp7gq44fp9jv-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -123,38 +123,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const res = await fetch(`${BASE_URL}/freelancer/profile?user_id=${userId}`);
 					const data = await res.json();
+					if (!res.ok) return { success: false, error: data.msg };
 
-					if (res.ok) {
-						return { success: true, profile: data };
-					} else {
-						return { success: false, error: data.msg };
-					}
-				} catch (error) {
+					return { success: true, profile: data };
+				} catch {
 					return { success: false, error: "Error al obtener perfil de freelancer" };
 				}
 			},
 
 			getEmployerProfile: async (userId) => {
 				try {
-					const token = localStorage.getItem("token");
-					const res = await fetch(
-						`${BASE_URL}/employer/profile?user_id=${userId}`,
-						{
-							headers: {
-								"Content-Type": "application/json",
-								"Authorization": `Bearer ${token}`
-							}
-						}
-					);
-
+					const res = await fetch(`${BASE_URL}/employer/profile?user_id=${userId}`);
 					const data = await res.json();
+					if (!res.ok) return { success: false, error: data.msg };
 
-					if (res.ok) {
-						return { success: true, profile: data };
-					} else {
-						return { success: false, error: data.msg };
-					}
-				} catch (error) {
+					return { success: true, profile: data };
+				} catch {
 					return { success: false, error: "Error al obtener perfil de employer" };
 				}
 			},

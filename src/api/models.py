@@ -308,6 +308,20 @@ class Review(db.Model):
     reviewee = relationship("User", foreign_keys=[reviewee_id])
     proposal = relationship("Proposal", back_populates="reviews")
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "rating": self.rating,
+            "comment": self.comment,
+            "created_at": self.created_at.isoformat(),
+            "reviewer": {
+                "id": self.reviewer.id,
+                "first_name": self.reviewer.first_name,
+                "last_name": self.reviewer.last_name,
+                "profile_picture": getattr(self.reviewer.profile, "profile_picture", None)
+            }
+        }
+
 
 class Contact(db.Model):
     __tablename__ = "contacts"

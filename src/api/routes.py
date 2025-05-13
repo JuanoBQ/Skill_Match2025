@@ -187,6 +187,13 @@ def get_freelancer_profile():
                 "name": fs.skill.name
             })
 
+    reviews = Review.query \
+        .filter_by(reviewee_id=int(user_id)) \
+        .order_by(Review.created_at.desc()) \
+        .all()
+
+    freelancer_data["reviews"] = [r.serialize() for r in reviews]
+
     return jsonify(freelancer_data), 200
 
 
@@ -634,16 +641,16 @@ def complete_payment(payment_id):
 @routes.route('/employer/profile', methods=['GET'])
 def get_employer_profile():
     user_id = request.args.get('user_id')
-
     if not user_id:
         return jsonify({"msg": "No se proporcionó user_id"}), 400
 
-    profile = Profile.query.options(joinedload(Profile.user)).filter_by(user_id=user_id).first()
-
+    profile = Profile.query.options(
+        joinedload(Profile.user)
+    ).filter_by(user_id=user_id).first()
     if not profile:
         return jsonify({"msg": "Perfil no encontrado"}), 404
 
-    return jsonify({
+    response_data = {
         "id": profile.id,
         "bio": profile.bio,
         "profile_picture": profile.profile_picture,
@@ -656,7 +663,16 @@ def get_employer_profile():
             "last_name": profile.user.last_name,
             "email": profile.user.email
         }
-    }), 200
+    }
+
+    reviews = Review.query \
+        .filter_by(reviewee_id=int(user_id)) \
+        .order_by(Review.created_at.desc()) \
+        .all()
+
+    response_data["reviews"] = [r.serialize() for r in reviews]
+
+    return jsonify(response_data), 200
 
 
 @routes.route('/employer/profile', methods=['POST'])
@@ -665,7 +681,6 @@ def create_employer_profile():
     data = request.get_json()
     user_id = int(get_jwt_identity())
 
-    # No permitimos crear si ya existe
     if Profile.query.filter_by(user_id=user_id).first():
         return jsonify({"msg": "El perfil ya existe"}), 400
 
