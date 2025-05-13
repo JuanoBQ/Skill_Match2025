@@ -969,6 +969,8 @@ def delete_user(user_id):
     user = User.query.get(user_id)
     if not user:
         return jsonify({"msg": "Usuario no encontrado"}), 404
+    
+    
 
     db.session.delete(user)
     db.session.commit()

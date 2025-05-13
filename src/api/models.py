@@ -34,6 +34,22 @@ class User(db.Model):
         "Review", foreign_keys="[Review.reviewer_id]", back_populates="reviewer")
     reviews_received: Mapped[List["Review"]] = relationship(
         "Review", foreign_keys="[Review.reviewee_id]", back_populates="reviewee")
+    
+    my_contacts: Mapped[List["Contact"]] = relationship(
+        "Contact",
+        foreign_keys="[Contact.user_id]",
+        cascade="all, delete-orphan",
+        back_populates="user",
+        overlaps="contacted_by"
+    )
+
+    contacted_by: Mapped[List["Contact"]] = relationship(
+        "Contact",
+        foreign_keys="[Contact.contact_id]",
+        cascade="all, delete-orphan",
+        back_populates="contact",
+        overlaps="my_contacts"
+    )
 
 
     def __repr__(self):
@@ -316,8 +332,6 @@ class Review(db.Model):
                 "profile_picture": getattr(self.reviewer.profile, "profile_picture", None)
             }
         }
-
-
 class Contact(db.Model):
     __tablename__ = "contacts"
 
@@ -326,11 +340,13 @@ class Contact(db.Model):
     contact_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    user: Mapped["User"] = relationship("User", foreign_keys=[user_id], backref="my_contacts")
-    contact: Mapped["User"] = relationship("User", foreign_keys=[contact_id], backref="contacted_by")
+    user: Mapped["User"] = relationship(
+        "User", foreign_keys=[user_id], back_populates="my_contacts", overlaps="contacted_by"
+    )
+    contact: Mapped["User"] = relationship(
+        "User", foreign_keys=[contact_id], back_populates="contacted_by", overlaps="my_contacts"
+    )
 
-    def __repr__(self):
-        return f"<Contact(user_id={self.user_id}, contact_id={self.contact_id})>"
     
 
 class Message(db.Model):

@@ -30,60 +30,105 @@ const FreelancerProfile = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatOtherId, setChatOtherId] = useState(null);
   const [chatOtherName, setChatOtherName] = useState("");
+  const [profileNotFound, setProfileNotFound] = useState(false);
+  // useEffect(() => {
+  //   const userId = localStorage.getItem("user_id");
+  //   if (!userId) {
+  //     console.error("No hay user_id en localStorage.");
+  //     setLoading(false);
+  //     return;
+  //   }
 
+  //   const loadAll = async () => {
+
+
+  //     const profileRes = await actions.getFreelancerProfile(userId);
+  //     if (profileRes.success) {
+  //       setProfile(profileRes.profile);
+  //       const stored = localStorage.getItem("profile_picture");
+  //       setProfileImage(
+  //         profileRes.profile.profile_picture ||
+  //         undefinedImg
+  //       );
+  //     } else {
+  //       navigate("/freelancerForm");
+  //       return;
+  //     }
+
+  //     setProfile(profileRes.profile);
+
+
+  //     const respProps = await actions.getFreelancerCompletedProposals(userId);
+  //     if (respProps.success) {
+  //       setCompletedProposals(respProps.proposals);
+  //     }
+
+  //     const respSent = await actions.getFreelancerSentProposals(userId);
+  //     console.log("🚀 solicitudes enviadas del API:", respSent);
+  //     if (respSent.success) {
+  //       setSentProposals(respSent.proposals);
+  //     }
+
+  //     const completedRes = await actions.getCompletedProjects();
+  //     if (completedRes.success) {
+  //       setCompletedProjects(completedRes.projects);
+  //     }
+
+  //     const statsRes = await actions.getEmployerStats();
+  //     if (statsRes.success) {
+  //       setStats(statsRes.stats);
+  //     }
+
+  //     setLoading(false);
+  //   };
+
+  //   loadAll();
+  // }, [actions, navigate]);
   useEffect(() => {
-    const userId = localStorage.getItem("user_id");
-    if (!userId) {
-      console.error("No hay user_id en localStorage.");
-      setLoading(false);
+  const userId = localStorage.getItem("user_id");
+  if (!userId || profileNotFound) {
+    setLoading(false);
+    return;
+  }
+
+  const loadAll = async () => {
+    const profileRes = await actions.getFreelancerProfile(userId);
+    if (profileRes.success) {
+      setProfile(profileRes.profile);
+      setProfileImage(
+        profileRes.profile.profile_picture || undefinedImg
+      );
+    } else {
+      setProfileNotFound(true);
       return;
     }
 
-    const loadAll = async () => {
+    const respProps = await actions.getFreelancerCompletedProposals(userId);
+    if (respProps.success) {
+      setCompletedProposals(respProps.proposals);
+    }
 
+    const respSent = await actions.getFreelancerSentProposals(userId);
+    if (respSent.success) {
+      setSentProposals(respSent.proposals);
+    }
 
-      const profileRes = await actions.getFreelancerProfile(userId);
-      if (profileRes.success) {
-        setProfile(profileRes.profile);
-        const stored = localStorage.getItem("profile_picture");
-        setProfileImage(
-          profileRes.profile.profile_picture ||
-          undefinedImg
-        );
-      } else {
-        navigate("/freelancerForm");
-        return;
-      }
+    const completedRes = await actions.getCompletedProjects();
+    if (completedRes.success) {
+      setCompletedProjects(completedRes.projects);
+    }
 
-      setProfile(profileRes.profile);
+    const statsRes = await actions.getEmployerStats();
+    if (statsRes.success) {
+      setStats(statsRes.stats);
+    }
 
+    setLoading(false);
+  };
 
-      const respProps = await actions.getFreelancerCompletedProposals(userId);
-      if (respProps.success) {
-        setCompletedProposals(respProps.proposals);
-      }
+  loadAll();
+}, [actions, navigate, profileNotFound]);
 
-      const respSent = await actions.getFreelancerSentProposals(userId);
-      console.log("🚀 solicitudes enviadas del API:", respSent);
-      if (respSent.success) {
-        setSentProposals(respSent.proposals);
-      }
-
-      const completedRes = await actions.getCompletedProjects();
-      if (completedRes.success) {
-        setCompletedProjects(completedRes.projects);
-      }
-
-      const statsRes = await actions.getEmployerStats();
-      if (statsRes.success) {
-        setStats(statsRes.stats);
-      }
-
-      setLoading(false);
-    };
-
-    loadAll();
-  }, [actions, navigate]);
 
   const handleOpenReview = (proposal) => {
     setCurrentProposal(proposal);
