@@ -17,7 +17,7 @@ export const ContactUs = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Aquí podrías integrar una API o lógica para enviar el formulario
+        
         console.log('Formulario enviado:', formData);
         alert('Gracias por contactarnos. Te responderemos pronto.');
         setFormData({ name: '', email: '', message: '' });

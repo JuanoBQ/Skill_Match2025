@@ -34,7 +34,7 @@ export const Dashboard = () => {
 
         loadProfile();
 
-    }, [actions, store.isAuthenticated, store.contacts]);
+    }, [actions, store.isAuthenticated]);
 
 
     const fullName = profile?.user
@@ -48,27 +48,32 @@ export const Dashboard = () => {
                 <div className="col-lg-8 ms-5 mb-4">
                     <div className="d-flex">
                         <div className="container-fluid mb-4 mx-3 mt-5">
-                            <div style={{
-                                width: "100%",
-                                height: "23rem",
-                                minHeight: "18rem",
-                                borderRadius: "12px",
-                                overflow: "hidden",
-                                boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center"
-                            }}>
+                            <div
+                                style={{
+                                    width: "100%",
+                                    height: "23rem",
+                                    minHeight: "18rem",
+                                    borderRadius: "12px",
+                                    overflow: "hidden",
+                                    boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    backgroundColor: "#003362"
+                                }}
+                            >
                                 <img
                                     src={banner}
                                     alt="Banner"
                                     style={{
                                         width: "100%",
                                         height: "100%",
-                                        objectFit: "cover"
+                                        objectFit: "contain", 
+                                        objectPosition: "center",
                                     }}
                                 />
                             </div>
+
 
                         </div>
                     </div>
@@ -91,7 +96,7 @@ export const Dashboard = () => {
                                 </div>
                             </div>
                             <div className="card-body ms-3">
-                                <h5 className="text-dark">Contactos: {store.contacts? store.contacts.length : "0"} </h5>
+                                <h5 className="text-dark">Contactos: {store.contacts ? store.contacts.length : "0"} </h5>
                             </div>
                         </div>
                     )}

@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext";
 
 const ProjectDetails = () => {
+  const { store, actions } = useContext(Context);
   const { id } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
+  const [proposalMessage, setProposalMessage] = useState("");
+  const [proposedBudget, setProposedBudget] = useState("");
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const res = await fetch(`https://glowing-umbrella-69vwpw4vg6pwcrwqp-3001.app.github.dev/api/projects/${id}`);
+        const res = await fetch(`${process.env.BACKEND_URL}/api/projects/${id}`);
         const data = await res.json();
 
         if (res.ok) {
@@ -25,6 +29,30 @@ const ProjectDetails = () => {
     fetchProject();
   }, [id]);
 
+  const handleApply = async () => {
+    if (!store.isAuthenticated) {
+      alert("Debes estar logueado como freelancer.");
+      navigate("/login");
+      return;
+    }
+
+    const res = await actions.createProposal({
+      project_id: project.id,
+      freelancer_id: store.userId,
+      message: proposalMessage,
+      proposed_budget: proposedBudget
+    });
+
+    if (res.success) {
+      alert("Aplicaste exitosamente a la oferta.");
+      setProposalMessage("");
+      setProposedBudget("");
+      window.location.reload();
+    } else {
+      alert("Error al aplicar: " + res.error);
+    }
+  };
+
   if (!project) {
     return <div className="text-center mt-5">Cargando proyecto...</div>;
   }
@@ -37,17 +65,14 @@ const ProjectDetails = () => {
         <h2 className="fw-bold text-primary mb-3">{project.title}</h2>
 
         <div className="mb-3">
-          <p className="text-dark">{project.description}</p>
+          <p className="text-dark"><strong>Descripción:</strong> {project.description}</p>
         </div>
 
         {employer && (
           <div className="mb-3">
-            <p className="text-muted mb-1">
-              <strong>Publicado por:</strong> {employer.first_name} {employer.last_name}
-            </p>
-            <p className="text-muted mb-0">
-              <strong>Email:</strong> {employer.email}
-            </p>
+            <p><strong>Publicado por:</strong> {employer.first_name} {employer.last_name}</p>
+            <p><strong>Email:</strong> {employer.email}</p>
+            <p><strong>Calificación:</strong> ⭐ {employer.rating}</p>
           </div>
         )}
 
@@ -55,22 +80,26 @@ const ProjectDetails = () => {
 
         <div className="row mb-3">
           <div className="col-md-4">
-            <p><strong>Presupuesto:</strong> ${project.budget}</p>
+            <p><strong>Presupuesto estimado:</strong> ${project.budget}</p>
           </div>
           <div className="col-md-4">
-            <p><strong>Estado:</strong> {project.status}</p>
+            <p><strong>Categoría:</strong> {project.category}</p>
           </div>
           <div className="col-md-4">
-            <p><strong>Fecha límite:</strong> {project.deadline ? new Date(project.deadline).toLocaleDateString() : "No especificada"}</p>
+            <p><strong>Ubicación:</strong> {project.location}</p>
           </div>
+        </div>
+
+        <div className="mb-3">
+          <p><strong>Fecha límite:</strong> {project.deadline ? new Date(project.deadline).toLocaleDateString() : "No especificada"}</p>
         </div>
 
         <div className="mb-4">
           <strong>Habilidades requeridas:</strong>
           <div className="mt-2">
             {project.skills.length > 0 ? (
-              project.skills.map((s, i) => (
-                <span key={i} className="badge bg-dark text-light me-2 mb-1">{s.name}</span>
+              project.skills.map(skill => (
+                <span key={skill.id} className="badge bg-dark text-light me-2 mb-1">{skill.name}</span>
               ))
             ) : (
               <span className="text-muted">No especificadas</span>
@@ -78,10 +107,51 @@ const ProjectDetails = () => {
           </div>
         </div>
 
-        <div className="d-flex flex-wrap gap-3 mt-4">
-          <button className="btn btn-outline-primary px-4">Enviar mensaje</button>
-          <button className="btn btn-secondary ms-auto" onClick={() => navigate(-1)}>Volver</button>
-        </div>
+        <hr />
+
+        {store.role === "freelancer" && (
+          project.proposals.some(proposal => proposal.freelancer_id === Number(store.userId)) ? (
+            <div className="alert alert-info fw-semibold">
+              Ya has aplicado a esta oferta. 🙌
+            </div>
+          ) : (
+            <div className="p-4 mt-4 rounded-3" style={{ backgroundColor: "#ffffff", boxShadow: "0 0 10px rgba(0,0,0,0.05)" }}>
+              <h5 className="fw-semibold mb-3 text-primary">Envía tu propuesta</h5>
+
+              <div className="mb-3">
+                <label htmlFor="proposalMessage" className="form-label fw-medium">Mensaje para el empleador</label>
+                <textarea
+                  id="proposalMessage"
+                  className="form-control"
+                  rows={4}
+                  placeholder="Escribe un mensaje claro y profesional..."
+                  value={proposalMessage}
+                  onChange={(e) => setProposalMessage(e.target.value)}
+                  style={{ borderRadius: "0.5rem" }}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="proposedBudget" className="form-label fw-medium">Presupuesto propuesto (USD)</label>
+                <input
+                  id="proposedBudget"
+                  type="number"
+                  className="form-control"
+                  placeholder="Ej: 250"
+                  value={proposedBudget}
+                  onChange={(e) => setProposedBudget(e.target.value)}
+                  style={{ borderRadius: "0.5rem" }}
+                />
+              </div>
+
+              <div className="d-flex gap-3">
+                <button className="btn btn-primary px-4" onClick={handleApply}>Aplicar a esta oferta</button>
+                <button className="btn btn-outline-secondary ms-auto" onClick={() => navigate(-1)}>Volver</button>
+              </div>
+            </div>
+          )
+        )}
+
       </div>
     </div>
   );

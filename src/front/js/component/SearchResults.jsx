@@ -94,7 +94,7 @@ const SearchResults = () => {
                   </div>
 
                   <button
-                    className="btn btn-info btn-sm w-100 mt-auto"
+                    className="btn btn-primary btn-sm w-100 mt-auto"
                     onClick={() => navigate(`/profile/${f.user.id}`)}
                   >
                     Ver perfil
@@ -159,7 +159,7 @@ const SearchResults = () => {
                   )}
 
                   <button
-                    className="btn btn-info btn-sm w-100 mt-auto"
+                    className="btn btn-primary btn-sm w-100 mt-auto"
                     
                     onClick={() => navigate(`/project/${p.id}`)}
                   >

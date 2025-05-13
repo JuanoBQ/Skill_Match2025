@@ -142,7 +142,7 @@ const EmployerProfile = () => {
         setModalOpen(true);
     };
 
-    // ——— Enviar review ———
+    
     const submitReview = async () => {
         const payload = {
             proposal_id: currentProposal.id,
@@ -152,7 +152,7 @@ const EmployerProfile = () => {
         };
         const resp = await actions.createReview(payload);
         if (resp.success) {
-            // marcar como calificado en la lista de proposals
+            
             setProposals((prev) =>
                 prev.map((p) =>
                     p.id === currentProposal.id ? { ...p, reviewed: true } : p

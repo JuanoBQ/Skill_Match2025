@@ -9,13 +9,13 @@ export const Footer = () => {
             <div className="container">
                 <div className="row align-items-center">
 
-                    {/* Logo y nombre */}
+                    
                     <div className="col-md-4 text-center text-md-start mb-3 mb-md-0">
                         <h4 className="mb-0 text-white">SkillMatch</h4>
                         <small>Conectando talento y oportunidades</small>
                     </div>
 
-                    {/* Menú de navegación */}
+                    
                     <div className="col-md-4 mb-3 mb-md-0">
                         <ul className="nav justify-content-center">
                             <li className="nav-item">
@@ -35,7 +35,7 @@ export const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Redes Sociales */}
+                   
                     <div className="col-md-4 text-center text-md-end">
                         <a href="#" className="text-light me-3">
                             <i className="fab fa-facebook fa-lg"></i>
@@ -51,7 +51,7 @@ export const Footer = () => {
 
                 <hr className="my-3" />
 
-                {/* Derechos de autor */}
+                
                 <div className="text-center small">
                     © {new Date().getFullYear()} SkillMatch. Todos los derechos reservados.
                 </div>

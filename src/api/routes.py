@@ -1001,17 +1001,17 @@ def get_contacts():
 @routes.route("/contacts", methods=["POST"])
 @jwt_required()
 def add_contact():
-    user_id = get_jwt_identity()  # Obtén el user_id del JWT
-    contact_id = request.json.get("contact_id")  # Obtén el ID del contacto a agregar
+    user_id = get_jwt_identity()  
+    contact_id = request.json.get("contact_id") 
 
     if not contact_id:
         return jsonify({"error": "No se proporcionó un ID de contacto"}), 400
 
-    # Evitar que un usuario se agregue a sí mismo como contacto
+    
     if user_id == contact_id:
         return jsonify({"error": "No puedes agregar a ti mismo como contacto"}), 400
 
-    # Verificar si el contacto ya existe
+    
     existing_contact = Contact.query.filter(
         (Contact.user_id == user_id) & (Contact.contact_id == contact_id)
     ).first()
@@ -1019,9 +1019,37 @@ def add_contact():
     if existing_contact:
         return jsonify({"message": "El contacto ya está en tu lista de contactos"}), 200
 
-    # Crear el nuevo contacto
+    
     new_contact = Contact(user_id=user_id, contact_id=contact_id)
     db.session.add(new_contact)
     db.session.commit()
 
     return jsonify({"message": "Contacto agregado correctamente"}), 201
+
+
+
+@routes.route("/contacts", methods=["DELETE"])
+@jwt_required()
+def delete_contact():
+    user_id = get_jwt_identity()
+    contact_id = request.json.get("contact_id")
+
+    if not contact_id:
+        return jsonify({"error": "No se proporcionó un ID de contacto"}), 400
+
+    if user_id == contact_id:
+        return jsonify({"error": "No puedes eliminar tu propio perfil como contacto"}), 400
+
+    # Buscar el contacto que se quiere eliminar
+    contact = Contact.query.filter(
+        (Contact.user_id == user_id) & (Contact.contact_id == contact_id)
+    ).first()
+
+    if not contact:
+        return jsonify({"error": "Contacto no encontrado"}), 404
+
+    # Eliminar el contacto
+    db.session.delete(contact)
+    db.session.commit()
+
+    return jsonify({"message": "Contacto eliminado correctamente"}), 200

@@ -5,7 +5,6 @@ const MyUsersList = () => {
     const { store, actions } = useContext(Context);
     const [loading, setLoading] = useState(true);
 
-    // Cargar usuarios y proyectos al montar el componente
     useEffect(() => {
         const loadData = async () => {
             try {
@@ -14,7 +13,7 @@ const MyUsersList = () => {
             } catch (error) {
                 console.error("Error al cargar datos:", error);
             } finally {
-                setLoading(false); // ✅ solo cuando todo terminó
+                setLoading(false); 
             }
         };
         loadData();
@@ -28,7 +27,7 @@ const MyUsersList = () => {
         if (!result.success) {
             alert("Error eliminando usuario: " + result.error);
         } else {
-            // ✅ Actualiza los datos luego de eliminar
+           
             await actions.getUsers();
             await actions.getProjects();
         }

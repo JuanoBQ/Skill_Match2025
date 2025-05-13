@@ -34,7 +34,7 @@ const Register = () => {
     e.preventDefault();
     const { firstName, lastName, email, password, confirmPassword, role } = formData;
 
-    // Validaciones
+    
     if (!firstName || !lastName || !email || !password || !role) {
       setFormData((prevData) => ({ ...prevData, error: 'Por favor, completa todos los campos.' }));
       return;
@@ -55,7 +55,7 @@ const Register = () => {
       return;
     }
 
-    // Llamar al action register
+    
     const response = await actions.register(email, password, role, firstName, lastName);
 
     if (response.success) {

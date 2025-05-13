@@ -158,12 +158,7 @@ class ProjectSkill(db.Model):
             "skill": self.skill.serialize()
         }
 
-
-
-
-
-
-
+        
 # --- PROYECTOS Y PROPUESTAS ---
 
 

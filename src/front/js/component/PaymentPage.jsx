@@ -10,7 +10,7 @@ import {
 } from "@stripe/react-stripe-js";
 import logo from "./../../../../public/stripe-logo.png";
 
-const BASE_URL = "https://glowing-umbrella-69vwpw4vg6pwcrwqp-3001.app.github.dev/api";
+const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
 
 const PaymentPage = () => {
     const { proposalId } = useParams();
@@ -25,9 +25,9 @@ const PaymentPage = () => {
     const [paymentId, setPaymentId] = useState(null);
     const [payLoading, setPayLoading] = useState(false);
     const [alertInfo, setAlertInfo] = useState({
-        show: false,        // si se muestra o no
-        type: "",           // 'success' | 'danger' | 'warning' ...
-        message: ""         // texto a mostrar
+        show: false,        
+        type: "",           
+        message: ""        
     });
 
     useEffect(() => {
@@ -112,7 +112,7 @@ const PaymentPage = () => {
                     type: "success",
                     message: "¡Pago exitoso y status actualizado!"
                 });
-                // opcional: redirige con un pequeño delay para que lean la alerta
+                
                 setTimeout(() => navigate("/employerProfile"), 5000);
             }
         } catch (err) {

@@ -85,7 +85,7 @@ export const Profile = () => {
                         <span>
                             {profile.skills && profile.skills.length > 0 ? (
                                 profile.skills.map((skill, idx) => (
-                                    <span key={idx} className="badge bg-secondary me-2">{skill.name || "Habilidad desconocida"}</span>
+                                    <span key={idx} className="badge bg-dark me-2">{skill.name || "Habilidad desconocida"}</span>
                                 ))
                             ) : (
                                 "Sin habilidades registradas"
@@ -106,6 +106,10 @@ export const Profile = () => {
                     <li className="list-group-item d-flex justify-content-between">
                         <strong>Tarifa por hora:</strong>
                         <span>{profile.hourly_rate ? `$${profile.hourly_rate} USD` : "No definida"}</span>
+                    </li>
+                    <li className="list-group-item d-flex justify-content-between">
+                        <strong>Contacto:</strong>
+                        <span>{profile.user ? `${profile.user.email}` : "No definido"}</span>
                     </li>
                 </ul>
             </div>

@@ -37,7 +37,7 @@ const FreelancerProfile = () => {
 
     const loadAll = async () => {
 
-      // 1) Traer perfil
+      
       const profileRes = await actions.getFreelancerProfile(userId);
       if (profileRes.success) {
         setProfile(profileRes.profile);
@@ -53,7 +53,7 @@ const FreelancerProfile = () => {
 
       setProfile(profileRes.profile);
 
-      // 2) Traer propuestas completadas
+      
       const respProps = await actions.getFreelancerCompletedProposals(userId);
       if (respProps.success) {
         setCompletedProposals(respProps.proposals);
@@ -88,7 +88,7 @@ const FreelancerProfile = () => {
     setModalOpen(true);
   };
 
-  // Enviar review
+  
   const submitReview = async () => {
     const payload = {
       proposal_id: currentProposal.id,
@@ -98,13 +98,13 @@ const FreelancerProfile = () => {
     };
     const resp = await actions.createReview(payload);
     if (resp.success) {
-      // marcar como calificado
+     
       setCompletedProposals((prev) =>
         prev.map((p) =>
           p.id === currentProposal.id ? { ...p, reviewed: true } : p
         )
       );
-      // actualizar promedio en UI
+      
       setProfile((p) => ({ ...p, rating: resp.data.new_average }));
       setModalOpen(false);
     } else {

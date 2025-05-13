@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
 
 export const DashAccordion = () => {
-
     const { store, actions } = useContext(Context);
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -32,12 +31,26 @@ export const DashAccordion = () => {
         };
 
         actions.getContacts()
-        
+
         loadProfile();
     }, [store.contacts]);
 
     const goToProfile = (id) => {
         navigate(`/Profile/${id}`);
+    };
+
+    const handleDeleteContact = async (contactId) => {
+        try {
+            const result = await actions.deleteContact(contactId);
+            if (result.success) {
+                alert("¡Contacto eliminado exitosamente!");
+            } else {
+                alert(`Error: ${result.error || "Error desconocido"}`);
+            }
+        } catch (error) {
+            console.error("Error al eliminar el contacto:", error);
+            alert("Hubo un error al intentar eliminar el contacto. Intenta de nuevo más tarde.");
+        }
     };
 
     if (loading) return <div>Cargando...</div>;
@@ -53,10 +66,8 @@ export const DashAccordion = () => {
                     <div className="accordion-body d-flex flex-column justify-content-center align-items-center">
                         {store.contacts.length > 0 ? (
                             store.contacts.map((contact) => (
-                                <div key={contact.id} className="card mb-2 shadow-sm" style={{ borderRadius: '12px', width: '100%' }}
-                                >
-
-                                    <div className="row no-gutters">
+                                <div key={contact.id} className="card mb-2 shadow-sm" style={{ borderRadius: '12px', width: '100%' }}>
+                                    <div className="row g-0">
                                         <div className="col-3 d-flex justify-content-center align-items-center p-2">
                                             <img
                                                 src={contact.profile_picture || undefinedImg}
@@ -72,12 +83,22 @@ export const DashAccordion = () => {
                                                 }}
                                             />
                                         </div>
-                                        <div className="col-9">
+                                        <div className="col-8 d-flex flex-row">
                                             <div className="card-body p-2">
                                                 <h6 className="text-dark fs-7 fw-bold mb-1">{contact.first_name} {contact.last_name}</h6>
                                                 <p className="text-muted fs-8 mb-1">{contact.career}</p>
                                                 <button className="btn btn-outline-primary btn-sm mt-1" style={{ borderRadius: '12px' }} onClick={() => goToProfile(contact.id)}>Ver Perfil</button>
+
+
                                             </div>
+                                            <div className="d-flex justify-content-center align-items-center"><button
+                                                className="btn btn-danger btn-sm mt-1 ms-2"
+                                                style={{ borderRadius: '50%', fontSize: '1rem' }}
+                                                onClick={() => handleDeleteContact(contact.id)}
+                                            >
+                                                <span className="text-white">X</span>
+                                            </button></div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -88,16 +109,7 @@ export const DashAccordion = () => {
                     </div>
                 </div>
             </div>
-            <div className="accordion-item">
-                <h2 className="accordion-header">
-                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-                        <span className="fw-bold">Mensajes</span>
-                    </button>
-                </h2>
-                <div id="flush-collapseTwo" className="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                    <div className="accordion-body">No hay mensajes!</div>
-                </div>
-            </div>
         </div>
     );
 };
+

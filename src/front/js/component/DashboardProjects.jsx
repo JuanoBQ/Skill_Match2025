@@ -27,8 +27,8 @@ const DashboardProjects = () => {
             navigate("/login");
             return;
         }
-        setSelectedProject(project);
-        setShowModal(true);
+        else navigate(`/project/${project}`);
+        
     };
 
     const handleApply = async () => {
@@ -69,7 +69,7 @@ const DashboardProjects = () => {
                 (!store.filters.rating || project.rating >= parseInt(store.filters.rating)) &&
                 (!store.filters.location || project.location === store.filters.location)
             )
-            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Orden por fecha
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
         : [];
 
     return (
@@ -107,7 +107,7 @@ const DashboardProjects = () => {
                                             <p className="card-text text-muted mb-2"><i className="bi bi-file-earmark-check"></i> Status: {project.status}</p>
 
                                             {project.status === "open" ? (
-                                                <button className="btn btn-primary btn-md mt-3 w-100" onClick={() => handleViewOffer(project)}>
+                                                <button className="btn btn-primary btn-md mt-3 w-100" onClick={() => handleViewOffer(project.id)}>
                                                     Ver Oferta
                                                 </button>
                                             ) : (
@@ -125,7 +125,7 @@ const DashboardProjects = () => {
             )}
 
             {/* MODAL DE APLICACIÓN */}
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
+            {/* <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>{selectedProject?.title}</Modal.Title>
                 </Modal.Header>
@@ -166,7 +166,7 @@ const DashboardProjects = () => {
                     <Button variant="secondary" onClick={() => setShowModal(false)}>Cancelar</Button>
                     <Button variant="primary" onClick={handleApply}>Aplicar a esta oferta</Button>
                 </Modal.Footer>
-            </Modal>
+            </Modal> */}
         </div>
     );
 };

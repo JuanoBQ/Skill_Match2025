@@ -46,6 +46,14 @@ const DashboardFreelancer = () => {
 
     const handleAddContact = async (contactId) => {
         try {
+            const userId = localStorage.getItem("user_id");
+
+          
+            if (parseInt(contactId) === parseInt(userId)) {
+                alert("No puedes agregar tu propio perfil como contacto.");
+                return; 
+            }
+
             const result = await actions.addNewContact(contactId);
             if (result.success) {
                 alert("¡Conexión exitosa!");
@@ -57,6 +65,7 @@ const DashboardFreelancer = () => {
             alert("Hubo un error al intentar agregar el contacto. Intenta de nuevo más tarde.");
         }
     };
+
 
     return (
         <div className='container-fluid d-flex justify-content-center mt-5'>

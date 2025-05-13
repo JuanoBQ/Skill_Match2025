@@ -1,4 +1,4 @@
-const BASE_URL = "https://glowing-umbrella-69vwpw4vg6pwcrwqp-3001.app.github.dev/api";
+const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -18,7 +18,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				freelancers: [],
 				projects: [],
 				freelancers: [],
-				projects: [],
 				skills: [],
 				filters: {}
 			},
@@ -636,12 +635,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 			// 	}
 			// },
 
-			getUsers: async () => {    // Codigo nuevo (para hacer funcionar el map de admin)
+			getUsers: async () => {
 				try {
 					const res = await fetch(`${BASE_URL}/admin/users`);
 					const data = await res.json();
 					setStore({ users: data });
-					return data; // Use 'users' instead of 'user' (es la unica diferencia entre ambos codigos ni idea de porque el resultado cambia)
+					return data;
 				} catch (error) {
 					console.error(error);
 				}
@@ -650,7 +649,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			getProjects: async () => {
 				try {
-					const res = await fetch(`${BASE_URL}/projects`)
+					const res = await fetch(`${BASE_URL}/projects/`)
 					const data = await res.json();
 					setStore({ projects: data });
 				} catch (error) {
@@ -678,7 +677,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					});
 					const data = await resp.json();
 					if (resp.ok) {
-						// devolvemos también el nuevo promedio para actualizar UI
+
 						return { success: true, data, msg: data.msg };
 					} else {
 						return { success: false, msg: data.msg || "Error al crear review" };
@@ -784,17 +783,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 			addNewContact: async (contactId) => {
 				try {
 					const token = localStorage.getItem("token");
-					const userId = localStorage.getItem("user_id");
 
 					if (!token) {
 						return { success: false, error: "Usuario no autenticado." };
 					}
-
-
-					if (contactId === userId) {
-						return { success: false, error: "No puedes agregar a tu propio perfil como contacto." };
-					}
-
 
 					const store = getStore();
 					const existingContact = store.contacts.find(contact => contact.id === contactId);
@@ -827,6 +819,34 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+
+			deleteContact: async (contactId) => {
+				try {
+					const token = localStorage.getItem("token");
+					if (!token) {
+						return { success: false, error: "Usuario no autenticado." };
+					}
+
+					const res = await fetch(`${BASE_URL}/contacts`, {
+						method: "DELETE",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
+						},
+						body: JSON.stringify({ contact_id: contactId }),
+					});
+
+					const data = await res.json();
+					if (res.ok) {
+						return { success: true, message: data.message || "Contacto eliminado correctamente." };
+					} else {
+						return { success: false, error: data.error || "Error al eliminar el contacto." };
+					}
+				} catch (error) {
+					console.error("Error al eliminar el contacto:", error);
+					return { success: false, error: "Error de red o del servidor." };
+				}
+			},
 
 
 
