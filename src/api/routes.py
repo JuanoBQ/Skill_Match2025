@@ -1,10 +1,11 @@
 import os
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Review, Payment, ProjectSkill, Contact
+from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal, Review, Payment, ProjectSkill, Contact, Message
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import cross_origin
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import func
 import stripe, json
@@ -1068,3 +1069,84 @@ def delete_contact():
     db.session.commit()
 
     return jsonify({"message": "Contacto eliminado correctamente"}), 200
+
+
+@routes.route('/messages', methods=['POST'])
+@jwt_required()
+def send_message():
+    data = request.get_json()
+    recipient_user_id = data.get('recipient_id')
+    content = (data.get('content') or '').strip()
+
+    if not recipient_user_id or not content:
+        return jsonify({"msg": "recipient_id y content son obligatorios"}), 400
+
+    # 1) Perfil del remitente a partir del JWT
+    sender_user_id = get_jwt_identity()
+    sender_profile = Profile.query.filter_by(user_id=sender_user_id).first()
+    if not sender_profile:
+        return jsonify({"msg": "Perfil de usuario no encontrado"}), 404
+
+    # 2) Perfil del destinatario a partir del user_id que vino en el body
+    recipient_profile = Profile.query.filter_by(user_id=recipient_user_id).first()
+    if not recipient_profile:
+        return jsonify({"msg": "El usuario destinatario no existe"}), 404
+
+    # 3) Crear y guardar el mensaje usando profile.id
+    msg = Message(
+        sender_id=sender_profile.id,
+        recipient_id=recipient_profile.id,
+        content=content
+    )
+    db.session.add(msg)
+    db.session.commit()
+
+    # 4) Devolver los user_id (no los profile.id) para que el front siga igual
+    return jsonify({
+        "id":        msg.id,
+        "from":      sender_profile.user_id,
+        "to":        recipient_profile.user_id,
+        "content":   msg.content,
+        "timestamp": msg.timestamp.isoformat()
+    }), 201
+
+
+@routes.route('/messages/<int:other_user_id>', methods=['GET'])
+@jwt_required()
+def get_conversation(other_user_id):
+    # 1) Perfil propio
+    my_user_id = get_jwt_identity()
+    my_profile = Profile.query.filter_by(user_id=my_user_id).first()
+    if not my_profile:
+        return jsonify({"msg": "Perfil de usuario no encontrado"}), 404
+
+    # 2) Perfil “otro” a partir del user_id pasado en la URL
+    other_profile = Profile.query.filter_by(user_id=other_user_id).first()
+    if not other_profile:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    # 3) Buscar todos los mensajes entre ambos profile.id
+    msgs = Message.query.filter(
+        or_(
+            and_(
+                Message.sender_id    == my_profile.id,
+                Message.recipient_id == other_profile.id
+            ),
+            and_(
+                Message.sender_id    == other_profile.id,
+                Message.recipient_id == my_profile.id
+            )
+        )
+    ).order_by(Message.timestamp.asc()).all()
+
+    # 4) Mapear a user_id en vez de profile.id
+    history = []
+    for m in msgs:
+        history.append({
+            "id":        m.id,
+            "from":      m.sender.user_id,
+            "to":        m.recipient.user_id,
+            "content":   m.content,
+            "timestamp": m.timestamp.isoformat()
+        })
+    return jsonify({"messages": history}), 200

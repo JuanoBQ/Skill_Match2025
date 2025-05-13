@@ -98,9 +98,7 @@ class Profile(db.Model):
         }
 
 
-
 # --- SKILLS Y RELACIÓN MANY-TO-MANY ---
-
 
 class Skill(db.Model):
     __tablename__ = "skills"
@@ -157,10 +155,8 @@ class ProjectSkill(db.Model):
             "project_id": self.project_id,
             "skill": self.skill.serialize()
         }
-
-        
+ 
 # --- PROYECTOS Y PROPUESTAS ---
-
 
 class Project(db.Model):
     __tablename__ = "projects"
@@ -189,7 +185,6 @@ class Project(db.Model):
         return f"<Project {self.title}>"
 
     def serialize(self):
-        # Obtener el rating desde el perfil del empleador
         employer_profile = self.employer.profile if self.employer else None
         employer_rating = employer_profile.rating if employer_profile and employer_profile.rating is not None else None
 
@@ -336,3 +331,16 @@ class Contact(db.Model):
 
     def __repr__(self):
         return f"<Contact(user_id={self.user_id}, contact_id={self.contact_id})>"
+    
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relaciones
+    sender = db.relationship('Profile', foreign_keys=[sender_id])
+    recipient = db.relationship('Profile', foreign_keys=[recipient_id])

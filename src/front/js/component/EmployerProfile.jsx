@@ -3,6 +3,7 @@ import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
+import MessageThread from "./MessageThread.jsx";
 
 const EmployerProfile = () => {
     const navigate = useNavigate();
@@ -30,8 +31,10 @@ const EmployerProfile = () => {
     const [category, setCategory] = useState("");
     const [deadline, setDeadline] = useState("");
     const [location, setLocation] = useState("");
-
     const [completedProjects, setCompletedProjects] = useState([]);
+    const [chatOpen, setChatOpen] = useState(false);
+    const [chatOtherId, setChatOtherId] = useState(null);
+    const [chatOtherName, setChatOtherName] = useState("");
 
     // ——— Estados para el modal de calificación ———
     const [modalOpen, setModalOpen] = useState(false);
@@ -477,6 +480,19 @@ const EmployerProfile = () => {
                                             >
                                                 Contratar
                                             </button>
+                                            {/* NUEVO: Botón Chat */}
+                                            <button
+                                                className="btn btn-sm btn-outline-secondary w-100 mt-2"
+                                                onClick={() => {
+                                                    setChatOtherId(p.freelancer.id);
+                                                    setChatOtherName(
+                                                        `${p.freelancer.first_name} ${p.freelancer.last_name}`
+                                                    );
+                                                    setChatOpen(true);
+                                                }}
+                                            >
+                                                Chat
+                                            </button>
                                         </div>
                                     ))
                                 ) : (
@@ -618,7 +634,31 @@ const EmployerProfile = () => {
                 </>
             )}
 
-
+            {chatOpen && (
+                <>
+                    <div className="modal d-block" tabIndex={-1}>
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Chat con {chatOtherName}</h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        onClick={() => setChatOpen(false)}
+                                    />
+                                </div>
+                                <div className="modal-body">
+                                    <MessageThread
+                                        otherId={chatOtherId}
+                                        otherName={chatOtherName}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show"></div>
+                </>
+            )}
         </div>
     );
 };

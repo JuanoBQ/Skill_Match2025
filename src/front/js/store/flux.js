@@ -832,6 +832,42 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			getConversation: async (otherId) => {
+				const resp = await fetch(
+					`${BASE_URL}/messages/${otherId}`,
+					{
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: "Bearer " + localStorage.getItem("token"),
+						},
+					}
+				);
+				const data = await resp.json();
+				if (resp.ok) {
+					return { success: true, messages: data.messages };
+				} else {
+					return { success: false, error: data.msg || "Error al obtener mensajes" };
+				}
+			},
+
+			// 2. Enviar un mensaje a otro usuario
+			sendMessage: async ({ recipient_id, content }) => {
+				const resp = await fetch(`${BASE_URL}/messages`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: "Bearer " + localStorage.getItem("token"),
+					},
+					body: JSON.stringify({ recipient_id, content }),
+				});
+				const data = await resp.json();
+				if (resp.ok) {
+					return { success: true, message: data };
+				} else {
+					return { success: false, error: data.msg || "Error al enviar mensaje" };
+				}
+			}
+
 
 
 
