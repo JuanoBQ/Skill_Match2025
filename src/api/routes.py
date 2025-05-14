@@ -865,11 +865,12 @@ def get_employer_completed_projects():
         .join(Payment, Payment.proposal_id == Proposal.id)
         .filter(
             Project.employer_id == user_id,
-            Payment.status == "completed"
+            Payment.status  == "completed",
+            Proposal.status == "completed"
         )
         .all()
     )
-
+    
     result = [p.serialize_basic() for p in completed_projects]
     return jsonify(result), 200
 

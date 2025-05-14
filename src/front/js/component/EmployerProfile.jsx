@@ -3,6 +3,8 @@ import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 import MessageThread from "./MessageThread.jsx";
 import ChatAccordion from "./ChatAccordion.jsx";
 
@@ -118,7 +120,11 @@ const EmployerProfile = () => {
             location: location?.value
         });
         if (res.success) {
-            alert("Oferta creada exitosamente.");
+            await Swal.fire({
+                icon: "success",
+                title: "¡Oferta de trabajo creada!",
+                confirmButtonText: "Ok"
+            });
             setShowForm(false);
             setTitle("");
             setDescription("");
@@ -133,7 +139,12 @@ const EmployerProfile = () => {
             const projRes = await actions.getEmployerProjects();
             if (projRes.success) setOffers(projRes.projects);
         } else {
-            alert("Error al crear la oferta: " + res.error);
+            await Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "No se pudo crear la oferta: " + res.error,
+                confirmButtonText: "Ok"
+            });
         }
     };
 
@@ -163,8 +174,19 @@ const EmployerProfile = () => {
                 )
             );
             setModalOpen(false);
+            await Swal.fire({
+                icon: "success",
+                title: "Reseña enviada",
+                text: "¡Gracias por tu valoración!",
+                confirmButtonText: "Ok"
+            });
         } else {
-            alert(resp.msg);
+            await Swal.fire({
+                icon: "error",
+                title: "Error al enviar reseña",
+                text: resp.msg,
+                confirmButtonText: "Ok"
+            });
         }
     };
 
@@ -432,15 +454,33 @@ const EmployerProfile = () => {
                                                     type="button"
                                                     className="btn btn-sm btn-outline-danger mt-2"
                                                     onClick={async () => {
-                                                        const ok = window.confirm("¿Estás seguro de que quieres eliminar esta oferta?");
-                                                        if (!ok) return;
+                                                        const result = await Swal.fire({
+                                                            title: "¿Estás seguro?",
+                                                            text: "Esta oferta se eliminará permanentemente.",
+                                                            icon: "warning",
+                                                            showCancelButton: true,
+                                                            confirmButtonText: "Sí, eliminar",
+                                                            cancelButtonText: "Cancelar",
+                                                        });
+                                                        if (!result.isConfirmed) return;
 
                                                         const res = await actions.deleteProject(o.id);
                                                         if (res.success) {
                                                             const proj = await actions.getEmployerProjects();
                                                             if (proj.success) setOffers(proj.projects);
+                                                            await Swal.fire({
+                                                                icon: "success",
+                                                                title: "Oferta eliminada",
+                                                                timer: 2000,
+                                                                showConfirmButton: false
+                                                            });
                                                         } else {
-                                                            alert("Error al eliminar: " + res.error);
+                                                            await Swal.fire({
+                                                                icon: "error",
+                                                                title: "Error al eliminar",
+                                                                text: res.error,
+                                                                confirmButtonText: "Ok"
+                                                            });
                                                         }
                                                     }}
                                                 >

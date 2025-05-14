@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 import MessageThread from "./MessageThread.jsx";
 import ChatAccordion from "./ChatAccordion.jsx";
 
@@ -157,8 +159,19 @@ const FreelancerProfile = () => {
 
       setProfile((p) => ({ ...p, rating: resp.data.new_average }));
       setModalOpen(false);
+      await Swal.fire({
+        icon: "success",
+        title: "Reseña enviada",
+        text: "¡Gracias por tu valoración!",
+        confirmButtonText: "Ok"
+      });
     } else {
-      alert(resp.msg);
+      await Swal.fire({
+        icon: "error",
+        title: "Error al enviar reseña",
+        text: resp.msg,
+        confirmButtonText: "Ok"
+      });
     }
   };
 
