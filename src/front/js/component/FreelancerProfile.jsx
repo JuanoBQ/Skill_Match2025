@@ -239,7 +239,7 @@ const FreelancerProfile = () => {
 
           {profile.reviews && profile.reviews.length > 0 && (
             <div className="mt-5">
-              <h5 className="fw-bold">Reseñas de clientes</h5>
+              <h5 className="fw-bold">Reseñas</h5>
               <ul className="list-group">
                 {profile.reviews.map(r => (
                   <li key={r.id} className="list-group-item">
@@ -274,17 +274,6 @@ const FreelancerProfile = () => {
                       <strong>{p.project.title}</strong><br />
                       Empleador: {p.project.employer_name}
                     </div>
-                    {/* NUEVO: Botón Chat */}
-                    <button
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => {
-                        setChatOtherId(p.project.employer_id);
-                        setChatOtherName(p.project.employer_name);
-                        setChatOpen(true);
-                      }}
-                    >
-                      Chat
-                    </button>
                     {p.reviewed
                       ? <span className="badge bg-success">Calificado</span>
                       : <button
@@ -315,7 +304,7 @@ const FreelancerProfile = () => {
                 >
                   <div className="modal-content rounded-4 shadow-lg">
                     <div className="modal-header border-0">
-                      <h5 className="modal-title">Calificar a {profile.user.first_name}</h5>
+                      <h5 className="modal-title">Calificar a {currentProposal.project.employer_name}</h5>
                       <button
                         type="button"
                         className="btn-close"

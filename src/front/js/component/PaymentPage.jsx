@@ -9,6 +9,8 @@ import {
     CardCvcElement,
 } from "@stripe/react-stripe-js";
 import logo from "./../../../../public/stripe-logo.png";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const BASE_URL = "https://psychic-rotary-phone-x5rx4xvrw7wr2pwx5-3001.app.github.dev/api";
 
@@ -24,11 +26,6 @@ const PaymentPage = () => {
     const [clientSecret, setClientSecret] = useState(null);
     const [paymentId, setPaymentId] = useState(null);
     const [payLoading, setPayLoading] = useState(false);
-    const [alertInfo, setAlertInfo] = useState({
-        show: false,        
-        type: "",           
-        message: ""        
-    });
 
     useEffect(() => {
         const fetchProposal = async () => {
@@ -94,12 +91,14 @@ const PaymentPage = () => {
             });
 
             if (error) {
-                setAlertInfo({
-                    show: true,
-                    type: "danger",
-                    message: "Error al procesar la tarjeta: " + error.message
+                await Swal.fire({
+                    icon: "error",
+                    title: "Error al procesar el pago",
+                    text: error.message,
+                    confirmButtonText: "Ok"
                 });
             } else if (paymentIntent?.status === "succeeded") {
+                // Marcar el pago completado en tu API
                 await fetch(`${BASE_URL}/payments/${paymentId}/complete`, {
                     method: "POST",
                     headers: {
@@ -107,20 +106,22 @@ const PaymentPage = () => {
                         "Authorization": "Bearer " + localStorage.getItem("token")
                     }
                 });
-                setAlertInfo({
-                    show: true,
-                    type: "success",
-                    message: "¡Pago exitoso y status actualizado!"
+
+                await Swal.fire({
+                    icon: "success",
+                    title: "Pago exitoso",
+                    confirmButtonText: "Ok"
                 });
-                
-                setTimeout(() => navigate("/employerProfile"), 5000);
+
+                navigate("/employerProfile");
             }
         } catch (err) {
             console.error(err);
-            setAlertInfo({
-                show: true,
-                type: "danger",
-                message: "Ocurrió un error inesperado."
+            await Swal.fire({
+                icon: "error",
+                title: "Ocurrió un error inesperado",
+                text: err.message || "",
+                confirmButtonText: "Ok"
             });
         } finally {
             setPayLoading(false);
@@ -136,21 +137,6 @@ const PaymentPage = () => {
 
     return (
         <div className="container mt-5">
-            {alertInfo.show && (
-                <div
-                    className={`alert alert-${alertInfo.type} alert-dismissible fade show mx-auto`}
-                    style={{ maxWidth: "600px" }}
-                    role="alert"
-                >
-                    {alertInfo.message}
-                    <button
-                        type="button"
-                        className="btn-close"
-                        aria-label="Close"
-                        onClick={() => setAlertInfo({ ...alertInfo, show: false })}
-                    />
-                </div>
-            )}
             <h2 className="text-center mb-5">Resumen de Pago</h2>
 
             <div className="row gx-4">
