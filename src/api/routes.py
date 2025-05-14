@@ -1159,10 +1159,15 @@ def get_conversation(other_user_id):
 def list_conversations():
     # 1) Perfil actual
     my_user_id = get_jwt_identity()
+    print("🔍 Debug JWT identity:", my_user_id)
     me = Profile.query.filter_by(user_id=my_user_id).first()
+    print("🔍 Debug Profile encontrado:", me and {"profile.id": me.id, "profile.user_id": me.user_id})
     if not me:
         return jsonify({"msg": "Perfil de usuario no encontrado"}), 404
 
+    all_msgs = Message.query.all()
+    print("📋 TODOS los mensajes (id, sender_id, recipient_id):", 
+          [(m.id, m.sender_id, m.recipient_id) for m in all_msgs])
     # 2) Traer todos los mensajes donde participo
     msgs = Message.query.filter(
         or_(
@@ -1178,6 +1183,8 @@ def list_conversations():
             otros_ids.add(m.sender_id)
         if m.recipient_id != me.id:
             otros_ids.add(m.recipient_id)
+
+    print("🔍 Debug otros_ids (profile.id):", otros_ids)
 
     # 4) Construir la lista de conversaciones
     conversations = []
