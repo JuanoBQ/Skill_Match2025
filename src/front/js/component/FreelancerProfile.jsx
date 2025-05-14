@@ -3,6 +3,7 @@ import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
 import MessageThread from "./MessageThread.jsx";
+import ChatAccordion from "./ChatAccordion.jsx";
 
 const FreelancerProfile = () => {
   const navigate = useNavigate();
@@ -85,49 +86,49 @@ const FreelancerProfile = () => {
   //   loadAll();
   // }, [actions, navigate]);
   useEffect(() => {
-  const userId = localStorage.getItem("user_id");
-  if (!userId || profileNotFound) {
-    setLoading(false);
-    return;
-  }
-
-  const loadAll = async () => {
-    const profileRes = await actions.getFreelancerProfile(userId);
-    if (profileRes.success) {
-      setProfile(profileRes.profile);
-      setProfileImage(
-        profileRes.profile.profile_picture || undefinedImg
-      );
-    } else {
-      setProfileNotFound(true);
+    const userId = localStorage.getItem("user_id");
+    if (!userId || profileNotFound) {
+      setLoading(false);
       return;
     }
 
-    const respProps = await actions.getFreelancerCompletedProposals(userId);
-    if (respProps.success) {
-      setCompletedProposals(respProps.proposals);
-    }
+    const loadAll = async () => {
+      const profileRes = await actions.getFreelancerProfile(userId);
+      if (profileRes.success) {
+        setProfile(profileRes.profile);
+        setProfileImage(
+          profileRes.profile.profile_picture || undefinedImg
+        );
+      } else {
+        setProfileNotFound(true);
+        return;
+      }
 
-    const respSent = await actions.getFreelancerSentProposals(userId);
-    if (respSent.success) {
-      setSentProposals(respSent.proposals);
-    }
+      const respProps = await actions.getFreelancerCompletedProposals(userId);
+      if (respProps.success) {
+        setCompletedProposals(respProps.proposals);
+      }
 
-    const completedRes = await actions.getCompletedProjects();
-    if (completedRes.success) {
-      setCompletedProjects(completedRes.projects);
-    }
+      const respSent = await actions.getFreelancerSentProposals(userId);
+      if (respSent.success) {
+        setSentProposals(respSent.proposals);
+      }
 
-    const statsRes = await actions.getEmployerStats();
-    if (statsRes.success) {
-      setStats(statsRes.stats);
-    }
+      const completedRes = await actions.getCompletedProjects();
+      if (completedRes.success) {
+        setCompletedProjects(completedRes.projects);
+      }
 
-    setLoading(false);
-  };
+      const statsRes = await actions.getEmployerStats();
+      if (statsRes.success) {
+        setStats(statsRes.stats);
+      }
 
-  loadAll();
-}, [actions, navigate, profileNotFound]);
+      setLoading(false);
+    };
+
+    loadAll();
+  }, [actions, navigate, profileNotFound]);
 
 
   const handleOpenReview = (proposal) => {
@@ -389,6 +390,7 @@ const FreelancerProfile = () => {
               </div>
             </div>
           ))}
+          <ChatAccordion />
         </div>
       </div>
       {chatOpen && (

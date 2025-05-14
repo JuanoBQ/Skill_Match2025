@@ -1152,3 +1152,44 @@ def get_conversation(other_user_id):
             "timestamp": m.timestamp.isoformat()
         })
     return jsonify({"messages": history}), 200
+
+
+@routes.route('/conversations', methods=['GET'])
+@jwt_required()
+def list_conversations():
+    # 1) Perfil actual
+    my_user_id = get_jwt_identity()
+    me = Profile.query.filter_by(user_id=my_user_id).first()
+    if not me:
+        return jsonify({"msg": "Perfil de usuario no encontrado"}), 404
+
+    # 2) Traer todos los mensajes donde participo
+    msgs = Message.query.filter(
+        or_(
+            Message.sender_id    == me.id,
+            Message.recipient_id == me.id
+        )
+    ).all()
+
+    # 3) Extraer todos los profile.id implicados, excepto el mío
+    otros_ids = set()
+    for m in msgs:
+        if m.sender_id != me.id:
+            otros_ids.add(m.sender_id)
+        if m.recipient_id != me.id:
+            otros_ids.add(m.recipient_id)
+
+    # 4) Construir la lista de conversaciones
+    conversations = []
+    for prof_id in otros_ids:
+        prof = Profile.query.get(prof_id)
+        if not prof:
+            # si el perfil ya no existe, lo saltamos
+            continue
+        user = prof.user  # relación Profile → User
+        conversations.append({
+            "user_id": user.id,
+            "name":    f"{user.first_name} {user.last_name}"
+        })
+
+    return jsonify({"conversations": conversations}), 200

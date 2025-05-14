@@ -10,7 +10,7 @@ import {
 } from "@stripe/react-stripe-js";
 import logo from "./../../../../public/stripe-logo.png";
 
-const BASE_URL = "https://automatic-space-trout-r47wxwp7gq44fp9jv-3001.app.github.dev/api";
+const BASE_URL = "https://psychic-rotary-phone-x5rx4xvrw7wr2pwx5-3001.app.github.dev/api";
 
 const PaymentPage = () => {
     const { proposalId } = useParams();

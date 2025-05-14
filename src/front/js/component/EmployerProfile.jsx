@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
 import MessageThread from "./MessageThread.jsx";
+import ChatAccordion from "./ChatAccordion.jsx";
 
 const EmployerProfile = () => {
     const navigate = useNavigate();
@@ -506,6 +507,7 @@ const EmployerProfile = () => {
                 </div>
 
                 <div className="col-auto d-flex flex-column gap-3 align-items-end">
+
                     {[
                         { label: "Trabajos publicados", value: stats.offers },
                         { label: "Propuestas recibidas", value: stats.proposals },
@@ -528,6 +530,7 @@ const EmployerProfile = () => {
                             </div>
                         </div>
                     ))}
+                    <ChatAccordion />
                 </div>
             </div>
 

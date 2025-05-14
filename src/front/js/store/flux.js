@@ -1,4 +1,4 @@
-const BASE_URL = "https://super-garbanzo-4j7jxp7v9x74hj4g7-3001.app.github.dev/api";
+const BASE_URL = "https://psychic-rotary-phone-x5rx4xvrw7wr2pwx5-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
@@ -847,6 +847,23 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return { success: true, messages: data.messages };
 				} else {
 					return { success: false, error: data.msg || "Error al obtener mensajes" };
+				}
+			},
+
+			getConversations: async () => {
+				const resp = await fetch(`${BASE_URL}/conversations`,
+					{
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: "Bearer " + localStorage.getItem("token"),
+						}
+					}
+				);
+				const data = await resp.json();
+				if (resp.ok) {
+					return { success: true, conversations: data.conversations };
+				} else {
+					return { success: false, error: data.msg || "Error al cargar conversaciones" };
 				}
 			},
 
