@@ -865,11 +865,12 @@ def get_employer_completed_projects():
         .join(Payment, Payment.proposal_id == Proposal.id)
         .filter(
             Project.employer_id == user_id,
-            Payment.status == "completed"
+            Payment.status  == "completed",
+            Proposal.status == "completed"
         )
         .all()
     )
-
+    
     result = [p.serialize_basic() for p in completed_projects]
     return jsonify(result), 200
 
@@ -1152,3 +1153,51 @@ def get_conversation(other_user_id):
             "timestamp": m.timestamp.isoformat()
         })
     return jsonify({"messages": history}), 200
+
+
+@routes.route('/conversations', methods=['GET'])
+@jwt_required()
+def list_conversations():
+    # 1) Perfil actual
+    my_user_id = get_jwt_identity()
+    print("🔍 Debug JWT identity:", my_user_id)
+    me = Profile.query.filter_by(user_id=my_user_id).first()
+    print("🔍 Debug Profile encontrado:", me and {"profile.id": me.id, "profile.user_id": me.user_id})
+    if not me:
+        return jsonify({"msg": "Perfil de usuario no encontrado"}), 404
+
+    all_msgs = Message.query.all()
+    print("📋 TODOS los mensajes (id, sender_id, recipient_id):", 
+          [(m.id, m.sender_id, m.recipient_id) for m in all_msgs])
+    # 2) Traer todos los mensajes donde participo
+    msgs = Message.query.filter(
+        or_(
+            Message.sender_id    == me.id,
+            Message.recipient_id == me.id
+        )
+    ).all()
+
+    # 3) Extraer todos los profile.id implicados, excepto el mío
+    otros_ids = set()
+    for m in msgs:
+        if m.sender_id != me.id:
+            otros_ids.add(m.sender_id)
+        if m.recipient_id != me.id:
+            otros_ids.add(m.recipient_id)
+
+    print("🔍 Debug otros_ids (profile.id):", otros_ids)
+
+    # 4) Construir la lista de conversaciones
+    conversations = []
+    for prof_id in otros_ids:
+        prof = Profile.query.get(prof_id)
+        if not prof:
+            # si el perfil ya no existe, lo saltamos
+            continue
+        user = prof.user  # relación Profile → User
+        conversations.append({
+            "user_id": user.id,
+            "name":    f"{user.first_name} {user.last_name}"
+        })
+
+    return jsonify({"conversations": conversations}), 200

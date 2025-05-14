@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const { actions } = useContext(Context);
@@ -12,6 +13,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
     if (!email || !password) {
       setError('Por favor, completa todos los campos.');
@@ -21,10 +23,12 @@ const Login = () => {
     const response = await actions.login(email, password);
 
     if (response.success) {
-      sessionStorage.setItem("showLoginAlert", "true");
+      // Disparamos el toast justo aquí, tras login exitoso
+      toast.success('¡Bienvenido a SkillMatch!');
+      // Redirigimos al home (o donde quieras)
       navigate('/');
     } else {
-      setError(response.error);
+      setError(response.error || 'Error al iniciar sesión.');
     }
   };
 
@@ -35,10 +39,16 @@ const Login = () => {
           <div className="card">
             <div className="card-body">
               <h3 className="card-title text-center">Iniciar sesión</h3>
-              {error && <div className="alert alert-danger">{error}</div>}
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  {error}
+                </div>
+              )}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label htmlFor="email" className="form-label">Correo electrónico</label>
+                  <label htmlFor="email" className="form-label">
+                    Correo electrónico
+                  </label>
                   <input
                     type="email"
                     id="email"
@@ -50,7 +60,9 @@ const Login = () => {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="password" className="form-label">Contraseña</label>
+                  <label htmlFor="password" className="form-label">
+                    Contraseña
+                  </label>
                   <input
                     type="password"
                     id="password"

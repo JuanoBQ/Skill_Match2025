@@ -31,6 +31,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import ProjectDetails from "./component/ProjectDetails.jsx";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 
@@ -50,40 +52,49 @@ const Layout = () => {
 
     return (
         <div className="d-flex flex-column min-vh-100">
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar
+                newestOnTop={false}
+                closeOnClick
+                pauseOnHover
+                draggable
+            />
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
                     <Navbar />
                     <div className="flex-grow-1">
-                    <Routes>
-                        <Route element={<Home />} path="/" />
-                        <Route element={<Demo />} path="/demo" />
-                        <Route element={<Single />} path="/single/:theid" />
-                        <Route element={<Login />} path="/login" />
-                        <Route element={<Register />} path="/register" />
-                        <Route element={<EmployerProfile />} path="/employerProfile" />
-                        <Route element={<FreelancerProfile />} path="/freelancerProfile" />
-                        <Route element={<FreelancerForm />} path="/FreelancerForm" />
-                        <Route element={<DashboardFreelancer />} path="/DashboardFreelancer" />
-                        <Route element={<DashboardProjects />} path="/DashboardProjects" />
-                        <Route element={<Dashboard />} path="/Dashboard" />               
-                        <Route element={<EmployerForm />} path="/employerForm" />
-                        <Route
-                            path="/admin"
-                            element={store.role === "admin" ? <Admin /> : <Navigate to="/" replace />}
-                        />
+                        <Routes>
+                            <Route element={<Home />} path="/" />
+                            <Route element={<Demo />} path="/demo" />
+                            <Route element={<Single />} path="/single/:theid" />
+                            <Route element={<Login />} path="/login" />
+                            <Route element={<Register />} path="/register" />
+                            <Route element={<EmployerProfile />} path="/employerProfile" />
+                            <Route element={<FreelancerProfile />} path="/freelancerProfile" />
+                            <Route element={<FreelancerForm />} path="/FreelancerForm" />
+                            <Route element={<DashboardFreelancer />} path="/DashboardFreelancer" />
+                            <Route element={<DashboardProjects />} path="/DashboardProjects" />
+                            <Route element={<Dashboard />} path="/Dashboard" />
+                            <Route element={<EmployerForm />} path="/employerForm" />
+                            <Route
+                                path="/admin"
+                                element={store.role === "admin" ? <Admin /> : <Navigate to="/" replace />}
+                            />
 
-                        <Route path="*" element={<h1>Not found!</h1>} />
-                  
-                        <Route element={<SearchResults />} path="/search" />
-                        <Route element={<Profile />} path="/Profile/:id" />
-                        <Route path="/project/:id" element={<ProjectDetails />} />
-                        <Route element={< ContactUs/>} path="/Contact" />
-                        <Route element={< Helpcenter/>} path="/Help" />
-                        <Route element={< About/>} path="/About" />
-                        <Route element={<Elements stripe={stripePromise} options={{ link: false }}><PaymentPage /></Elements>} path="/payment/:proposalId" />
+                            <Route path="*" element={<h1>Not found!</h1>} />
+
+                            <Route element={<SearchResults />} path="/search" />
+                            <Route element={<Profile />} path="/Profile/:id" />
+                            <Route path="/project/:id" element={<ProjectDetails />} />
+                            <Route element={< ContactUs />} path="/Contact" />
+                            <Route element={< Helpcenter />} path="/Help" />
+                            <Route element={< About />} path="/About" />
+                            <Route element={<Elements stripe={stripePromise} options={{ link: false }}><PaymentPage /></Elements>} path="/payment/:proposalId" />
 
 
-                        
+
 
 
                             <Route element={<h1>Not found!</h1>} />
