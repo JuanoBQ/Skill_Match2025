@@ -1,4 +1,4 @@
-const BASE_URL = "https://super-garbanzo-4j7jxp7v9x74hj4g7-3001.app.github.dev/api";
+const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {

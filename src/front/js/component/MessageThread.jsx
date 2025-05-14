@@ -6,7 +6,7 @@ const MessageThread = ({ otherId, otherName }) => {
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
 
-  // Carga el historial al montar / cuando cambie otherId
+  
   useEffect(() => {
     const fetchConversation = async () => {
       const res = await actions.getConversation(otherId);
@@ -17,14 +17,14 @@ const MessageThread = ({ otherId, otherName }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newMsg.trim()) return;  // validación: no enviar vacío
+    if (!newMsg.trim()) return;  
 
     const res = await actions.sendMessage({
       recipient_id: otherId,
       content: newMsg.trim(),
     });
     if (res.success) {
-      // añade el mensaje enviado al final
+    
       setMessages((prev) => [...prev, res.message]);
       setNewMsg("");
     } else {

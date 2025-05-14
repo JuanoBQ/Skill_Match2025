@@ -10,7 +10,6 @@ from sqlalchemy.ext.mutable import MutableList
 
 db = SQLAlchemy()
 
-
 class User(db.Model):
     __tablename__ = "users"
 
