@@ -2,6 +2,8 @@ import React, { useState, useContext } from 'react';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const Register = () => {
   const { actions } = useContext(Context);
@@ -18,7 +20,7 @@ const Register = () => {
     age: '',
     role: '',
     error: ''
-    
+
   });
 
   const handleChange = (e) => {
@@ -34,34 +36,37 @@ const Register = () => {
     e.preventDefault();
     const { firstName, lastName, email, password, confirmPassword, role } = formData;
 
-    
+
     if (!firstName || !lastName || !email || !password || !role) {
-      setFormData((prevData) => ({ ...prevData, error: 'Por favor, completa todos los campos.' }));
-      return;
-    }
+      return Swal.fire({ icon: 'error', title: 'Ups...', text: 'Por favor, completa todos los campos.' });}
 
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setFormData((prevData) => ({ ...prevData, error: 'Por favor, ingresa un correo electrónico válido.' }));
-      return;
-    }
+      return Swal.fire({ icon: 'error', title: 'Email inválido', text: 'Por favor, ingresa un correo electrónico válido.' });}
 
     if (password.length < 6) {
-      setFormData((prevData) => ({ ...prevData, error: 'La contraseña debe tener al menos 6 caracteres.' }));
-      return;
-    }
+      return Swal.fire({ icon: 'error', title: 'Contraseña muy corta', text: 'La contraseña debe tener al menos 6 caracteres.' });}
 
     if (password !== confirmPassword) {
-      setFormData(prev => ({ ...prev, error: 'Las contraseñas no coinciden.' }));
-      return;
-    }
+      return Swal.fire({ icon: 'error', title: 'Error', text: 'Las contraseñas no coinciden.' });}
 
-    
+
     const response = await actions.register(email, password, role, firstName, lastName);
 
     if (response.success) {
-      navigate('/login');
+      await Swal.fire({
+        icon: "success",
+        title: "¡Registro exitoso!",
+        text: "Ya puedes iniciar sesión",
+        confirmButtonText: "Ir a Login"
+      });
+      navigate("/login");
     } else {
-      setFormData((prevData) => ({ ...prevData, error: response.error }));
+      await Swal.fire({
+        icon: "error",
+        title: "Error al registrar",
+        text: response.error || "Ocurrió un problema",
+        confirmButtonText: "Ok"
+      });
     }
   };
 
