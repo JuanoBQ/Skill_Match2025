@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
 import MessageThread from "./MessageThread.jsx";
 import "../../styles/ChatAccordion.css";
+import pattern from "../../img/chat-pattern.png";
 
 const ChatAccordion = () => {
   const { actions } = useContext(Context);
@@ -16,6 +17,7 @@ const ChatAccordion = () => {
 
   // Nuevo mensaje
   const [newMessage, setNewMessage] = useState("");
+  const [reloadFlag, setReloadFlag] = useState(0);
 
   // Carga la lista de conversaciones
   useEffect(() => {
@@ -29,9 +31,13 @@ const ChatAccordion = () => {
   // Envía el mensaje y limpia input
   const handleSend = async () => {
     if (!newMessage.trim()) return;
-    const res = await actions.sendMessage(activeChat, newMessage);
+    const res = await actions.sendMessage({
+      recipient_id: activeChat,
+      content: newMessage
+    });
     if (res.success) {
       setNewMessage("");
+      setReloadFlag(f => f + 1);
       // Opcional: si MessageThread no refresca automáticamente,
       // podrías disparar aquí una recarga de mensajes.
     }
@@ -76,7 +82,8 @@ const ChatAccordion = () => {
       {activeChat && (
         <>
           <div className="modal d-block" tabIndex={-1}>
-            <div className="modal-dialog modal-dialog-centered">
+            {/* Agregamos modal-dialog-scrollable */}
+            <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
               <div className="modal-content">
 
                 {/* Header */}
@@ -92,9 +99,21 @@ const ChatAccordion = () => {
                 {/* Body: flex column */}
                 <div className="modal-body p-0 d-flex flex-column">
 
-                  {/* Mensajes: patrón + scroll */}
-                  <div className="chat-body flex-grow-1">
-                    <MessageThread otherId={activeChat} otherName={activeName} />
+                  {/* Mensajes: patrón + scroll interno */}
+                  <div
+                    className="chat-body flex-grow-1"
+                    style={{
+                      backgroundImage: `url(${pattern})`,
+                      backgroundRepeat: "repeat",
+                      overflowY: "auto",
+                      maxHeight: "60vh"
+                    }}
+                  >
+                    <MessageThread
+                      otherId={activeChat}
+                      otherName={activeName}
+                      reloadFlag={reloadFlag}
+                    />
                   </div>
 
                   {/* Footer: input + botón */}

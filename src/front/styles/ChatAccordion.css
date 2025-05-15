@@ -1,12 +1,56 @@
 .chat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   min-height: 300px;
-  /* si quieres poner tope: max-height: 400px; */
   overflow-y: auto;
   padding: 1rem;
-  background-color: #f5e7dc;
-  background-image: url('../img/chat-pattern.png');
+  background-color: #91c5d0;
   background-repeat: repeat;
   box-sizing: border-box;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;          /* no ocupen toda la fila */
+}
+
+/* Mensajes entrantes */
+.message.received {
+  align-self: flex-start;
+  margin-right: auto;
+}
+
+/* Mensajes salientes */
+.message.sent {
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+/* La “burbuja” */
+.bubble {
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  line-height: 1.3;
+}
+
+/* Estilo distinto según quién envía */
+.message.received .bubble {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #333;
+}
+
+.message.sent .bubble {
+  background-color: #5185d4;
+  color: #fff;
+}
+
+.timestamp {
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 0.25rem;
+  align-self: flex-end;
 }
 
 .chat-footer {

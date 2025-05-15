@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Context } from "../store/appContext";
 
-const MessageThread = ({ otherId, otherName }) => {
+const MessageThread = ({ otherId, otherName, reloadFlag }) => {
   const { actions } = useContext(Context);
   const [messages, setMessages] = useState([]);
 
@@ -11,21 +11,27 @@ const MessageThread = ({ otherId, otherName }) => {
       if (res.success) setMessages(res.messages);
     };
     fetchConversation();
-  }, [otherId, actions]);
+  }, [otherId, actions, reloadFlag]);
 
   return (
-    <>
-      {messages.map((m) => (
-        <div key={m.id} style={{ margin: "0.5rem 0" }}>
-          <strong>{m.from === otherId ? otherName : "Tú"}:</strong>{" "}
-          {m.content}
-          <br />
-          <small className="text-muted">
-            {new Date(m.timestamp).toLocaleString()}
-          </small>
-        </div>
-      ))}
-    </>
+    <div className="message-list">
+      {messages.map((m) => {
+        const isSent = m.from !== otherId;
+        return (
+          <div
+            key={m.id}
+            className={`message ${isSent ? "sent" : "received"}`}
+          >
+            <div className="bubble">
+              <strong>{isSent ? "Tú" : otherName}:</strong> {m.content}
+            </div>
+            <small className="timestamp">
+              {new Date(m.timestamp).toLocaleString()}
+            </small>
+          </div>
+        );
+      })}
+    </div>
   );
 };
 
