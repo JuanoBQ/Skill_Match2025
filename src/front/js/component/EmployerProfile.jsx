@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import MessageThread from "./MessageThread.jsx";
 import ChatAccordion from "./ChatAccordion.jsx";
+import pattern from "../../img/chat-pattern.png";
 
 const EmployerProfile = () => {
     const navigate = useNavigate();
@@ -23,6 +24,7 @@ const EmployerProfile = () => {
         rating: 0,
     });
     const [offers, setOffers] = useState([]);
+    const [showOffers, setShowOffers] = useState(false);
     const [proposals, setProposals] = useState([]);
     const [availableSkills, setAvailableSkills] = useState([]);
     const [selectedSkills, setSelectedSkills] = useState([]);
@@ -44,6 +46,22 @@ const EmployerProfile = () => {
     const [currentProposal, setCurrentProposal] = useState(null);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
+    const [newMessage, setNewMessage] = useState("");
+    const [reloadThreadFlag, setReloadThreadFlag] = useState(0);
+    const chatBodyRef = useRef(null);
+
+    const handleSend = async () => {
+        if (!newMessage.trim()) return;
+        const res = await actions.sendMessage({
+            recipient_id: chatOtherId,
+            content: newMessage
+        });
+        if (res.success) {
+            setNewMessage("");
+            setReloadThreadFlag(f => f + 1);
+        }
+    };
+
 
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
@@ -51,6 +69,11 @@ const EmployerProfile = () => {
             console.error("No hay user_id en localStorage.");
             setLoading(false);
             return;
+        }
+
+        if (chatBodyRef.current) {
+            const el = chatBodyRef.current;
+            el.scrollTop = el.scrollHeight;
         }
 
         const loadAll = async () => {
@@ -95,7 +118,7 @@ const EmployerProfile = () => {
         };
 
         loadAll();
-    }, []);
+    }, [reloadThreadFlag, chatOtherId]);
 
     const handleEditProfile = () => navigate("/employerForm");
 
@@ -280,6 +303,12 @@ const EmployerProfile = () => {
                         >
                             {showProposals ? "Ocultar solicitudes" : "Ver solicitudes recibidas"}
                         </button>
+                        <button
+                            className="btn btn-outline-success"
+                            onClick={() => setShowOffers(o => !o)}
+                        >
+                            {showOffers ? "Ocultar Ofertas Activas" : "Ver Ofertas Activas"}
+                        </button>
                     </div>
 
 
@@ -405,72 +434,73 @@ const EmployerProfile = () => {
                     )}
 
 
+                    {showOffers && (
+                        <div className="mb-5">
+                            <h4>Ofertas de Trabajo Activas</h4>
+                            {offers.length > 0 ? (
+                                <div className="row">
+                                    {offers.map((o) => (
+                                        <div key={o.id} className="col-sm-6 col-lg-4 mb-3">
+                                            <div className="card h-100 p-2">
+                                                <div className="card-body d-flex flex-column">
+                                                    <h6 className="mb-2">{o.title}</h6>
+                                                    <p className="small mb-1">
+                                                        <strong>Presupuesto:</strong> ${o.budget}
+                                                    </p>
+                                                    <p className="small mb-1">
+                                                        <strong>Publicada:</strong>{" "}
+                                                        {new Date(o.created_at).toLocaleDateString()}
+                                                    </p>
+                                                    <p className="text-muted mt-auto small">
+                                                        {o.proposals_count} postulantes
+                                                    </p>
 
-                    <div className="mb-5">
-                        <h4>Ofertas de Trabajo Activas</h4>
-                        {offers.length > 0 ? (
-                            <div className="row">
-                                {offers.map((o) => (
-                                    <div key={o.id} className="col-sm-6 col-lg-4 mb-3">
-                                        <div className="card h-100 p-2">
-                                            <div className="card-body d-flex flex-column">
-                                                <h6 className="mb-2">{o.title}</h6>
-                                                <p className="small mb-1">
-                                                    <strong>Presupuesto:</strong> ${o.budget}
-                                                </p>
-                                                <p className="small mb-1">
-                                                    <strong>Publicada:</strong>{" "}
-                                                    {new Date(o.created_at).toLocaleDateString()}
-                                                </p>
-                                                <p className="text-muted mt-auto small">
-                                                    {o.proposals_count} postulantes
-                                                </p>
-
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-sm btn-outline-danger mt-2"
-                                                    onClick={async () => {
-                                                        const result = await Swal.fire({
-                                                            title: "¿Estás seguro?",
-                                                            text: "Esta oferta se eliminará permanentemente.",
-                                                            icon: "warning",
-                                                            showCancelButton: true,
-                                                            confirmButtonText: "Sí, eliminar",
-                                                            cancelButtonText: "Cancelar",
-                                                        });
-                                                        if (!result.isConfirmed) return;
-
-                                                        const res = await actions.deleteProject(o.id);
-                                                        if (res.success) {
-                                                            const proj = await actions.getEmployerProjects();
-                                                            if (proj.success) setOffers(proj.projects);
-                                                            await Swal.fire({
-                                                                icon: "success",
-                                                                title: "Oferta eliminada",
-                                                                timer: 2000,
-                                                                showConfirmButton: false
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-sm btn-outline-danger mt-2"
+                                                        onClick={async () => {
+                                                            const result = await Swal.fire({
+                                                                title: "¿Estás seguro?",
+                                                                text: "Esta oferta se eliminará permanentemente.",
+                                                                icon: "warning",
+                                                                showCancelButton: true,
+                                                                confirmButtonText: "Sí, eliminar",
+                                                                cancelButtonText: "Cancelar",
                                                             });
-                                                        } else {
-                                                            await Swal.fire({
-                                                                icon: "error",
-                                                                title: "Error al eliminar",
-                                                                text: res.error,
-                                                                confirmButtonText: "Ok"
-                                                            });
-                                                        }
-                                                    }}
-                                                >
-                                                    Eliminar
-                                                </button>
+                                                            if (!result.isConfirmed) return;
+
+                                                            const res = await actions.deleteProject(o.id);
+                                                            if (res.success) {
+                                                                const proj = await actions.getEmployerProjects();
+                                                                if (proj.success) setOffers(proj.projects);
+                                                                await Swal.fire({
+                                                                    icon: "success",
+                                                                    title: "Oferta eliminada",
+                                                                    timer: 2000,
+                                                                    showConfirmButton: false
+                                                                });
+                                                            } else {
+                                                                await Swal.fire({
+                                                                    icon: "error",
+                                                                    title: "Error al eliminar",
+                                                                    text: res.error,
+                                                                    confirmButtonText: "Ok"
+                                                                });
+                                                            }
+                                                        }}
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-center text-muted">No hay ofertas de trabajo activas.</p>
-                        )}
-                    </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-center text-muted">No hay ofertas de trabajo activas.</p>
+                            )}
+                        </div>
+                    )}
 
 
                     {showProposals && (
@@ -478,44 +508,47 @@ const EmployerProfile = () => {
                             <div className="card-body">
                                 <h5 className="mb-4 text-center">Solicitudes Recibidas</h5>
                                 {proposals.length > 0 ? (
-                                    proposals.map((p) => (
-                                        <div key={p.id} className="border rounded p-3 mb-3">
-                                            <h6>Proyecto: {p.project?.title || "Sin título"}</h6>
-                                            <p>
-                                                <strong>Freelancer:</strong> {p.freelancer?.first_name}{" "}
-                                                {p.freelancer?.last_name}
-                                            </p>
-                                            <p>
-                                                <strong>Mensaje:</strong> {p.message}
-                                            </p>
-                                            <p>
-                                                <strong>Oferta:</strong> ${p.proposed_budget}
-                                            </p>
-                                            <button
-                                                className="btn btn-sm btn-outline-success w-100"
-                                                onClick={() => handleHire(p.id)}
-                                            >
-                                                Contratar
-                                            </button>
-                                            {/* NUEVO: Botón Chat */}
-                                            <button
-                                                className="btn btn-sm btn-outline-secondary w-100 mt-2"
-                                                onClick={() => {
-                                                    setChatOtherId(p.freelancer.id);
-                                                    setChatOtherName(
-                                                        `${p.freelancer.first_name} ${p.freelancer.last_name}`
-                                                    );
-                                                    setChatOpen(true);
-                                                }}
-                                            >
-                                                Chat
-                                            </button>
-                                        </div>
-                                    ))
+                                    <div className="row">
+                                        {proposals.map((p) => (
+                                            <div key={p.id} className="col-sm-6 col-lg-4 mb-3">
+                                                <div className="card h-100 shadow-sm">
+                                                    <div className="card-body d-flex flex-column">
+                                                        <h6 className="card-title">{p.project?.title || "Sin título"}</h6>
+                                                        <p className="small mb-1">
+                                                            <strong>Freelancer:</strong>{" "}
+                                                            {p.freelancer?.first_name} {p.freelancer?.last_name}
+                                                        </p>
+                                                        <p className="small mb-3">
+                                                            <strong>Mensaje:</strong> {p.message}
+                                                        </p>
+                                                        <p className="small text-muted mt-auto mb-3">
+                                                            <strong>Oferta:</strong> ${p.proposed_budget}
+                                                        </p>
+                                                        <button
+                                                            className="btn btn-sm btn-success w-100 mb-2"
+                                                            onClick={() => handleHire(p.id)}
+                                                        >
+                                                            Contratar
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-secondary w-100"
+                                                            onClick={() => {
+                                                                setChatOtherId(p.freelancer.id);
+                                                                setChatOtherName(
+                                                                    `${p.freelancer.first_name} ${p.freelancer.last_name}`
+                                                                );
+                                                                setChatOpen(true);
+                                                            }}
+                                                        >
+                                                            Chat
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 ) : (
-                                    <p className="text-center text-muted">
-                                        Aún no has recibido propuestas.
-                                    </p>
+                                    <p className="text-center text-muted">Aún no has recibido propuestas.</p>
                                 )}
                             </div>
                         </div>
@@ -684,6 +717,8 @@ const EmployerProfile = () => {
                     <div className="modal d-block" tabIndex={-1}>
                         <div className="modal-dialog modal-dialog-centered">
                             <div className="modal-content">
+
+                                {/* Header */}
                                 <div className="modal-header">
                                     <h5 className="modal-title">Chat con {chatOtherName}</h5>
                                     <button
@@ -692,13 +727,47 @@ const EmployerProfile = () => {
                                         onClick={() => setChatOpen(false)}
                                     />
                                 </div>
-                                <div className="modal-body p-0">
-                                    <div className="chat-body">
+
+                                {/* Body + Input igual que en ChatAccordion */}
+                                <div className="modal-body p-0 d-flex flex-column">
+
+                                    {/* 1) Contenedor de mensajes */}
+                                    <div
+                                        ref={chatBodyRef}
+                                        className="chat-body flex-grow-1"
+                                        style={{
+                                            backgroundImage: `url(${pattern})`,     // si usas patrón
+                                            backgroundRepeat: "repeat",
+                                            overflowY: "auto",
+                                            maxHeight: "60vh",
+                                            padding: "1rem",
+                                            boxSizing: "border-box"
+                                        }}
+                                    >
                                         <MessageThread
                                             otherId={chatOtherId}
                                             otherName={chatOtherName}
+                                            reloadFlag={reloadThreadFlag}
                                         />
                                     </div>
+
+                                    {/* 2) Footer con input y botón */}
+                                    <div className="chat-footer p-3 border-top">
+                                        <div className="input-group">
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                placeholder="Escribe tu mensaje…"
+                                                value={newMessage}
+                                                onChange={e => setNewMessage(e.target.value)}
+                                                onKeyDown={e => e.key === "Enter" && handleSend()}
+                                            />
+                                            <button className="btn btn-primary" onClick={handleSend}>
+                                                Enviar
+                                            </button>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -706,6 +775,7 @@ const EmployerProfile = () => {
                     <div className="modal-backdrop fade show"></div>
                 </>
             )}
+
         </div>
     );
 };

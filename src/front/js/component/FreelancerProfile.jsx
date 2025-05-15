@@ -50,7 +50,7 @@ const FreelancerProfile = () => {
           profileRes.profile.profile_picture || undefinedImg
         );
       } else {
-        setProfileNotFound(true);
+        navigate("/freelancerForm");
         return;
       }
 
