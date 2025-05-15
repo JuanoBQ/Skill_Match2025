@@ -3,6 +3,7 @@ import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
+import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import MessageThread from "./MessageThread.jsx";
@@ -516,8 +517,14 @@ const EmployerProfile = () => {
                                                         <h6 className="card-title">{p.project?.title || "Sin título"}</h6>
                                                         <p className="small mb-1">
                                                             <strong>Freelancer:</strong>{" "}
-                                                            {p.freelancer?.first_name} {p.freelancer?.last_name}
+                                                            <Link
+                                                                to={`/Profile/${p.freelancer.id}`}
+                                                                className="name-link-bubble"
+                                                            >
+                                                                {p.freelancer.first_name} {p.freelancer.last_name}
+                                                            </Link>
                                                         </p>
+
                                                         <p className="small mb-3">
                                                             <strong>Mensaje:</strong> {p.message}
                                                         </p>
