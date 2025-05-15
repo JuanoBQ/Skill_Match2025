@@ -1,0 +1,14 @@
+.chat-body {
+  min-height: 300px;
+  /* si quieres poner tope: max-height: 400px; */
+  overflow-y: auto;
+  padding: 1rem;
+  background-color: #f5e7dc;
+  background-image: url('../img/chat-pattern.png');
+  background-repeat: repeat;
+  box-sizing: border-box;
+}
+
+.chat-footer {
+  background-color: #fff;
+}

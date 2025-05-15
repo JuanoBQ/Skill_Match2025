@@ -690,11 +690,13 @@ const EmployerProfile = () => {
                                         onClick={() => setChatOpen(false)}
                                     />
                                 </div>
-                                <div className="modal-body">
-                                    <MessageThread
-                                        otherId={chatOtherId}
-                                        otherName={chatOtherName}
-                                    />
+                                <div className="modal-body p-0">
+                                    <div className="chat-body">
+                                        <MessageThread
+                                            otherId={chatOtherId}
+                                            otherName={chatOtherName}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

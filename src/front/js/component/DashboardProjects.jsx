@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Context } from '../store/appContext';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 import { useNavigate } from 'react-router-dom';
 import styles from './../../styles/index.css';
 
@@ -21,20 +23,29 @@ const DashboardProjects = () => {
         return () => { isMounted = false; };
     }, []);
 
-    const handleViewOffer = (project) => {
+    const handleViewOffer = async (projectId) => {
         if (!store.isAuthenticated) {
-            alert("Debes estar logueado como freelancer para ver y aplicar a una oferta.");
-            navigate("/login");
+            await Swal.fire({
+                icon: 'error',
+                title: 'Acceso restringido',
+                text: 'Debes estar logueado como freelancer para ver y aplicar a una oferta.',
+                confirmButtonText: 'Ok'
+            });
+            navigate('/login');
             return;
         }
-        else navigate(`/project/${project}`);
-        
+        navigate(`/project/${projectId}`);
     };
 
     const handleApply = async () => {
         if (!store.isAuthenticated) {
-            alert("Debes estar logueado como freelancer.");
-            navigate("/login");
+            await Swal.fire({
+                icon: 'error',
+                title: 'Debes iniciar sesión',
+                text: 'Necesitas estar logueado como freelancer para aplicar.',
+                confirmButtonText: 'Ok'
+            });
+            navigate('/login');
             return;
         }
 
@@ -46,12 +57,22 @@ const DashboardProjects = () => {
         });
 
         if (res.success) {
-            alert("Aplicaste exitosamente a la oferta.");
+            await Swal.fire({
+                icon: 'success',
+                title: 'Aplicación enviada',
+                text: 'Has aplicado exitosamente a la oferta.',
+                confirmButtonText: 'Ok'
+            });
             setShowModal(false);
             setProposalMessage("");
             setProposedBudget("");
         } else {
-            alert("Error al aplicar: " + res.error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error al aplicar',
+                text: res.error || 'Error desconocido al enviar tu aplicación.',
+                confirmButtonText: 'Ok'
+            });
         }
     };
 

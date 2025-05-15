@@ -26,6 +26,7 @@ export const Dashboard = () => {
             if (!userId) return;
 
             const response = await actions.getFreelancerProfile(userId);
+            await actions.getContacts(userId);
             if (response.success) {
                 setProfile(response.profile);
             }
@@ -34,7 +35,7 @@ export const Dashboard = () => {
 
         loadProfile();
 
-    }, [actions, store.isAuthenticated]);
+    }, []);
 
 
     const fullName = profile?.user
@@ -68,7 +69,7 @@ export const Dashboard = () => {
                                     style={{
                                         width: "100%",
                                         height: "100%",
-                                        objectFit: "contain", 
+                                        objectFit: "contain",
                                         objectPosition: "center",
                                     }}
                                 />
