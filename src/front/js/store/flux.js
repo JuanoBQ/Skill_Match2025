@@ -851,20 +851,51 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			getConversations: async () => {
-				const resp = await fetch(`${BASE_URL}/conversations`,
-					{
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: "Bearer " + localStorage.getItem("token"),
-						}
+				// 1) traes tu lista de conversaciones
+				const resp = await fetch(`${BASE_URL}/conversations`, {
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: "Bearer " + localStorage.getItem("token"),
 					}
-				);
+				});
 				const data = await resp.json();
-				if (resp.ok) {
-					return { success: true, conversations: data.conversations };
-				} else {
+				if (!resp.ok) {
 					return { success: false, error: data.msg || "Error al cargar conversaciones" };
 				}
+
+				// 2) identifica tu propio user_id
+				const currentUserId = parseInt(localStorage.getItem("user_id"));
+
+				// 3) para cada conversación, pide el hilo y cuenta los no leídos
+				const conversationsWithUnread = await Promise.all(
+					data.conversations.map(async (c) => {
+						try {
+							const r2 = await fetch(`${BASE_URL}/messages/${c.user_id}`, {
+								headers: {
+									"Content-Type": "application/json",
+									Authorization: "Bearer " + localStorage.getItem("token"),
+								}
+							});
+							const d2 = await r2.json();
+							if (!r2.ok) throw new Error();
+
+							// asumo que d2.messages es un array con { to, read, … }
+							const unread_count = d2.messages.filter(
+								msg => msg.to === currentUserId && msg.read === false
+							).length;
+
+							return { ...c, unread_count };
+						} catch {
+							// si falla, lo contamos como 0
+							return { ...c, unread_count: 0 };
+						}
+					})
+				);
+
+				return {
+					success: true,
+					conversations: conversationsWithUnread
+				};
 			},
 
 			// 2. Enviar un mensaje a otro usuario

@@ -1142,16 +1142,26 @@ def get_conversation(other_user_id):
         )
     ).order_by(Message.timestamp.asc()).all()
 
-    # 4) Mapear a user_id en vez de profile.id
-    history = []
     for m in msgs:
-        history.append({
-            "id":        m.id,
-            "from":      m.sender.user_id,
-            "to":        m.recipient.user_id,
-            "content":   m.content,
-            "timestamp": m.timestamp.isoformat()
-        })
+        if m.recipient_id == my_profile.id and not m.is_read:
+            m.is_read = True
+    db.session.commit()
+
+    # 4) Marcar como leídos los que van hacia mí
+    for m in msgs:
+        if m.recipient_id == my_profile.id and not m.is_read:
+            m.is_read = True
+    db.session.commit()
+
+    # 5) Mapear a user_id + exponer is_read
+    history = [{
+        "id":        m.id,
+        "from":      m.sender.user_id,
+        "to":        m.recipient.user_id,
+        "content":   m.content,
+        "timestamp": m.timestamp.isoformat(),
+        "is_read":   m.is_read
+    } for m in msgs]
     return jsonify({"messages": history}), 200
 
 
@@ -1166,9 +1176,6 @@ def list_conversations():
     if not me:
         return jsonify({"msg": "Perfil de usuario no encontrado"}), 404
 
-    all_msgs = Message.query.all()
-    print("📋 TODOS los mensajes (id, sender_id, recipient_id):", 
-          [(m.id, m.sender_id, m.recipient_id) for m in all_msgs])
     # 2) Traer todos los mensajes donde participo
     msgs = Message.query.filter(
         or_(
@@ -1185,19 +1192,26 @@ def list_conversations():
         if m.recipient_id != me.id:
             otros_ids.add(m.recipient_id)
 
-    print("🔍 Debug otros_ids (profile.id):", otros_ids)
 
     # 4) Construir la lista de conversaciones
     conversations = []
     for prof_id in otros_ids:
         prof = Profile.query.get(prof_id)
         if not prof:
-            # si el perfil ya no existe, lo saltamos
             continue
-        user = prof.user  # relación Profile → User
+        user = prof.user
+
+        # contar cuánto me enviaron a mí sin marcar como leído
+        unread = Message.query.filter_by(
+            sender_id    = prof.id,
+            recipient_id = me.id,
+            is_read      = False
+        ).count()
+
         conversations.append({
-            "user_id": user.id,
-            "name":    f"{user.first_name} {user.last_name}"
+            "user_id":      user.id,
+            "name":         f"{user.first_name} {user.last_name}",
+            "unread_count": unread
         })
 
     return jsonify({"conversations": conversations}), 200

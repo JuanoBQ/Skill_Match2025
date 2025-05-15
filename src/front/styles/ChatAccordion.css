@@ -13,29 +13,25 @@
 .message {
   display: flex;
   flex-direction: column;
-  max-width: 70%;          /* no ocupen toda la fila */
+  max-width: 70%;
 }
 
-/* Mensajes entrantes */
 .message.received {
   align-self: flex-start;
   margin-right: auto;
 }
 
-/* Mensajes salientes */
 .message.sent {
   align-self: flex-end;
   margin-left: auto;
 }
 
-/* La “burbuja” */
 .bubble {
   padding: 0.75rem 1rem;
   border-radius: 1rem;
   line-height: 1.3;
 }
 
-/* Estilo distinto según quién envía */
 .message.received .bubble {
   background-color: rgba(255, 255, 255, 0.8);
   color: #333;
@@ -55,4 +51,13 @@
 
 .chat-footer {
   background-color: #fff;
+}
+
+.unread-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 0.5rem;
 }

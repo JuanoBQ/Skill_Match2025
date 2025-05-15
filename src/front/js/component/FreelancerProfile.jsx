@@ -34,7 +34,7 @@ const FreelancerProfile = () => {
   const [chatOtherId, setChatOtherId] = useState(null);
   const [chatOtherName, setChatOtherName] = useState("");
   const [profileNotFound, setProfileNotFound] = useState(false);
-  
+
   useEffect(() => {
     const userId = localStorage.getItem("user_id");
     if (!userId || profileNotFound) {
@@ -64,9 +64,10 @@ const FreelancerProfile = () => {
         setSentProposals(respSent.proposals);
       }
 
-      const completedRes = await actions.getCompletedProjects();
+      const completedRes = await actions.getFreelancerCompletedProposals(userId);
       if (completedRes.success) {
-        setCompletedProjects(completedRes.projects);
+        // extraemos sólo la parte de `project` de cada propuesta completada
+        setCompletedProjects(completedRes.proposals.map(p => p.project));
       }
 
       const statsRes = await actions.getEmployerStats();
@@ -198,33 +199,6 @@ const FreelancerProfile = () => {
             </div>
           </div>
 
-          {profile.reviews && profile.reviews.length > 0 && (
-            <div className="mt-5">
-              <h5 className="fw-bold">Reseñas</h5>
-              <ul className="list-group">
-                {profile.reviews.map(r => (
-                  <li key={r.id} className="list-group-item">
-                    <div className="d-flex align-items-center">
-                      <img src={r.reviewer.profile_picture}
-                        alt={`${r.reviewer.first_name}`}
-                        className="rounded-circle me-3"
-                        style={{ width: 40, height: 40, objectFit: 'cover' }} />
-                      <div>
-                        <strong>{r.reviewer.first_name} {r.reviewer.last_name}</strong>
-                        <span className="ms-2 text-warning">
-                          {'★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)}
-                        </span>
-                      </div>
-                    </div>
-                    {r.comment && <p className="mt-2 mb-0">{r.comment}</p>}
-                    <small className="text-muted">{new Date(r.created_at).toLocaleDateString()}</small>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-
           <div className="mt-4">
             <details>
               <summary className="fw-bold">Proyectos completados ({completedProposals.length})</summary>
@@ -315,6 +289,32 @@ const FreelancerProfile = () => {
 
               <div className="modal-backdrop fade show"></div>
             </>
+          )}
+
+          {profile.reviews && profile.reviews.length > 0 && (
+            <div className="mt-5">
+              <h5 className="fw-bold">Reseñas</h5>
+              <ul className="list-group">
+                {profile.reviews.map(r => (
+                  <li key={r.id} className="list-group-item">
+                    <div className="d-flex align-items-center">
+                      <img src={r.reviewer.profile_picture}
+                        alt={`${r.reviewer.first_name}`}
+                        className="rounded-circle me-3"
+                        style={{ width: 40, height: 40, objectFit: 'cover' }} />
+                      <div>
+                        <strong>{r.reviewer.first_name} {r.reviewer.last_name}</strong>
+                        <span className="ms-2 text-warning">
+                          {'★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)}
+                        </span>
+                      </div>
+                    </div>
+                    {r.comment && <p className="mt-2 mb-0">{r.comment}</p>}
+                    <small className="text-muted">{new Date(r.created_at).toLocaleDateString()}</small>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
 
         </div>
