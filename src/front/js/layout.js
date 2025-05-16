@@ -33,6 +33,7 @@ import ProjectDetails from "./component/ProjectDetails.jsx";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Historial } from "./pages/historial.js"
 
 
 
@@ -78,6 +79,7 @@ const Layout = () => {
                             <Route element={<DashboardProjects />} path="/DashboardProjects" />
                             <Route element={<Dashboard />} path="/Dashboard" />
                             <Route element={<EmployerForm />} path="/employerForm" />
+                            <Route element={<Historial />} path="/PaymentHistory" />
                             <Route
                                 path="/admin"
                                 element={store.role === "admin" ? <Admin /> : <Navigate to="/" replace />}
@@ -92,6 +94,7 @@ const Layout = () => {
                             <Route element={< Helpcenter />} path="/Help" />
                             <Route element={< About />} path="/About" />
                             <Route element={<Elements stripe={stripePromise} options={{ link: false }}><PaymentPage /></Elements>} path="/payment/:proposalId" />
+                            
 
 
 

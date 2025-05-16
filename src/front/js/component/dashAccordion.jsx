@@ -33,7 +33,7 @@ export const DashAccordion = () => {
 
         actions.getContacts();
         loadProfile();
-    }, []);
+    }, [actions]);
 
     const goToProfile = (id) => {
         navigate(`/Profile/${id}`);

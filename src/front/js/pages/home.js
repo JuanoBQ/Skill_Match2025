@@ -10,6 +10,7 @@ import Empresa2 from "./../../img/Empresas/Empresa 2.png"
 import Empresa3 from "./../../img/Empresas/Empresa 3.png"
 import Empresa4 from "./../../img/Empresas/Empresa 4.png"
 import Empresa5 from "./../../img/Empresas/Empresa 5.png"
+import logo from './../../../../public/Logo SkillMatch.png';
 
 const Home = () => {
 	const [showAlert, setShowAlert] = useState(false);
@@ -35,33 +36,49 @@ const Home = () => {
 					></button>
 				</div>
 			)}
-			<section className="hero-section">
-				<div className="container">
-					<div className="row">
-						<div className="col-lg-6 col-md-12 hero-content">
-							<h1>Encuentra el talento perfecto para tu proyecto</h1>
-							<p className="hero-subtitle">
-								Contrata a los mejores freelancers para cualquier trabajo, en línea.
-							</p>
+					<section className="hero-section">
+			<div className="container">
+				<div className="row">
+				{/* Columna izquierda */}
+				<div className="col-lg-6 col-md-12 hero-content">
+					<div className="d-flex align-items-center mb-4">
+					<img
+						src={logo}
+						alt="Logo SkillMatch"
+						style={{ width: "64px", height: "64px", marginRight: "15px" }}
+					/>
+					<h1 style={{ fontSize: "4.0rem", fontWeight: "bold", margin: 0 }}>
+						Skill Match
+					</h1>
+					</div>
 
-							<div className="popular-searches">
-								<span>Popular:</span>
-								<Link to="#">Desarrollo Web</Link>
-								<Link to="#">Diseño Gráfico</Link>
-								<Link to="#">Marketing Digital</Link>
-								<Link to="#">Redacción</Link>
-							</div>
-						</div>
-						<div className="col-lg-6 col-md-12 hero-image">
-							<img
-								src="https://s36496.pcdn.co/wp-content/uploads/2022/12/guia-sector-it-02.jpg"
-								alt="Profesional trabajando"
-								className="img-fluid"
-							/>
-						</div>
+					<h2>Encuentra el talento perfecto para tu proyecto</h2>
+
+					<p className="hero-subtitle">
+					Contrata a los mejores freelancers para cualquier trabajo, en línea.
+					</p>
+
+					<div className="popular-searches">
+						<span>Popular:</span>
+						<span className="fake-link">Desarrollo Web</span>
+						<span className="fake-link">Diseño Gráfico</span>
+						<span className="fake-link">Marketing Digital</span>
+						<span className="fake-link">Redacción</span>
 					</div>
 				</div>
+
+				{/* Columna derecha */}
+				<div className="col-lg-6 col-md-12 hero-image">
+					<img
+					src="https://s36496.pcdn.co/wp-content/uploads/2022/12/guia-sector-it-02.jpg"
+					alt="Profesional trabajando"
+					className="img-fluid"
+					/>
+				</div>
+				</div>
+			</div>
 			</section>
+
 
 			{/* Empresas */}
 			<section className="trusted-by">

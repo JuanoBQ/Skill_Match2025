@@ -63,6 +63,11 @@ const EmployerProfile = () => {
         }
     };
 
+    const readMore = (bio) => {
+        if (!bio) return "No Bio";
+        return bio.length > 150 ? bio.slice(0, 150) + "..." : bio;
+    };
+
 
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
@@ -526,7 +531,7 @@ const EmployerProfile = () => {
                                                         </p>
 
                                                         <p className="small mb-3">
-                                                            <strong>Mensaje:</strong> {p.message}
+                                                            <strong>Mensaje:</strong> {readMore(p.message)}
                                                         </p>
                                                         <p className="small text-muted mt-auto mb-3">
                                                             <strong>Oferta:</strong> ${p.proposed_budget}
