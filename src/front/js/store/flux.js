@@ -1,4 +1,4 @@
-const BASE_URL = "https://psychic-space-acorn-xrwrqq5wqv2vwqx-3001.app.github.dev/api";
+const BASE_URL = "https://jubilant-barnacle-r47wxwp7gq6jhww6x-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {

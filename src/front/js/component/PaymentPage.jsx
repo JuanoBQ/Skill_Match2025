@@ -12,7 +12,7 @@ import logo from "./../../../../public/stripe-logo.png";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
-const BASE_URL = "https://psychic-space-acorn-xrwrqq5wqv2vwqx-3001.app.github.dev/api";
+const BASE_URL = "https://jubilant-barnacle-r47wxwp7gq6jhww6x-3001.app.github.dev/api";
 
 const PaymentPage = () => {
     const { proposalId } = useParams();
