@@ -1,7 +1,651 @@
-/*
-    home.css: This website contains selectors only used in home.css
+/* General Styles */
+:root {
+    --color-primary: #000;          /* Negro principal */
+    --color-secondary: #333;        /* Gris oscuro para texto, bordes */
+    --color-text: #555;             /* Gris medio para texto de párrafo */
+    --color-background: #fff;       /* Blanco principal */
+    --color-light-gray: #f4f4f4;    /* Gris claro para fondos de sección */
+    --color-border: #eee;           /* Gris muy claro para bordes sutiles */
+    --color-dark-background: #1a1a1a; /* Fondo oscuro para secciones destacadas */
 
-    All pages share the styles on index.css but you should create 
-    one more css for each page that will contain the selected used 
-    on that page only (the ones not reused in other pages).
-*/
+    --spacing-sm: 10px;
+    --spacing-md: 20px;
+    --spacing-lg: 40px;
+    --spacing-xl: 80px;
+
+    --border-radius: 5px;
+    --transition-speed: 0.3s;
+}
+
+body {
+    font-family: 'Arial', sans-serif; /* Usar una fuente sans-serif moderna */
+    line-height: 1.6;
+    color: var(--color-text);
+    background-color: var(--color-background);
+    margin: 0;
+    padding: 0;
+}
+
+.upwork-homepage {
+    overflow-x: hidden; /* Prevenir desplazamiento horizontal por si acaso */
+}
+
+/* Container (Assuming basic centered container) */
+.container {
+    width: 100%;
+    max-width: 1200px; /* O el max-width que uses en tu proyecto */
+    margin: 0 auto;
+    padding: 0 var(--spacing-md); /* Espacio a los lados */
+}
+
+/* Headings */
+h1, h2, h3, h4, h5 {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.2;
+}
+
+h1 { font-size: 3em; } /* Ajusta según necesidad */
+h2 { font-size: 2.5em; }
+h3 { font-size: 1.8em; }
+h4 { font-size: 1.4em; }
+h5 { font-size: 1.2em; }
+
+/* Links */
+a {
+    color: var(--color-secondary);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+/* Section Base Styles */
+section {
+    padding: var(--spacing-xl) 0; /* Espacio entre secciones */
+}
+
+/* Hero Section */
+.hero-section {
+    background-color: var(--color-light-gray);
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra verticalmente con la imagen si son de la misma altura */
+    padding-right: var(--spacing-md); /* Espacio entre contenido e imagen */
+}
+
+.hero-section h1 {
+    font-size: 3.5em; /* Tamaño grande para el título principal */
+    margin-bottom: var(--spacing-sm);
+    font-weight: bold;
+}
+
+.hero-subtitle {
+    font-size: 1.3em;
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.search-container {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    max-width: 500px; /* Limita el ancho de la barra de búsqueda */
+    background-color: var(--color-background); /* Fondo blanco para el contenedor de búsqueda */
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow: hidden; /* Para que los hijos respeten el border-radius */
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    outline: none;
+    font-size: 1em;
+}
+
+.search-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    border: none;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0; /* Solo esquinas derechas */
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.search-btn:hover {
+    background-color: var(--color-secondary); /* Un gris oscuro al pasar el ratón */
+    color: var(--color-background);
+}
+
+.popular-searches {
+    font-size: 0.9em;
+    color: var(--color-secondary);
+    margin-top: var(--spacing-md);
+}
+
+.popular-searches span {
+    font-weight: bold;
+    margin-right: var(--spacing-sm);
+}
+
+.popular-searches a {
+    margin-right: var(--spacing-sm);
+    color: var(--color-text);
+}
+
+.popular-searches a:hover {
+    text-decoration: underline;
+    color: var(--color-primary);
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sutil sombra */
+}
+
+/* Trusted By Section */
+.trusted-by {
+    padding: var(--spacing-md) 0; /* Menos espacio que otras secciones */
+    background-color: var(--color-background);
+}
+
+.trusted-by h5 {
+    font-size: 1em;
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+.logos-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los logos salten de línea */
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-lg); /* Espacio entre logos */
+}
+
+.logos-container img {
+    height: 30px; /* Altura fija para los logos */
+    max-width: 120px; /* Max ancho para evitar que sean demasiado grandes */
+    object-fit: contain; /* Asegura que la imagen se ajuste sin distorsionarse */
+    opacity: 0.6; /* Un poco transparentes */
+    transition: opacity var(--transition-speed);
+}
+
+.logos-container img:hover {
+    opacity: 1; /* Opacidad completa al pasar el ratón */
+}
+
+
+/* Categories Section */
+.categories-section {
+    background-color: var(--color-light-gray);
+}
+
+.categories-section h2 {
+    text-align: left; /* O center si prefieres */
+    margin-bottom: var(--spacing-lg);
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Grid responsivo */
+    gap: var(--spacing-md);
+}
+
+.category-card {
+    background-color: var(--color-background);
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinea contenido a la izquierda */
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.category-card:hover {
+    transform: translateY(-5px); /* Efecto hover sutil */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.category-icon {
+    font-size: 2em;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+    /* Puedes añadir un fondo o borde si quieres */
+    /* width: 50px; height: 50px; border-radius: 50%; background-color: #eee; display: flex; justify-content: center; align-items: center; */
+}
+
+.category-card h3 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.4em;
+}
+
+.category-card p {
+    margin-bottom: 0;
+    font-size: 0.9em;
+    color: var(--color-text);
+}
+
+.view-all-btn {
+    display: inline-block; /* Asegura que padding y margin funcionen */
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-background);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.view-all-btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    text-decoration: none;
+}
+
+
+/* How It Works */
+.how-it-works {
+    background-color: var(--color-background);
+}
+
+.how-it-works h2 {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.steps-container {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    flex-wrap: wrap; /* Permite que los pasos salten de línea en pantallas pequeñas */
+}
+
+.step-card {
+    flex: 1; /* Hace que las cards intenten ocupar el mismo espacio */
+    min-width: 250px; /* Ancho mínimo antes de apilarse */
+    text-align: center;
+    padding: var(--spacing-md);
+    /* Puedes añadir un borde sutil o sombra */
+    /* border: 1px solid var(--color-border); */
+    /* border-radius: var(--border-radius); */
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    font-size: 1.5em;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto var(--spacing-sm) auto; /* Centra el número */
+}
+
+.step-card h3 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.3em;
+}
+
+.step-card p {
+    font-size: 0.95em;
+    color: var(--color-text);
+}
+
+
+/* Testimonials */
+.testimonials {
+    background-color: var(--color-light-gray);
+}
+
+.testimonials h2 {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Row class from Bootstrap or similar */
+.testimonials .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: calc(-1 * var(--spacing-md) / 2); /* Compensa el gap */
+    margin-right: calc(-1 * var(--spacing-md) / 2);
+}
+
+.testimonials .col-lg-4,
+.testimonials .col-md-6 {
+    padding-left: calc(var(--spacing-md) / 2);
+    padding-right: calc(var(--spacing-md) / 2);
+    margin-bottom: var(--spacing-md); /* Espacio entre columnas cuando se apilan */
+}
+
+.testimonial-card {
+    background-color: var(--color-background);
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    height: 100%; /* Asegura que las cards tengan la misma altura si están en la misma fila */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Empuja el autor hacia abajo */
+}
+
+.testimonial-content p {
+    font-style: italic;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-secondary);
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+}
+
+.author-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: var(--spacing-sm);
+    border: 2px solid var(--color-border); /* Borde sutil alrededor de la imagen */
+}
+
+.testimonial-author h4 {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.testimonial-author p {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--color-text);
+}
+
+
+/* Stats Section */
+.stats-section {
+    background-color: var(--color-dark-background); /* Fondo oscuro */
+    color: var(--color-background); /* Texto blanco */
+}
+
+.stats-section h2,
+.stats-section p {
+    color: inherit; /* Hereda el color blanco de la sección */
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    gap: var(--spacing-md);
+    flex-wrap: wrap; /* Permite que los stats salten de línea */
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1; /* Permite que los ítems intenten ocupar espacio */
+    min-width: 150px; /* Ancho mínimo antes de reorganizarse */
+}
+
+.stat-item h2 {
+    font-size: 2.5em;
+    margin-bottom: var(--spacing-sm);
+    font-weight: bold;
+}
+
+.stat-item p {
+    font-size: 1.1em;
+    color: var(--color-light-gray); /* Texto un poco más claro */
+    margin-bottom: 0;
+}
+
+
+/* CTA Section */
+.cta-section {
+    background-color: var(--color-background);
+}
+
+/* Row class from Bootstrap or similar */
+.cta-section .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: calc(-1 * var(--spacing-md) / 2); /* Compensa el gap */
+    margin-right: calc(-1 * var(--spacing-md) / 2);
+}
+
+.cta-section .col-md-6 {
+     padding-left: calc(var(--spacing-md) / 2);
+    padding-right: calc(var(--spacing-md) / 2);
+    margin-bottom: var(--spacing-md); /* Espacio entre columnas cuando se apilan */
+}
+
+
+.cta-card {
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius);
+    height: 100%; /* Asegura que las cards tengan la misma altura */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinea contenido a la izquierda */
+    justify-content: space-between; /* Empuja el botón hacia abajo */
+    border: 1px solid var(--color-border);
+}
+
+.client-cta {
+    background-color: var(--color-light-gray); /* Fondo gris claro para una CTA */
+}
+
+.freelancer-cta {
+     background-color: var(--color-background); /* Fondo blanco para la otra CTA */
+}
+
+
+.cta-card h2 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+}
+
+.cta-card p {
+    margin-bottom: var(--spacing-md);
+    font-size: 1em;
+    color: var(--color-text);
+}
+
+.cta-btn {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    transition: background-color var(--transition-speed), opacity var(--transition-speed);
+    margin-top: auto; /* Empuja el botón hacia abajo */
+}
+
+.cta-btn:hover {
+    background-color: var(--color-secondary); /* Un gris oscuro al pasar el ratón */
+    text-decoration: none;
+}
+
+
+/* Helper Classes (if not using Bootstrap) */
+.text-center {
+    text-align: center;
+}
+
+.mt-4 {
+    margin-top: var(--spacing-lg); /* Equivalente a mt-4 de Bootstrap aproximadamente */
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 992px) { /* Large devices (desktops) */
+    .hero-section .row {
+        flex-direction: column; /* Stack columns on smaller screens */
+    }
+
+    .hero-content {
+        padding-right: 0;
+        margin-bottom: var(--spacing-lg); /* Add space below content when stacked */
+        text-align: center;
+        align-items: center;
+    }
+
+    .hero-content h1,
+    .hero-subtitle {
+        text-align: center;
+    }
+
+    .hero-image {
+        padding-left: 0;
+        display: flex; /* Use flex to center the image */
+        justify-content: center;
+    }
+
+    .popular-searches {
+        justify-content: center; /* Center popular searches */
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+    .popular-searches span {
+        flex-basis: 100%; /* Make span take full width */
+        text-align: center;
+        margin-right: 0;
+    }
+
+    .steps-container,
+    .stats-container {
+        flex-direction: column; /* Stack steps/stats vertically */
+    }
+
+    .step-card,
+    .stat-item {
+        min-width: auto; /* Reset min-width */
+        width: 100%;
+        margin-bottom: var(--spacing-md); /* Add space between stacked items */
+    }
+
+     /* Adjust padding for stacked columns */
+    .testimonials .col-md-6,
+    .cta-section .col-md-6 {
+         padding-left: var(--spacing-md);
+         padding-right: var(--spacing-md);
+         margin-bottom: var(--spacing-md);
+     }
+
+    .testimonials .row,
+    .cta-section .row {
+         margin-left: 0;
+         margin-right: 0;
+     }
+}
+
+@media (max-width: 768px) { /* Medium devices (tablets) */
+     h1 { font-size: 2.5em; }
+     h2 { font-size: 2em; }
+     h3 { font-size: 1.6em; }
+
+     section {
+        padding: var(--spacing-lg) 0; /* Reduce section padding */
+     }
+
+     .container {
+        padding: 0 var(--spacing-sm); /* Reduce container padding */
+     }
+
+     .logos-container {
+        gap: var(--spacing-md); /* Reduce gap */
+     }
+
+     .logos-container img {
+        height: 25px; /* Smaller logos */
+        max-width: 100px;
+     }
+
+     .search-container {
+        flex-direction: column; /* Stack search input and button */
+        max-width: 300px; /* Limit width */
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: var(--border-radius); /* Apply radius to all corners now */
+     }
+
+     .search-input, .search-btn {
+        border-radius: var(--border-radius); /* Apply radius to all corners */
+     }
+
+     .search-btn {
+         border-radius: var(--border-radius); /* Ensure border-radius is applied */
+     }
+}
+
+@media (max-width: 576px) { /* Small devices (phones) */
+    h1 { font-size: 2em; }
+    h2 { font-size: 1.8em; }
+    h3 { font-size: 1.4em; }
+    h4 { font-size: 1.2em; }
+
+    section {
+        padding: var(--spacing-md) 0; /* Further reduce section padding */
+    }
+
+    .search-container {
+         max-width: 100%; /* Use full width on very small screens */
+    }
+}
+
+.footer-section {
+    background-color: #212529;
+    color: #f8f9fa;
+    font-size: 0.9rem;
+}
+
+.footer-section a {
+    color: #f8f9fa;
+    text-decoration: none;
+}
+
+.footer-section a:hover {
+    text-decoration: underline;
+}
+
+.footer-section .nav-link {
+    padding: 0 10px;
+}
+
+.footer-section .fab {
+    transition: transform 0.3s ease;
+}
+
+.footer-section .fab:hover {
+    transform: scale(1.2);
+}

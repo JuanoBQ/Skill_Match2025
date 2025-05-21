@@ -73,10 +73,20 @@
 		]
 	},
 	"dependencies": {
+		"@stripe/react-stripe-js": "^3.7.0",
+		"@stripe/stripe-js": "^7.3.0",
+		"animate.css": "^4.1.1",
+		"axios": "^1.9.0",
+		"bootstrap": "^5.3.5",
 		"prop-types": "^15.6.1",
 		"react": "^16.8.4",
+		"react-bootstrap": "^2.10.9",
 		"react-dom": "^16.8.4",
+		"react-icons": "^5.5.0",
 		"react-polyfills": "0.0.1",
-		"react-router-dom": "^6.3.0"
+		"react-router-dom": "^6.3.0",
+		"react-select": "^5.10.1",
+		"react-toastify": "^8.2.0",
+		"sweetalert2": "^11.21.0"
 	}
 }
