@@ -37,6 +37,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 
 
+
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY, { link: false });
 
 
@@ -79,6 +80,7 @@ const Layout = () => {
                             <Route element={<DashboardProjects />} path="/DashboardProjects" />
                             <Route element={<Dashboard />} path="/Dashboard" />
                             <Route element={<EmployerForm />} path="/employerForm" />
+                            <Route element={<Historial />} path="/PaymentHistory" />
                             <Route
                                 path="/admin"
                                 element={store.role === "admin" ? <Admin /> : <Navigate to="/" replace />}
@@ -93,7 +95,8 @@ const Layout = () => {
                             <Route element={< Helpcenter />} path="/Help" />
                             <Route element={< About />} path="/About" />
                             <Route element={<Elements stripe={stripePromise} options={{ link: false }}><PaymentPage /></Elements>} path="/payment/:proposalId" />
-                            <Route element={<Historial />} path="/PaymentHistory" />
+                            
+
 
 
 

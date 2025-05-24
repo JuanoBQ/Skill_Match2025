@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from '../store/appContext';
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const MyUsersList = () => {
     const { store, actions } = useContext(Context);
@@ -13,23 +15,54 @@ const MyUsersList = () => {
             } catch (error) {
                 console.error("Error al cargar datos:", error);
             } finally {
-                setLoading(false); 
+                setLoading(false);
             }
         };
         loadData();
     }, []);
 
     const handleDeleteUser = async (userId) => {
-        const confirmed = window.confirm("¿Estás seguro de eliminar este usuario?");
-        if (!confirmed) return;
+        const confirmResult = await Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción eliminará al usuario de forma permanente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
+        });
 
-        const result = await actions.deleteUser(userId);
-        if (!result.success) {
-            alert("Error eliminando usuario: " + result.error);
-        } else {
-           
-            await actions.getUsers();
-            await actions.getProjects();
+        if (!confirmResult.isConfirmed) return;
+
+        try {
+            const result = await actions.deleteUser(userId);
+
+            if (result.success) {
+                await Swal.fire({
+                    icon: "success",
+                    title: "Usuario eliminado",
+                    text: "El usuario ha sido eliminado exitosamente.",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                await actions.getUsers();
+                await actions.getProjects();
+            } else {
+                await Swal.fire({
+                    icon: "error",
+                    title: "Error eliminando usuario",
+                    text: result.message || "Hubo un problema al eliminar el usuario.",
+                    confirmButtonText: "Ok"
+                });
+            }
+        } catch (error) {
+            await Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message,
+                confirmButtonText: "Ok"
+            });
         }
     };
 

@@ -72,8 +72,8 @@ export const Navbar = () => {
 
           <div className="navbar-nav navOptions col d-flex flex-row">
             <Link to={"/dashboard"} className="nav-link active ms-2 me-3 text-black">Dashboard</Link>
-            <Link to={"/About"} className="nav-link active ms-2 me-3 text-black">About</Link>
-            <Link to={"/Contact"} className="nav-link active ms-2 me-3 text-black">Contact</Link>
+            <Link to={"/About"} className="nav-link active ms-2 me-3 text-black">Acerca de Nosotros</Link>
+            <Link to={"/Contact"} className="nav-link active ms-2 me-3 text-black">Contacto</Link>
           </div>
 
           <form className="d-flex me-4" onSubmit={handleSearchSubmit}>
@@ -115,16 +115,16 @@ export const Navbar = () => {
                   <i className="fa-solid fa-user" style={{ color: "#ffffff" }}></i> Mi Perfil
                 </button>
                 <button onClick={handleLogout} className="btn btn-danger px-4 py-2">
-                  Logout
+                  Cerrar sesión
                 </button>
               </>
             ) : (
               <>
                 <Link to="/login">
-                  <button className="btn btn-dark px-4 py-2 me-2">Log in</button>
+                  <button className="btn btn-dark px-4 py-2 me-2">Iniciar sesión</button>
                 </Link>
                 <Link to="/register">
-                  <button className="btn btn-dark px-4 py-2">Sign up</button>
+                  <button className="btn btn-dark px-4 py-2">Registrarse</button>
                 </Link>
               </>
             )}
