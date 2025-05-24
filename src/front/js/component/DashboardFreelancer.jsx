@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 import undefinedImg from "./../../../front/img/User_Undefined.jpg";
 
 const DashboardFreelancer = () => {
@@ -45,36 +47,53 @@ const DashboardFreelancer = () => {
     );
 
     const handleAddContact = async (contactId) => {
+        const userId = localStorage.getItem("user_id");
+
+        // Evitar agregarse a uno mismo
+        if (parseInt(contactId) === parseInt(userId)) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'No puedes agregarte a ti mismo',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
         try {
-            const userId = localStorage.getItem("user_id");
-
-          
-            if (parseInt(contactId) === parseInt(userId)) {
-                alert("No puedes agregar tu propio perfil como contacto.");
-                return; 
-            }
-
             const result = await actions.addNewContact(contactId);
             if (result.success) {
-                alert("¡Conexión exitosa!");
+                await Swal.fire({
+                    icon: 'success',
+                    title: '¡Conexión exitosa!',
+                    confirmButtonText: 'Ok'
+                });
             } else {
-                alert(`Error: ${result.error || "Error desconocido"}`);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error al agregar contacto',
+                    text: result.error || 'Error desconocido',
+                    confirmButtonText: 'Ok'
+                });
             }
         } catch (error) {
             console.error("Error al agregar el contacto:", error);
-            alert("Hubo un error al intentar agregar el contacto. Intenta de nuevo más tarde.");
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error inesperado',
+                text: 'No se pudo conectar. Intenta de nuevo más tarde.',
+                confirmButtonText: 'Ok'
+            });
         }
     };
 
-
     return (
         <div className='container-fluid d-flex justify-content-center mt-5'>
-            {filteredProfiles.length > 0 ? (
-                <div>
-                    {filteredProfiles.map((profile) => (
-                        <div key={profile.user.id}>
-                            <div className="card mb-4 freelancer-card shadow-lg" style={{ borderRadius: '20px', overflow: 'hidden' }}>
-                                <div className="row no-gutters">
+            <div style={{ width: '100%', maxWidth: '900px' }}>
+                {filteredProfiles.length > 0 ? (
+                    filteredProfiles.map((profile) => (
+                        <div key={profile.user.id} className="mb-4">
+                            <div className="card freelancer-card shadow-lg" style={{ borderRadius: '20px', overflow: 'hidden' }}>
+                                <div className="row g-0">
                                     <div className="col-md-2 d-flex justify-content-center align-items-center p-3">
                                         <img
                                             src={profile.profile_picture || undefinedImg}
@@ -88,16 +107,13 @@ const DashboardFreelancer = () => {
                                             }}
                                         />
                                     </div>
-
                                     <div className="col-md-10">
                                         <div className="card-body p-4">
-                                            <h4 className="text-dark fs-5 fw-bold mb-2">{profile.user.first_name} {profile.user.last_name}</h4>
+                                            <h4 className="fs-5 fw-bold mb-2">{profile.user.first_name} {profile.user.last_name}</h4>
                                             <h5 className="text-muted mb-3">{profile.career}</h5>
-
-                                            <p className="card-text text-muted mb-3" style={{ height: '70px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            <p className="text-muted mb-3" style={{ height: '70px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                 {readMore(profile.bio)}
                                             </p>
-
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <button
                                                     className="btn btn-outline-primary px-4 py-2"
@@ -106,53 +122,46 @@ const DashboardFreelancer = () => {
                                                 >
                                                     Ver perfil
                                                 </button>
-                                                <div className="text-muted d-flex gap-3">
-                                                    <a href="#" className="card-link text-decoration-none">Mensaje</a>
-                                                    <a
-                                                        href="#"
-                                                        className="card-link text-decoration-none"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            handleAddContact(profile.user.id);
-                                                        }}
+                                                <div className="d-flex gap-3">
+                                                    <button className="btn btn-link text-decoration-none">Mensaje</button>
+                                                    <button
+                                                        className="btn btn-link text-decoration-none"
+                                                        onClick={() => handleAddContact(profile.user.id)}
                                                     >
                                                         Conectar
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div className="card-body p-4 bg-light">
                                     <div className="d-flex justify-content-between align-items-center mb-3" style={{ fontSize: '0.9rem' }}>
                                         <strong>Ubicación:</strong>
-                                        <span className="text-muted" style={{ fontWeight: '400' }}>{profile.location || "No especificada"}</span>
+                                        <span className="text-muted">{profile.location || "No especificada"}</span>
                                     </div>
-
-                                    <div className="gap-2 mb-3" style={{ fontSize: '0.9rem' }}>
+                                    <div className="mb-3" style={{ fontSize: '0.9rem' }}>
                                         <strong>Skills:</strong>
                                         {profile.skills?.length > 0 ? (
                                             profile.skills.map((skill, index) => (
                                                 <span key={index} className="badge bg-dark ms-2 rounded-pill">{skill.name}</span>
                                             ))
                                         ) : (
-                                            <span className="text-muted">No Skills</span>
+                                            <span className="text-muted ms-2">No Skills</span>
                                         )}
                                     </div>
-
-                                    <div className="d-flex justify-content-between align-items-center mb-3" style={{ fontSize: '0.9rem' }}>
+                                    <div className="d-flex justify-content-between align-items-center" style={{ fontSize: '0.9rem' }}>
                                         <strong>Rating:</strong>
-                                        <span className="text-muted" style={{ fontWeight: '400' }}>{profile.rating ? `⭐ ${profile.rating}` : "No Rating"}</span>
+                                        <span className="text-muted">{profile.rating ? `⭐ ${profile.rating}` : "No Rating"}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <div>No se encontraron perfiles</div>
-            )}
+                    ))
+                ) : (
+                    <div>No se encontraron perfiles</div>
+                )}
+            </div>
         </div>
     );
 };

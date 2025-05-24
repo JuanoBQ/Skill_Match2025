@@ -347,12 +347,14 @@ class Contact(db.Model):
 
     
 class Message(db.Model):
-    __tablename__ = 'messages'
+    __tablename__ = "messages"
+
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('profiles.id', ondelete='CASCADE'), nullable=False)
     recipient_id = db.Column(db.Integer, db.ForeignKey('profiles.id', ondelete='CASCADE'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
 
     sender = db.relationship('Profile', foreign_keys=[sender_id])
     recipient = db.relationship('Profile', foreign_keys=[recipient_id])

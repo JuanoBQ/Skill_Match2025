@@ -32,6 +32,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import ProjectDetails from "./component/ProjectDetails.jsx";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { Historial } from "./pages/historial.js";
 import "react-toastify/dist/ReactToastify.css";
 
 
@@ -92,7 +93,7 @@ const Layout = () => {
                             <Route element={< Helpcenter />} path="/Help" />
                             <Route element={< About />} path="/About" />
                             <Route element={<Elements stripe={stripePromise} options={{ link: false }}><PaymentPage /></Elements>} path="/payment/:proposalId" />
-
+                            <Route element={<Historial />} path="/PaymentHistory" />
 
 
 

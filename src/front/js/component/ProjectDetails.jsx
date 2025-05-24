@@ -2,6 +2,9 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Modal, Button } from "react-bootstrap";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
+
 
 const ProjectDetails = () => {
   const { store, actions } = useContext(Context);
@@ -17,7 +20,7 @@ const ProjectDetails = () => {
       try {
         const res = await fetch(`${process.env.BACKEND_URL}/api/projects/${id}`);
         const data = await res.json();
-
+        console.log(data)
         if (res.ok) {
           setProject(data);
         } else {
@@ -33,7 +36,12 @@ const ProjectDetails = () => {
 
   const handleApply = async () => {
     if (!store.isAuthenticated) {
-      alert("Debes estar logueado como freelancer.");
+      await Swal.fire({
+        icon: 'error',
+        title: 'Debes iniciar sesión',
+        text: 'Necesitas estar logueado como freelancer para aplicar a esta oferta.',
+        confirmButtonText: 'Ok'
+      });
       navigate("/login");
       return;
     }
@@ -48,9 +56,20 @@ const ProjectDetails = () => {
     if (res.success) {
       setProposalMessage("");
       setProposedBudget("");
-      setShowSuccessModal(true);
+      await Swal.fire({
+        icon: 'success',
+        title: '¡Solicitud Enviada!',
+        text: 'Has aplicado con éxito a esta oferta.',
+        confirmButtonText: 'Aceptar'
+      });
+      navigate(-1);
     } else {
-      alert("Error al aplicar: " + res.error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error al aplicar',
+        text: res.error || 'Ocurrió un error al enviar tu propuesta.',
+        confirmButtonText: 'Ok'
+      });
     }
   };
 
