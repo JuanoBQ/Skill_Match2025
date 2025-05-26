@@ -12,7 +12,7 @@ import logo from "./../../../../public/stripe-logo.png";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
-const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
+const BASE_URL = "https://cautious-space-guide-g4rq77pr75qpf9jwp-3001.app.github.dev/api";
 
 const PaymentPage = () => {
     const { proposalId } = useParams();
