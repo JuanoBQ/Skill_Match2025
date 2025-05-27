@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask import Flask, request, jsonify, url_for, send_from_directory, send_file
+from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
@@ -20,7 +20,8 @@ import stripe
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
-static_file_dir = os.path.join(os.path.dirname(__file__), '../dist/')
+static_file_dir = os.path.join(os.path.dirname(
+    os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
 
 CORS(app,
@@ -75,8 +76,7 @@ def handle_invalid_usage(error):
 def sitemap():
     if ENV == "development":
         return generate_sitemap(app)
-    return send_file(os.path.join(static_file_dir, 'index.html'))
-
+    return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
 
