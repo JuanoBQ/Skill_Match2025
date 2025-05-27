@@ -1,4 +1,4 @@
-const BASE_URL = "https://effective-enigma-7v59ppx5prxwfpv5w-3001.app.github.dev/api";
+const BASE_URL = "https://cautious-space-guide-g4rq77pr75qpf9jwp-3001.app.github.dev/api";
 
 
 const getState = ({ getStore, getActions, setStore }) => {
